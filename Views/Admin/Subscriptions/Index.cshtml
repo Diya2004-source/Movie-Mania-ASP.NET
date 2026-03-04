@@ -1,0 +1,46 @@
+﻿@model IEnumerable<MovieMania.Models.SubscriptionPlan>
+
+@{
+    ViewData["Title"] = "Subscription Plans";
+}
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Container for spacing -->
+<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <h2 class="mb-4">Subscription Plans</h2>
+
+    <p>
+        <a class="btn btn-primary" asp-action="Create">Add New Plan</a>
+    </p>
+
+    <table class="table table-bordered table-hover table-dark text-white">
+        <thead class="table-secondary text-dark">
+            <tr>
+                <th>Name</th>
+                <th>Price ($)</th>
+                <th>Duration (Days)</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plan in Model)
+            {
+                <tr>
+                    <td>@plan.Name</td>
+                    <td>@plan.Price</td>
+                    <td>@plan.DurationDays</td>
+                    <td>@plan.Status</td>
+                    <td>
+                        <a class="btn btn-info btn-sm text-white" asp-action="Details" asp-route-id="@plan.Id">Details</a>
+                        <a class="btn btn-warning btn-sm text-dark" asp-action="Edit" asp-route-id="@plan.Id">Edit</a>
+                        <a class="btn btn-danger btn-sm text-white" asp-action="Delete" asp-route-id="@plan.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

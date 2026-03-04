@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Panel - Movie Mania</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #0A0C0F;
+            color: white;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #111317;
+            position: fixed;
+            padding-top: 20px;
+        }
+
+            .sidebar a {
+                color: #cfcfcf;
+                text-decoration: none;
+                display: block;
+                padding: 12px 20px;
+                transition: 0.3s;
+            }
+
+                .sidebar a:hover,
+                .sidebar a.active {
+                    background-color: #1E1E1E;
+                    color: #4A80F0;
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 25px;
+        }
+
+        .topbar {
+            background-color: #111317;
+            padding: 15px 25px;
+            border-bottom: 1px solid #1E1E1E;
+        }
+
+        .card {
+            background-color: #1E1E1E !important;
+            border: none;
+            border-radius: 12px;
+        }
+
+        .btn-primary {
+            background-color: #4A80F0;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #3768d8;
+            }
+
+        .table {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h4 class="text-center text-white mb-4"> Admin Panel</h4>
+
+        <a asp-controller="AdminDashboard" asp-action="Index">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+
+        <a asp-controller="AdminMovies" asp-action="Index">
+            <i class="bi bi-film"></i> Movies
+        </a>
+
+        <a asp-controller="Users" asp-action="Index">
+            <i class="bi bi-people"></i> Users
+        </a>
+
+        <a asp-controller="Offers" asp-action="Index">
+            <i class="bi bi-tag"></i> Offers
+        </a>
+
+        <a asp-controller="SubscriptionPlans" asp-action="Index">
+            <i class="bi bi-card-checklist"></i> Subscription Plans
+        </a>
+
+        <a asp-controller="Payments" asp-action="Index">
+            <i class="bi bi-credit-card"></i> Payments
+        </a>
+
+        <hr class="text-secondary" />
+
+        <a asp-controller="Admin" asp-action="Logout">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+
+        <!-- Topbar -->
+        <div class="topbar d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Admin Dashboard</h5>
+
+            <div>
+                <span class="me-3">Welcome, Admin</span>
+                <i class="bi bi-person-circle fs-4"></i>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="mt-4">
+            @RenderBody()
+        </div>
+
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

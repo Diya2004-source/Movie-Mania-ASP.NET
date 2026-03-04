@@ -1,0 +1,122 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+
+    <h2 class="text-info mb-4 fw-bold">Admin Dashboard</h2>
+
+    <!-- Stats Cards -->
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h6>Total Movies</h6>
+                    <h3>@ViewBag.TotalMovies</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h6>Total Users</h6>
+                    <h3>@ViewBag.TotalUsers</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h6>Active Subscriptions</h6>
+                    <h3>@ViewBag.ActiveSubscriptions</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h6>Total Revenue</h6>
+                    <h3>₹ @ViewBag.TotalRevenue</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Movies Table -->
+    <div class="card mt-5 dashboard-table">
+        <div class="card-body">
+            <h5 class="text-info mb-3">Recent Movies</h5>
+
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Genre</th>
+                        <th>Release Year</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.RecentMovies != null)
+                    {
+                        foreach (var movie in ViewBag.RecentMovies)
+                        {
+                            <tr>
+                                <td>@movie.Title</td>
+                                <td>@movie.Genre</td>
+                                <td>@movie.ReleaseYear</td>
+                                <td>@movie.Duration mins</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    body {
+        background-color: #0A0C0F;
+    }
+
+    .dashboard-card {
+        background-color: #1E1E1E;
+        color: white;
+        border-radius: 15px;
+        transition: 0.3s;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(74, 128, 240, 0.3);
+        }
+
+        .dashboard-card h6 {
+            color: #aaa;
+        }
+
+        .dashboard-card h3 {
+            color: #4A80F0;
+            font-weight: bold;
+        }
+
+    .dashboard-table {
+        background-color: #1E1E1E;
+        border-radius: 15px;
+    }
+
+    .table-dark {
+        background-color: transparent;
+    }
+
+    .text-info {
+        color: #4A80F0 !important;
+    }
+</style>

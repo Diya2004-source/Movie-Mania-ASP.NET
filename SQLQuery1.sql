@@ -1,0 +1,3 @@
+﻿ALTER TABLE Movies ADD ReleaseYear INT;
+ALTER TABLE Movies ADD Rating DECIMAL(3,2) DEFAULT 0;
+ALTER TABLE Movies ADD Thumbnail NVARCHAR(500);

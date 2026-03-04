@@ -1,0 +1,18 @@
+﻿@model MovieMania.Models.Offer
+
+<div class="container mt-4">
+    <div class="card card-dark p-4 text-center">
+
+        <h3 class="text-danger">Delete Offer</h3>
+        <p>
+            Are you sure you want to delete
+            <strong>@Model.Title</strong>?
+        </p>
+
+        <form method="post">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="/Offers" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+
+    </div>
+</div>

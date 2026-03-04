@@ -1,0 +1,18 @@
+﻿@model MovieMania.Models.Payment
+
+<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <h2 class="mb-4">Delete Payment</h2>
+
+    <div class="card p-3 bg-dark text-white">
+        <p><strong>User:</strong> @Model.User?.Name ?? "Unknown"</p>
+        <p><strong>Amount:</strong> $@Model.Amount</p>
+        <p><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+        <p><strong>Payment Date:</strong> @Model.PaymentDate.ToString("dd MMM yyyy HH:mm")</p>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger mt-2">Delete</button>
+        <a asp-action="Index" class="btn btn-secondary mt-2">Cancel</a>
+    </form>
+</div>
