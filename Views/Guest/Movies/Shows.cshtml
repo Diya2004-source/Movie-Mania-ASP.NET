@@ -1,0 +1,105 @@
+﻿@{
+    ViewData["Title"] = "Shows";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h2 class="mb-4"> Popular Shows</h2>
+
+    <div class="row">
+
+        <!-- SHOW 1 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/put_your_head_on_my_shoulder.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Put your head on my shoulder</h5>
+                    <p class="card-text">Romance</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOW 2 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/tmkoc.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">TMKOC</h5>
+                    <p class="card-text">Comedy</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOW 3 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/khichdi.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Khichdi</h5>
+                    <p class="card-text">Comedy - Family</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOW 4 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/hostages.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Hostages</h5>
+                    <p class="card-text">Suspence</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+    .movie-card{
+        background:#1E1E1E;
+        border:none;
+        border-radius:10px;
+        transition:0.3s;
+    }
+
+    .movie-card:hover{
+        transform:scale(1.05);
+    }
+
+    .movie-card img{
+        height:300px;
+        object-fit:cover;
+    }
+
+</style>

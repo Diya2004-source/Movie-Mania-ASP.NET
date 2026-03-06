@@ -1,5 +1,71 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>MovieMania</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+        }
+
+        .navbar {
+            background-color: #000;
+        }
+
+        .movie-card img {
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .card {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+    </style>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="GuestHome" asp-action="Index">
+                MovieMania
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link"
+                   asp-controller="GuestMovies"
+                   asp-action="Movies">
+                    Movies
+                </a>
+
+                <a class="nav-link"
+                   asp-controller="GuestMovies"
+                   asp-action="Shows">
+                    Shows
+                </a>
+
+                <a class="nav-link"
+                   asp-controller="GuestMovies"
+                   asp-action="Anime">
+                    Anime
+                </a>
+                <a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a>
+                <a class="nav-link" asp-controller="Auth" asp-action="Register">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+</body>
+</html>

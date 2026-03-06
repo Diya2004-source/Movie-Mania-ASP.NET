@@ -1,0 +1,71 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+
+    <div class="card shadow-lg p-4 register-card">
+
+        <h2 class="text-center text-danger mb-4">Create Account</h2>
+
+        <form>
+
+            <div class="mb-3">
+                <label>Full Name</label>
+                <input type="text" class="form-control" placeholder="Enter Name">
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" class="form-control" placeholder="Enter Email">
+            </div>
+
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" class="form-control" placeholder="Enter Password">
+            </div>
+
+            <div class="mb-3">
+                <label>Confirm Password</label>
+                <input type="password" class="form-control" placeholder="Confirm Password">
+            </div>
+
+            <button class="btn btn-danger w-100">Register</button>
+
+            <p class="text-center mt-3">
+                Already have an account?
+                <a href="/Auth/Login" class="text-danger">Login</a>
+            </p>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+
+    body {
+        background: #0f0f0f;
+        color: white;
+    }
+
+    .register-card {
+        width: 450px;
+        background: #1a1a1a;
+        border-radius: 12px;
+    }
+
+    .form-control {
+        background: #2b2b2b;
+        border: none;
+        color: white;
+    }
+
+        .form-control:focus {
+            background: #2b2b2b;
+            color: white;
+            box-shadow: none;
+        }
+
+</style>

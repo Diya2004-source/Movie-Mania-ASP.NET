@@ -1,0 +1,212 @@
+﻿@model IEnumerable<MovieMania.Models.Movie>
+
+@{
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<style>
+
+    body {
+        background: #121212;
+        color: white;
+    }
+
+    /* HERO CAROUSEL */
+
+    .carousel-item img {
+        height: 450px;
+        object-fit: cover;
+        filter: brightness(70%);
+    }
+
+    .carousel-caption {
+        bottom: 120px;
+        text-align: left;
+    }
+
+    /* GENRE FILTER */
+
+    .genre-btn {
+        margin: 5px;
+    }
+
+    /* MOVIE CARD */
+
+    .movie-card {
+        background: #1e1e1e;
+        border: none;
+        transition: transform 0.3s;
+    }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-card img {
+            height: 300px;
+            object-fit: cover;
+        }
+
+    .movie-title {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+</style>
+
+
+<!-- ================= HERO CAROUSEL ================= -->
+
+<div id="movieCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+
+    <div class="carousel-inner">
+
+        @{
+            var first = true;
+        }
+
+        @foreach (var movie in Model.Take(3))
+        {
+            <div class="carousel-item @(first ? "active" : "")">
+
+                <img src="~/uploads/@movie.Thumbnail" class="d-block w-100">
+
+                <div class="carousel-caption">
+
+                    <h2>@movie.Title</h2>
+
+                    <p>@movie.Description</p>
+
+                    <a class="btn btn-danger"
+                       asp-controller="Auth"
+                       asp-action="Index">
+                        Watch Now
+                    </a>
+
+                </div>
+
+            </div>
+
+            first = false;
+        }
+
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#movieCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+
+    <button class="carousel-control-next" type="button" data-bs-target="#movieCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+
+</div>
+
+
+<!-- ================= SEARCH ================= -->
+
+<div class="row mb-4">
+
+    <div class="col-md-6">
+
+        <input type="text"
+               id="movieSearch"
+               class="form-control"
+               placeholder="Search Movies...">
+
+    </div>
+
+</div>
+
+
+<!-- ================= GENRE FILTER ================= -->
+
+<div class="mb-4">
+
+    <button class="btn btn-outline-light genre-btn" onclick="filterGenre('All')">All</button>
+    <button class="btn btn-outline-light genre-btn" onclick="filterGenre('Action')">Action</button>
+    <button class="btn btn-outline-light genre-btn" onclick="filterGenre('Comedy')">Comedy</button>
+    <button class="btn btn-outline-light genre-btn" onclick="filterGenre('Drama')">Drama</button>
+    <button class="btn btn-outline-light genre-btn" onclick="filterGenre('Horror')">Horror</button>
+
+</div>
+
+
+<!-- ================= MOVIE GRID ================= -->
+
+<div class="row" id="movieContainer">
+
+    @foreach (var movie in Model)
+    {
+
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 movie-item"
+             data-genre="@movie.Genre">
+
+            <div class="card movie-card text-white">
+
+                <img src="~/uploads/@movie.Thumbnail" class="card-img-top">
+
+                <div class="card-body">
+
+                    <div class="movie-title">@movie.Title</div>
+
+                    <p class="text-muted">@movie.Genre</p>
+
+                    <a class="btn btn-sm btn-danger"
+                       asp-controller="Auth"
+                       asp-action="Index">
+                        Login to Watch
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    }
+
+</div>
+
+
+<script>
+
+    /* SEARCH */
+
+    document.getElementById("movieSearch").addEventListener("keyup", function(){
+
+    let value = this.value.toLowerCase();
+
+    document.querySelectorAll(".movie-item").forEach(function(card){
+
+    let title = card.innerText.toLowerCase();
+
+    card.style.display = title.includes(value) ? "block" : "none";
+
+    });
+
+    });
+
+
+    /* GENRE FILTER */
+
+    function filterGenre(genre){
+
+    document.querySelectorAll(".movie-item").forEach(function(card){
+
+    if(genre === "All")
+    card.style.display = "block";
+
+    else if(card.dataset.genre === genre)
+    card.style.display = "block";
+
+    else
+    card.style.display = "none";
+
+    });
+
+    }
+
+</script>

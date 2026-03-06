@@ -1,0 +1,33 @@
+﻿@model MovieMania.Models.Movie
+
+@{
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+}
+
+<div class="row">
+
+    <div class="col-md-4">
+        <img src="~/uploads/@Model.Thumbnail" class="img-fluid">
+    </div>
+
+    <div class="col-md-8">
+
+        <h2>@Model.Title</h2>
+
+        <p>@Model.Description</p>
+
+        <p><b>Genre:</b> @Model.Genre</p>
+
+        <p><b>Release Year:</b> @Model.ReleaseYear</p>
+
+        <p><b>Duration:</b> @Model.Duration minutes</p>
+
+        <a asp-controller="Auth"
+           asp-action="Login"
+           class="btn btn-danger">
+            Login to Watch
+        </a>
+
+    </div>
+
+</div>

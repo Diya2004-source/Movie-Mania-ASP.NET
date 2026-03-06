@@ -1,0 +1,105 @@
+﻿@{
+    ViewData["Title"] = "Anime";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h2 class="mb-4">🍥 Popular Anime</h2>
+
+    <div class="row">
+
+        <!-- ANIME 1 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/chhota_bheem.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Chhota Bheem</h5>
+                    <p class="card-text">Action - Learning</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANIME 2 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/mash_and_bear.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Masha and Bear</h5>
+                    <p class="card-text">Fantasy</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANIME 3 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/paw_patrol.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Paw Patrol</h5>
+                    <p class="card-text">Action • Drama</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANIME 4 -->
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card">
+                <img src="~/images/movies/tom_jerry.jpg" class="card-img-top">
+
+                <div class="card-body">
+                    <h5 class="card-title">Tom and Jerry</h5>
+                    <p class="card-text">Comedy</p>
+
+                    <a class="btn btn-primary w-100"
+                       asp-controller="GuestPayment"
+                       asp-action="Pay">
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+    .movie-card {
+        background: #1E1E1E;
+        border: none;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-card img {
+            height: 300px;
+            object-fit: cover;
+        }
+
+</style>

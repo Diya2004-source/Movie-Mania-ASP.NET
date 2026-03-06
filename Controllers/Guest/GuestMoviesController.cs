@@ -4,9 +4,19 @@ namespace movie.Controllers.Guest
 {
     public class GuestMoviesController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Movies()
         {
-            return View();
+            return View("~/Views/Guest/Movies/Movies.cshtml");
+        }
+
+        public IActionResult Shows()
+        {
+            return View("~/Views/Guest/Movies/Shows.cshtml");
+        }
+
+        public IActionResult Anime()
+        {
+            return View("~/Views/Guest/Movies/Anime.cshtml");
         }
     }
 }

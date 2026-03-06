@@ -1,0 +1,44 @@
+﻿@model IEnumerable<MovieMania.Models.Movie>
+
+@{
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+}
+
+<h2>Search Movies</h2>
+
+<form method="get">
+
+    <input name="query"
+           class="form-control"
+           placeholder="Search movie...">
+
+    <button class="btn btn-primary mt-2">
+        Search
+    </button>
+
+</form>
+
+<hr>
+
+<div class="row">
+
+    @foreach (var movie in Model)
+    {
+        <div class="col-md-3">
+
+            <div class="card bg-dark text-white">
+
+                <img src="~/uploads/@movie.Thumbnail">
+
+                <div class="card-body">
+
+                    <h5>@movie.Title</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>

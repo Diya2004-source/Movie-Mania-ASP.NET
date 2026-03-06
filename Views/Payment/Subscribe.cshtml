@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Subscription";
+}
+
+<div class="container text-center mt-5">
+
+    <h2 class="mb-4">Scan & Pay</h2>
+
+    <div class="card mx-auto p-4" style="max-width:400px; background:#1E1E1E; border-radius:12px;">
+
+        <h5 class="mb-3">Premium Plan</h5>
+        <h3 class="text-info mb-4">₹199</h3>
+
+        <!-- QR IMAGE -->
+
+        <img src="~/images/payment/qr.jpg"
+             class="img-fluid mb-4"
+             style="border-radius:10px;" />
+
+        <p class="text-muted">
+            Scan this QR using any UPI app and complete payment.
+        </p>
+
+        <!-- PAYMENT DONE BUTTON -->
+
+        <a asp-controller="Payment"
+           asp-action="Success"
+           class="btn btn-success mt-3">
+
+            ✔ Payment Done
+
+        </a>
+
+    </div>
+
+</div>

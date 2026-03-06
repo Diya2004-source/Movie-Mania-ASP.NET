@@ -1,5 +1,173 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@* @model IEnumerable<MovieMania.Models.Movie>
+
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<h2>Trending Movies</h2>
+
+<div class="row">
+
+    @foreach (var movie in Model)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card movie-card bg-dark text-white">
+
+                <img src="~/uploads/@movie.Thumbnail" class="card-img-top">
+
+                <div class="card-body">
+
+                    <h5>@movie.Title</h5>
+
+                    <a asp-controller="GuestMovies"
+                       asp-action="Details"
+                       asp-route-id="@movie.Id"
+                       class="btn btn-primary btn-sm">
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    }
+
+</div> *@
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container-fluid px-4">
+
+    <!-- HERO CAROUSEL -->
+    <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner rounded">
+
+            <div class="carousel-item active">
+                <img src="~/images/movies/banner1.jpg" class="d-block w-100 banner-img">
+                <div class="carousel-caption text-start">
+                    <h1>Avatar</h1>
+                    <p>Experience the world of Pandora.</p>
+                    <button class="btn btn-primary">▶ Watch Now</button>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <img src="~/images/movies/banner2.jpg" class="d-block w-100 banner-img">
+                <div class="carousel-caption text-start">
+                    <h1>Batman</h1>
+                    <p>Gotham needs a hero.</p>
+                    <button class="btn btn-primary">▶ Watch Now</button>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <img src="~/images/movies/banner3.jpg" class="d-block w-100 banner-img">
+                <div class="carousel-caption text-start">
+                    <h1>Interstellar</h1>
+                    <p>Journey beyond the stars.</p>
+                    <button class="btn btn-primary">▶ Watch Now</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- TRENDING MOVIES -->
+    <h3 class="section-title"> Trending Movies</h3>
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/animal.jpg">
+                <div class="movie-info">
+                    <h6>Avatar</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/de_dana_dhan.jpg">
+                <div class="movie-info">
+                    <h6>Joker</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/conjuring.jpg">
+                <div class="movie-info">
+                    <h6>Batman</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/fast_furious_7.jpg">
+                <div class="movie-info">
+                    <h6>Interstellar</h6>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- TOP RATED -->
+    <h3 class="section-title mt-5"> Top Rated</h3>
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/mardaani_3.jpg">
+                <div class="movie-info">
+                    <h6>Inception</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/khichdi.jpg">
+                <div class="movie-info">
+                    <h6>Dark Knight</h6>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ANIME -->
+    <h3 class="section-title mt-5"> Anime</h3>
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/chhota_bheem.jpg">
+                <div class="movie-info">
+                    <h6>Naruto</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="movie-card">
+                <img src="~/images/movies/paw_patrol.jpg">
+                <div class="movie-info">
+                    <h6>Attack on Titan</h6>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -7,25 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="obj\Debug\" />
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Views\Admin\AdminAuth\" />
-    <Folder Include="Views\Guest\Movies\" />
-    <Folder Include="Views\Guest\Auth\" />
     <Folder Include="Views\User\Home\" />
     <Folder Include="Views\User\Movies\" />
     <Folder Include="Views\User\Payment\" />
     <Folder Include="Views\User\Profile\" />
     <Folder Include="Views\User\Wishlist\" />
     <Folder Include="Views\User\Subscription\" />
-    <Folder Include="wwwroot\images\movies\" />
     <Folder Include="wwwroot\images\users\" />
     <Folder Include="wwwroot\images\offers\" />
     <Folder Include="wwwroot\videos\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="obj\Debug\.gitignore" />
   </ItemGroup>
 
   <ItemGroup>
