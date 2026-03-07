@@ -1,90 +1,301 @@
-﻿<h2 class="mb-4">Movies</h2>
+﻿@* @{
+    ViewData["Title"] = "Movies";
+}
 
-<div class="row g-4">
+<style>
+    .movie-img {
+        height: 250px;
+        width: 100%;
+        object-fit: contain; /* prevents image cutting */
+        background: #000;
+    }
 
-    <!-- Movie 1 -->
-    <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="card movie-card h-100">
-            <img src="~/images/movies/gangubai.jpg" class="card-img-top">
+    .card {
+        height: 420px; /* equal card height */
+    }
 
-            <div class="card-body text-center">
-                <h5>Gangubai</h5>
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+</style>
 
-                <a asp-controller="Payment"
-                   asp-action="Subscribe"
-                   class="btn btn-primary w-100">
-                    ▶ Watch Now
-                </a>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">MovieMania 🎬</h2>
+
+    <div class="row">
+
+        <!-- Movie 1 -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <img src="~/images/movies/animal.jpg" class="card-img-top movie-img" alt="Animal">
+                <div class="card-body text-center">
+                    <div>
+                        <h5 class="card-title">Animal</h5>
+                        <p class="card-text">Action</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showQR()">Watch</button>
+                </div>
             </div>
         </div>
+
+        <!-- Movie 2 -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <img src="~/images/movies/gangubai.jpg" class="card-img-top movie-img" alt="Gangubai">
+                <div class="card-body text-center">
+                    <div>
+                        <h5 class="card-title">Gangubai</h5>
+                        <p class="card-text">Women Empowerment</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showQR()">Watch</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie 3 -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <img src="~/images/movies/mardaani_3.jpg" class="card-img-top movie-img" alt="Mardaani 3">
+                <div class="card-body text-center">
+                    <div>
+                        <h5 class="card-title">Mardaani 3</h5>
+                        <p class="card-text">Women Empowerment</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showQR()">Watch</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div> *@
+
+@{
+    ViewData["Title"] = "Movies";
+}
+
+<style>
+
+    body {
+        background: #0f172a;
+        font-family: Segoe UI;
+        color: white;
+    }
+
+    /* HERO BANNER */
+
+    .hero {
+        background: linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.8)),url('/images/movies/banner.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 320px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .hero h1 {
+            font-size: 40px;
+            font-weight: 700;
+        }
+
+    /* SEARCH BOX */
+
+    .search-box {
+        max-width: 400px;
+        margin: auto;
+        margin-top: 15px;
+    }
+
+    /* MOVIE IMAGE */
+
+    .movie-img {
+        height: 260px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    /* CARD STYLE */
+
+    .card {
+        background: #1e293b;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+    .card-body {
+        text-align: center;
+        color: white;
+    }
+
+    .card-text {
+        color: #cbd5f5;
+    }
+
+    /* RATING BADGE */
+
+    .rating {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #facc15;
+        color: black;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    /* WATCH BUTTON */
+
+    .watch-btn {
+        background: #e50914;
+        border: none;
+        width: 100%;
+        font-weight: 600;
+    }
+
+        .watch-btn:hover {
+            background: #ff1f2a;
+        }
+
+</style>
+
+<div class="container mt-4">
+
+    <!-- HERO SECTION -->
+
+    <div class="hero">
+
+        <div>
+
+            <h1> Welcome to MovieMania</h1>
+
+            <p>Watch your favourite movies instantly</p>
+
+            <div class="search-box">
+                <input type="text" class="form-control" placeholder="Search movies...">
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Movie 2 -->
-    <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="card movie-card h-100">
-            <img src="~/images/movies/hostages.jpg" class="card-img-top">
+    <div class="row g-4">
 
-            <div class="card-body text-center">
-                <h5>Hostages</h5>
+        <!-- Movie 1 -->
 
-                <a asp-controller="Payment"
-                   asp-action="Subscribe"
-                   class="btn btn-primary w-100">
-                    ▶ Watch Now
-                </a>
+        <div class="col-md-4">
+
+            <div class="card position-relative shadow">
+
+                <div class="rating">⭐ 8.5</div>
+
+                <img src="~/images/movies/animal.jpg" class="movie-img" alt="Animal">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">Animal</h5>
+
+                    <p class="card-text">Action Thriller</p>
+
+                    <button class="btn watch-btn" onclick="showQR()">Watch Now</button>
+
+                </div>
+
             </div>
+
         </div>
-    </div>
 
-    <!-- Movie 3 -->
-    <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="card movie-card h-100">
-            <img src="~/images/movies/animal.jpg" class="card-img-top">
+        <!-- Movie 2 -->
 
-            <div class="card-body text-center">
-                <h5>Animal</h5>
+        <div class="col-md-4">
 
-                <a asp-controller="Payment"
-                   asp-action="Subscribe"
-                   class="btn btn-primary w-100">
-                    ▶ Watch Now
-                </a>
+            <div class="card position-relative shadow">
+
+                <div class="rating">⭐ 8.2</div>
+
+                <img src="~/images/movies/gangubai.jpg" class="movie-img" alt="Gangubai">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">Gangubai</h5>
+
+                    <p class="card-text">Women Empowerment</p>
+
+                    <button class="btn watch-btn" onclick="showQR()">Watch Now</button>
+
+                </div>
+
             </div>
+
         </div>
-    </div>
 
-    <!-- Movie 4 -->
-    <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="card movie-card h-100">
-            <img src="~/images/movies/phir_hera_pheri.jpg" class="card-img-top">
+        <!-- Movie 3 -->
 
-            <div class="card-body text-center">
-                <h5>Phir Hera Pheri</h5>
+        <div class="col-md-4">
 
-                <a asp-controller="Payment"
-                   asp-action="Subscribe"
-                   class="btn btn-primary w-100">
-                    ▶ Watch Now
-                </a>
+            <div class="card position-relative shadow">
+
+                <div class="rating">⭐ 8.0</div>
+
+                <img src="~/images/movies/mardaani_3.jpg" class="movie-img" alt="Mardaani 3">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">Mardaani 3</h5>
+
+                    <p class="card-text">Crime Drama</p>
+
+                    <button class="btn watch-btn" onclick="showQR()">Watch Now</button>
+
+                </div>
+
             </div>
+
         </div>
-    </div>
 
-    <!-- Movie 5 -->
-    <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="card movie-card h-100">
-            <img src="~/images/movies/de_dana_dhan.jpg" class="card-img-top">
-
-            <div class="card-body text-center">
-                <h5>De Dana Dhan</h5>
-
-                <a asp-controller="Payment"
-                   asp-action="Subscribe"
-                   class="btn btn-primary w-100">
-                    ▶ Watch Now
-                </a>
-            </div>
-        </div>
     </div>
 
 </div>
+
+<!-- QR PAYMENT MODAL -->
+
+<div id="qrModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;">
+
+    <div style="background:white;width:350px;margin:8% auto;padding:25px;border-radius:12px;text-align:center;color:black;">
+
+        <h4>Scan QR to Watch</h4>
+
+        <img src="/images/payment/qr.jpg" width="220" />
+
+        <br><br>
+
+        <button class="btn btn-dark" onclick="closeQR()">Close</button>
+
+    </div>
+
+</div>
+
+<script>
+
+    function showQR(){
+    document.getElementById("qrModal").style.display="block";
+    }
+
+    function closeQR(){
+    document.getElementById("qrModal").style.display="none";
+    }
+
+</script>

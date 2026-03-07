@@ -32,12 +32,13 @@ namespace MovieMania.Controllers
         // POST: /Users/Create
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(User user)
+        public IActionResult Create(MovieMania.Models.User user)
         {
             if (ModelState.IsValid)
             {
                 _context.Users.Add(user);
                 _context.SaveChanges();
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -49,7 +50,9 @@ namespace MovieMania.Controllers
         public IActionResult Edit(int id)
         {
             var user = _context.Users.Find(id);
-            if (user == null) return NotFound();
+
+            if (user == null)
+                return NotFound();
 
             return View("/Views/Admin/Users/Edit.cshtml", user);
         }
@@ -57,14 +60,16 @@ namespace MovieMania.Controllers
         // POST: /Users/Edit/5
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, User user)
+        public IActionResult Edit(int id, MovieMania.Models.User user)
         {
-            if (id != user.Id) return NotFound();
+            if (id != user.Id)
+                return NotFound();
 
             if (ModelState.IsValid)
             {
                 _context.Users.Update(user);
                 _context.SaveChanges();
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -76,7 +81,9 @@ namespace MovieMania.Controllers
         public IActionResult Delete(int id)
         {
             var user = _context.Users.Find(id);
-            if (user == null) return NotFound();
+
+            if (user == null)
+                return NotFound();
 
             return View("/Views/Admin/Users/Delete.cshtml", user);
         }

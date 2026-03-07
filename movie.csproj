@@ -11,8 +11,6 @@
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Views\Admin\AdminAuth\" />
-    <Folder Include="Views\User\Home\" />
-    <Folder Include="Views\User\Movies\" />
     <Folder Include="Views\User\Payment\" />
     <Folder Include="Views\User\Profile\" />
     <Folder Include="Views\User\Wishlist\" />

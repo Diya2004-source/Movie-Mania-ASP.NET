@@ -8,6 +8,7 @@ namespace MovieMania.Models
     [Table("Users")]
     public class User
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -25,11 +26,15 @@ namespace MovieMania.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // ✅ Navigation Properties (ADD THESE BACK)
-        public ICollection<Wishlist> Wishlists { get; set; }
-        public ICollection<UserSubscription> Subscriptions { get; set; }
-        public ICollection<Payment> Payments { get; set; }
-        public ICollection<Referral> ReferralsMade { get; set; }
-        public ICollection<Referral> ReferralsReceived { get; set; }
+        // Navigation Properties
+        public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+
+        public virtual ICollection<UserSubscription> Subscriptions { get; set; } = new List<UserSubscription>();
+
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+        public virtual ICollection<Referral> ReferralsMade { get; set; } = new List<Referral>();
+
+        public virtual ICollection<Referral> ReferralsReceived { get; set; } = new List<Referral>();
     }
 }

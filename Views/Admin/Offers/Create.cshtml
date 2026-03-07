@@ -1,41 +1,101 @@
 ﻿@model MovieMania.Models.Offer
 
-<div class="container mt-4">
-    <div class="card card-dark p-4">
-        <h2>Create Offer</h2>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+
+    <div class="card card-dark p-4 shadow-lg">
+        <h2 class="mb-4 text-center text-light">Create Offer</h2>
 
         <form method="post">
 
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label>Title</label>
-                <input asp-for="Title" class="form-control" />
+                <label class="form-label text-light">Title</label>
+                <input asp-for="Title" class="form-control custom-input" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label>Description</label>
-                <textarea asp-for="Description" class="form-control"></textarea>
+                <label class="form-label text-light">Description</label>
+                <textarea asp-for="Description" class="form-control custom-input"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label>Discount %</label>
-                <input asp-for="DiscountPercentage" class="form-control" />
+                <label class="form-label text-light">Discount %</label>
+                <input asp-for="DiscountPercentage" class="form-control custom-input" />
             </div>
 
             <div class="mb-3">
-                <label>Expiry Date</label>
-                <input asp-for="ExpiryDate" type="date" class="form-control" />
+                <label class="form-label text-light">Expiry Date</label>
+                <input asp-for="ExpiryDate" type="date" class="form-control custom-input" />
             </div>
 
-            <button type="submit" class="btn btn-primary">Create</button>
-            <a href="/Offers" class="btn btn-secondary ms-2">Close</a>
+            <button type="submit" class="btn btn-success btn-custom">Create</button>
+            <a href="/Offers" class="btn btn-outline-light ms-2 btn-custom">Close</a>
 
         </form>
     </div>
+
 </div>
+
+<style>
+
+    body {
+        background: #0f0f0f;
+    }
+
+    /* Card Styling */
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 12px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    /* Input Styling */
+    .custom-input {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+        .custom-input:focus {
+            background: #2a2a2a;
+            color: white;
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13,110,253,0.4);
+        }
+
+    /* Button Styling */
+    .btn-custom {
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .btn-success {
+        background: #00c853;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background: #00e676;
+        }
+
+    .btn-outline-light:hover {
+        background: white;
+        color: black;
+    }
+
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

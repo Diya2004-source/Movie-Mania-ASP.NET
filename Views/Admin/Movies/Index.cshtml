@@ -1,97 +1,80 @@
-﻿@* @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
-}
-
-@model IEnumerable<MovieMania.Models.Movie>
-
-<h2>Admin Movies List</h2>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Thumbnail</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var movie in Model)
-        {
-            <tr>
-                <td>@movie.Title</td>
-                <td>@movie.Description</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(movie.Thumbnail))
-                    {
-                        <img src="~/uploads/@movie.Thumbnail" width="100" />
-                    }
-                </td>
-                <td>
-                    <a asp-controller="AdminMovies"
-                       asp-action="Edit"
-                       asp-route-id="@movie.Id"
-                       class="btn btn-primary btn-sm">
-                        Edit
-                    </a>
-
-                    <a asp-controller="AdminMovies"
-                       asp-action="Delete"
-                       asp-route-id="@movie.Id"
-                       class="btn btn-danger btn-sm">
-                        Delete
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<a asp-controller="AdminMovies"
-   asp-action="Create"
-   class="btn btn-success mt-3">
-    Add New Movie
-</a> *@
-
-
-@model IEnumerable<MovieMania.Models.Movie>
+﻿@model IEnumerable<MovieMania.Models.Movie>
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <h2 class="mb-4">Admin Movies List</h2>
+<div class="container mt-4 text-white">
 
-    <table class="table table-bordered table-hover table-dark text-white">
-        <thead class="table-secondary text-dark">
+    <h2 class="mb-4">Movies List</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <a asp-action="Create" class="btn btn-primary mb-3">
+        + Add New Movie
+    </a>
+
+    <table class="table table-dark table-striped table-bordered">
+
+        <thead>
             <tr>
-                <th>Title</th>
-                <th>Description</th>
                 <th>Thumbnail</th>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Year</th>
+                <th>Duration</th>
+                <th>Rating</th>
                 <th>Actions</th>
             </tr>
         </thead>
+
         <tbody>
+
             @foreach (var movie in Model)
             {
                 <tr>
-                    <td>@movie.Title</td>
-                    <td>@movie.Description</td>
+
                     <td>
                         @if (!string.IsNullOrEmpty(movie.Thumbnail))
                         {
-                            <img src="~/uploads/@movie.Thumbnail" width="100" />
+                            <img src="~/images/movies/@movie.Thumbnail"
+                                 width="100"
+                                 style="border-radius:8px;" />
                         }
                     </td>
+
+                    <td>@movie.Title</td>
+                    <td>@movie.Genre</td>
+                    <td>@movie.ReleaseYear</td>
+                    <td>@movie.Duration min</td>
+                    <td>@movie.Rating ⭐</td>
+
                     <td>
-                        <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm text-dark">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@movie.Id" class="btn btn-danger btn-sm text-white">Delete</a>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@movie.Id"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@movie.Id"
+                           class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+
                     </td>
+
                 </tr>
             }
+
         </tbody>
+
     </table>
 
-    <a asp-action="Create" class="btn btn-success mt-3">Add New Movie</a>
 </div>

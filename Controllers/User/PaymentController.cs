@@ -6,7 +6,7 @@ namespace movie.Controllers.User
     {
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Home", "User");
         }
     }
 }

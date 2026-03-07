@@ -1,6 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿//using Microsoft.AspNetCore.Mvc;
+//using MovieMania.Models;
+//using System.Linq;
 
-namespace movie.Controllers.Guest
+//namespace MovieMania.Controllers.Guest
+//{
+//    public class GuestMoviesController : Controller
+//    {
+//        private readonly ApplicationDbContext _context;
+
+//        public GuestMoviesController(ApplicationDbContext context)
+//        {
+//            _context = context;
+//        }
+
+//        // Movies Page
+//        public IActionResult Movies()
+//        {
+//            var movies = _context.Movies.ToList();
+//            return View("~/Views/Guest/Movies/Movies.cshtml", movies);
+//        }
+//    }
+//}
+
+using Microsoft.AspNetCore.Mvc;
+
+namespace MovieMania.Controllers
 {
     public class GuestMoviesController : Controller
     {
@@ -8,8 +32,7 @@ namespace movie.Controllers.Guest
         {
             return View("~/Views/Guest/Movies/Movies.cshtml");
         }
-
-        public IActionResult Shows()
+    public IActionResult Shows()
         {
             return View("~/Views/Guest/Movies/Shows.cshtml");
         }
@@ -19,4 +42,5 @@ namespace movie.Controllers.Guest
             return View("~/Views/Guest/Movies/Anime.cshtml");
         }
     }
+
 }
