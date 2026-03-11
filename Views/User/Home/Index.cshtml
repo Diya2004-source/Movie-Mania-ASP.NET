@@ -1,37 +1,226 @@
-﻿@model IEnumerable<MovieMania.Models.Movie>
+﻿<!-- Views/User/Home/Index.cshtml -->
+@model UserDashboardViewModel
 
-<h2>User Dashboard</h2>
+@{
+    ViewData["Title"] = "MOVIE MANIA";
+    Layout = "_UserLayout";
+}
 
-<div class="row">
+<!-- Hero Section - Featured Movie -->
+<section class="hero-section position-relative">
+    <div class="hero-backdrop" style="background-image: url('https://image.tmdb.org/t/p/original/featured-movie-bg.jpg');">
+        <div class="container hero-content">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="badge-group mb-3">
+                        <span class="premium-badge">PREMIUM</span>
+                        <span class="rating-badge">
+                            <i class="fas fa-star text-warning"></i> 9.8 Rating
+                        </span>
+                    </div>
 
-    @foreach (var movie in Model)
-    {
-        <div class="col-md-3 mb-4">
+                    <h1 class="hero-title">INTERSTELLAR DREAMS</h1>
 
-            <div class="card bg-dark text-white">
+                    <div class="movie-meta mb-3">
+                        <span class="meta-item">2024</span>
+                        <span class="meta-item">Sci-Fi, Adventure</span>
+                        <span class="meta-item">2h 15m</span>
+                        <span class="meta-item">4K ULTRA HD</span>
+                    </div>
 
-                <img src="~/images/movies/@movie.Thumbnail"
-                     class="card-img-top"
-                     style="height:250px; object-fit:cover;">
+                    <p class="hero-description">
+                        In a distant future where memories are a tradable commodity, a daring explorer
+                        must navigate the neon-lit corridors of a forgotten space colony to recover a
+                        lost dream that could rewrite human history. Every shadow hides a secret, and
+                        every light pulse reveals a path to salvation or destruction.
+                    </p>
 
-                <div class="card-body">
-
-                    <h5>@movie.Title</h5>
-
-                    <p>@movie.Genre</p>
-
-                    <a asp-controller="Movies"
-                       asp-action="Watch"
-                       asp-route-id="@movie.Id"
-                       class="btn btn-danger">
-                        Watch
-                    </a>
-
+                    <div class="hero-actions">
+                        <a href="#" class="btn btn-danger btn-lg me-3">
+                            <i class="fas fa-play"></i> Watch Now
+                        </a>
+                        <button class="btn btn-outline-light btn-lg add-wishlist" data-movieid="1">
+                            <i class="fas fa-heart"></i> Wishlist
+                        </button>
+                    </div>
                 </div>
-
             </div>
-
         </div>
-    }
+    </div>
+</section>
 
-</div>
+<!-- Top Cast Section -->
+<section class="cast-section py-5">
+    <div class="container">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">TOP CAST</h2>
+            <a href="#" class="view-all">View all <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="row cast-grid">
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="cast-card">
+                    <div class="cast-image">
+                        <img src="https://via.placeholder.com/150x150" alt="Alex Rivers">
+                    </div>
+                    <div class="cast-info">
+                        <h6>Alex Rivers</h6>
+                        <small>AS JAX KAELEN</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="cast-card">
+                    <div class="cast-image">
+                        <img src="https://via.placeholder.com/150x150" alt="Elena Thorne">
+                    </div>
+                    <div class="cast-info">
+                        <h6>Elena Thorne</h6>
+                        <small>AS DR. NOVA</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="cast-card">
+                    <div class="cast-image">
+                        <img src="https://via.placeholder.com/150x150" alt="Marcus Chen">
+                    </div>
+                    <div class="cast-info">
+                        <h6>Marcus Chen</h6>
+                        <small>AS THE GUARDIAN</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="cast-card">
+                    <div class="cast-image">
+                        <img src="https://via.placeholder.com/150x150" alt="Sarah Vince">
+                    </div>
+                    <div class="cast-info">
+                        <h6>Sarah Vince</h6>
+                        <small>AS LVRA 7</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="cast-card">
+                    <div class="cast-image">
+                        <img src="https://via.placeholder.com/150x150" alt="Tom Hardy">
+                    </div>
+                    <div class="cast-info">
+                        <h6>Tom Hardy</h6>
+                        <small>AS COMMANDER COLE</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="cast-card">
+                    <div class="cast-image">
+                        <img src="https://via.placeholder.com/150x150" alt="Jade Quinn">
+                    </div>
+                    <div class="cast-info">
+                        <h6>Jade Quinn</h6>
+                        <small>AS ECHO</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recommended For You Section -->
+<section class="recommended-section py-5">
+    <div class="container">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">RECOMMENDED FOR YOU</h2>
+            <a href="#" class="view-all">View all <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="row recommended-grid">
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://via.placeholder.com/200x300" alt="Void Horizon">
+                        <div class="movie-overlay">
+                            <button class="btn btn-sm btn-danger">Watch Now</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h6>Void Horizon</h6>
+                        <small>SCI-FI • 2023</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://via.placeholder.com/200x300" alt="Cyber City 2099">
+                        <div class="movie-overlay">
+                            <button class="btn btn-sm btn-danger">Watch Now</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h6>Cyber City 2099</h6>
+                        <small>CYBERPUNK • 2024</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://via.placeholder.com/200x300" alt="Beyond the Rift">
+                        <div class="movie-overlay">
+                            <button class="btn btn-sm btn-danger">Watch Now</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h6>Beyond the Rift</h6>
+                        <small>ADVENTURE • 2022</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://via.placeholder.com/200x300" alt="Gravity's End">
+                        <div class="movie-overlay">
+                            <button class="btn btn-sm btn-danger">Watch Now</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h6>Gravity's End</h6>
+                        <small>DRAMA • 2024</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://via.placeholder.com/200x300" alt="Shadow Protocol">
+                        <div class="movie-overlay">
+                            <button class="btn btn-sm btn-danger">Watch Now</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h6>Shadow Protocol</h6>
+                        <small>THRILLER • 2023</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-6 mb-3">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://via.placeholder.com/200x300" alt="Last Frontier">
+                        <div class="movie-overlay">
+                            <button class="btn btn-sm btn-danger">Watch Now</button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h6>Last Frontier</h6>
+                        <small>WESTERN • 2023</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -6,106 +6,64 @@
 }
 
 <div class="container mt-5">
-
     <div class="card card-dark p-4 shadow-lg">
-
         <h2 class="text-center text-light mb-4">Create Subscription Plan</h2>
 
         <form asp-action="Create" method="post">
-
             <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="mb-3">
                 <label asp-for="Name" class="form-label text-light"></label>
                 <input asp-for="Name" class="form-control custom-input" />
-                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Price" class="form-label text-light"></label>
                 <input asp-for="Price" class="form-control custom-input" />
-                <span asp-validation-for="Price" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="DurationDays" class="form-label text-light"></label>
-                <input asp-for="DurationDays" class="form-control custom-input" />
-                <span asp-validation-for="DurationDays" class="text-danger"></span>
+                <label asp-for="DurationInDays" class="form-label text-light"></label>  <!-- Fixed -->
+                <input asp-for="DurationInDays" class="form-control custom-input" />
             </div>
 
             <div class="mb-3">
-                <label asp-for="Status" class="form-label text-light"></label>
-                <select asp-for="Status" class="form-control custom-input">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                <label asp-for="MaxScreens" class="form-label text-light"></label>
+                <input asp-for="MaxScreens" class="form-control custom-input" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="VideoQuality" class="form-label text-light"></label>
+                <select asp-for="VideoQuality" class="form-control custom-input">
+                    <option value="SD">SD</option>
+                    <option value="HD">HD</option>
+                    <option value="Full HD">Full HD</option>
+                    <option value="4K">4K</option>
                 </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DisplayOrder" class="form-label text-light"></label>
+                <input asp-for="DisplayOrder" class="form-control custom-input" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label text-light"></label>
+                <textarea asp-for="Description" class="form-control custom-input" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="IsActive" class="form-check-input" checked />  <!-- Fixed -->
+                <label asp-for="IsActive" class="form-check-label text-light">Active</label>
             </div>
 
             <div class="text-center mt-3">
                 <button type="submit" class="btn btn-success btn-custom">Create</button>
                 <a asp-action="Index" class="btn btn-outline-light btn-custom ms-2">Back</a>
             </div>
-
         </form>
-
     </div>
-
 </div>
-
-<style>
-
-    body {
-        background: #0f0f0f;
-    }
-
-    /* Card */
-    .card-dark {
-        background: #1c1c1c;
-        border: none;
-        border-radius: 12px;
-        max-width: 600px;
-        margin: auto;
-    }
-
-    /* Inputs */
-    .custom-input {
-        background: #2a2a2a;
-        border: 1px solid #444;
-        color: white;
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-        .custom-input:focus {
-            background: #2a2a2a;
-            color: white;
-            border-color: #0d6efd;
-            box-shadow: 0 0 8px rgba(13,110,253,0.4);
-        }
-
-    /* Buttons */
-    .btn-custom {
-        padding: 8px 20px;
-        border-radius: 8px;
-        transition: 0.3s;
-    }
-
-    .btn-success {
-        background: #00c853;
-        border: none;
-    }
-
-        .btn-success:hover {
-            background: #00e676;
-        }
-
-    .btn-outline-light:hover {
-        background: white;
-        color: black;
-    }
-
-</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

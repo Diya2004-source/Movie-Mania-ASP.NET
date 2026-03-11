@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using movie.Models;
 using MovieMania.Models;
 using System.Linq;
 

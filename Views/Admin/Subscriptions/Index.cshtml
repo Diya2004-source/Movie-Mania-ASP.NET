@@ -1,43 +1,86 @@
-﻿@model IEnumerable<MovieMania.Models.SubscriptionPlan>
+@model IEnumerable<MovieMania.Models.SubscriptionPlan>
 
 @{
     ViewData["Title"] = "Subscription Plans";
-}
-
-@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<!-- Container for spacing -->
-<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <h2 class="mb-4">Subscription Plans</h2>
-
-    <p>
-        <a class="btn btn-primary" asp-action="Create">Add New Plan</a>
-    </p>
+<div class="container mt-4 text-white">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-crown me-2 text-warning"></i>Subscription Plans
+        </h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add New Plan
+        </a>
+    </div>
 
     <table class="table table-bordered table-hover table-dark text-white">
         <thead class="table-secondary text-dark">
             <tr>
                 <th>Name</th>
                 <th>Price ($)</th>
-                <th>Duration (Days)</th>
+                <th>Duration</th>
+                <th>Quality</th>
+                <th>Screens</th>
                 <th>Status</th>
+                <th>Order</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var plan in Model)
+            @foreach (var plan in Model.OrderBy(p => p.DisplayOrder))
             {
                 <tr>
-                    <td>@plan.Name</td>
-                    <td>@plan.Price</td>
-                    <td>@plan.DurationDays</td>
-                    <td>@plan.Status</td>
+                    <td class="fw-bold">@plan.Name</td>
+                    <td class="text-success fw-bold">$@plan.Price.ToString("N2")</td>
+                    <td>@plan.DurationInDays days</td>
                     <td>
-                        <a class="btn btn-info btn-sm text-white" asp-action="Details" asp-route-id="@plan.Id">Details</a>
-                        <a class="btn btn-warning btn-sm text-dark" asp-action="Edit" asp-route-id="@plan.Id">Edit</a>
-                        <a class="btn btn-danger btn-sm text-white" asp-action="Delete" asp-route-id="@plan.Id">Delete</a>
+                        @if (plan.VideoQuality == "4K")
+                        {
+                            <span class="badge bg-danger">4K</span>
+                        }
+                        else if (plan.VideoQuality == "Full HD")
+                        {
+                            <span class="badge bg-info">1080p</span>
+                        }
+                        else
+                        {
+                            <span>@plan.VideoQuality</span>
+                        }
+                        else if (plan.VideoQuality == "Full HD")
+                        {
+                            <span class="badge bg-info">1080p</span>
+                        }
+                        else
+                        {
+                            <span>@plan.VideoQuality</span>
+                        }
+                    </td>
+                    <td class="text-center">@plan.MaxScreens</td>
+                    <td>
+                        @if (plan.VideoQuality == "4K")
+                        {
+                            <span class="badge bg-danger">4K</span>
+                        }
+                        else if (plan.VideoQuality == "Full HD")
+                        {
+                            <span class="badge bg-info">1080p</span>
+                        }
+                        else
+                        {
+                            <span>@plan.VideoQuality</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td class="text-center">@plan.DisplayOrder</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@plan.Id" class="btn btn-info btn-sm text-white">Details</a>
+                        <a asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@plan.Id" class="btn btn-danger btn-sm text-white">Delete</a>
                     </td>
                 </tr>
             }

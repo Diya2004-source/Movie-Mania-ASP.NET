@@ -78,7 +78,7 @@ namespace MovieMania.Controllers.Admin
             {
                 Id = 1,
                 UserId = 1,
-                User = new MovieMania.Models.User { Id = 1, Name = "John Doe" },
+                User = new MovieMania.Models.AppUser { Id = 1, Name = "John Doe" },
                 Amount = 49.99m,
                 PaymentMethod = "Credit Card",
                 PaymentDate = DateTime.Now.AddDays(-5)
@@ -87,7 +87,7 @@ namespace MovieMania.Controllers.Admin
             {
                 Id = 2,
                 UserId = 2,
-                User = new MovieMania.Models.User { Id = 2, Name = "Jane Smith" },
+                User = new MovieMania.Models.AppUser { Id = 2, Name = "Jane Smith" },
                 Amount = 19.99m,
                 PaymentMethod = "PayPal",
                 PaymentDate = DateTime.Now.AddDays(-2)
@@ -96,7 +96,7 @@ namespace MovieMania.Controllers.Admin
             {
                 Id = 3,
                 UserId = 1,
-                User = new MovieMania.Models.User { Id = 1, Name = "John Doe" },
+                User = new MovieMania.Models.AppUser { Id = 1, Name = "John Doe" },
                 Amount = 9.99m,
                 PaymentMethod = "Credit Card",
                 PaymentDate = DateTime.Now

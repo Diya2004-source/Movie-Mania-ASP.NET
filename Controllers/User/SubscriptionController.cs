@@ -1,12 +1,90 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Controllers/User/SubscriptionController.cs
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MovieMania.Models;
+using MovieMania.ViewModels;
+using System.Security.Claims;
 
-namespace movie.Controllers.User
+namespace MovieMania.Controllers.User
 {
+    [Authorize(Roles = "user")]
     public class SubscriptionController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _context;
+
+        public SubscriptionController(ApplicationDbContext context)
         {
-            return View();
+            _context = context;
+        }
+
+        // GET: User/Subscription/Plans
+        public async Task<IActionResult> Plans()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var plans = await _context.SubscriptionPlans
+                .Where(sp => sp.IsActive)  // Now this works
+                .OrderBy(sp => sp.Price)
+                .ToListAsync();
+
+            var currentSubscription = await _context.UserSubscriptions
+                .Include(us => us.SubscriptionPlan)
+                .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Active");
+
+            ViewBag.CurrentSubscription = currentSubscription;
+
+            return View(plans);
+        }
+
+        // POST: User/Subscription/Cancel
+        [HttpPost]
+        public async Task<IActionResult> Cancel()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var subscription = await _context.UserSubscriptions
+                .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Active");
+
+            if (subscription == null)
+            {
+                return Json(new { success = false, message = "No active subscription found" });
+            }
+
+            subscription.Status = "Cancelled";
+            subscription.EndDate = DateTime.Now;
+            subscription.CancelledAt = DateTime.Now;  // Now this works
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                message = "Subscription cancelled successfully",
+                endDate = subscription.EndDate.ToString("MMM dd, yyyy")
+            });
+        }
+
+        // POST: User/Subscription/Reactivate
+        [HttpPost]
+        public async Task<IActionResult> Reactivate()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var subscription = await _context.UserSubscriptions
+                .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Cancelled");
+
+            if (subscription == null)
+            {
+                return Json(new { success = false, message = "No cancelled subscription found" });
+            }
+
+            subscription.Status = "Active";
+            subscription.ReactivatedAt = DateTime.Now;  // Now this works
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Subscription reactivated successfully" });
         }
     }
 }

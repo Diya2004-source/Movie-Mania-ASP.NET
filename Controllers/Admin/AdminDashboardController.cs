@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
 
 namespace MovieMania.Controllers.Admin
@@ -12,21 +13,22 @@ namespace MovieMania.Controllers.Admin
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            ViewBag.TotalMovies = _context.Movies.Count();
-            ViewBag.TotalUsers = _context.Users.Count();
+            // Use async methods for better performance
+            ViewBag.TotalMovies = await _context.Movies.CountAsync();
+            ViewBag.TotalUsers = await _context.Users.CountAsync();
 
-            ViewBag.ActiveSubscriptions =
-                _context.UserSubscriptions.Count(s => s.EndDate >= DateTime.Now);
+            ViewBag.ActiveSubscriptions = await _context.UserSubscriptions
+                .CountAsync(s => s.EndDate >= DateTime.Now);
 
-            ViewBag.TotalRevenue =
-                _context.Payments.Sum(p => (decimal?)p.Amount) ?? 0;
+            ViewBag.TotalRevenue = await _context.Payments
+                .SumAsync(p => (decimal?)p.Amount) ?? 0;
 
-            ViewBag.RecentMovies = _context.Movies
+            ViewBag.RecentMovies = await _context.Movies
                 .OrderByDescending(m => m.CreatedAt)
                 .Take(5)
-                .ToList();
+                .ToListAsync();
 
             return View("~/Views/Admin/Dashboard/Index.cshtml");
         }

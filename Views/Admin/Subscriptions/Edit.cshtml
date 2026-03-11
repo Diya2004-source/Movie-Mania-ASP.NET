@@ -1,6 +1,7 @@
 ﻿@model MovieMania.Models.SubscriptionPlan
 
 @{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Edit Subscription Plan";
 }
 
@@ -12,28 +13,46 @@
     <div class="form-group">
         <label asp-for="Name"></label>
         <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="Price"></label>
         <input asp-for="Price" class="form-control" />
-        <span asp-validation-for="Price" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="DurationDays"></label>
-        <input asp-for="DurationDays" class="form-control" />
-        <span asp-validation-for="DurationDays" class="text-danger"></span>
+        <label asp-for="DurationInDays"></label>  <!-- Fixed -->
+        <input asp-for="DurationInDays" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label asp-for="Status"></label>
-        <select asp-for="Status" class="form-control">
-            <option value="active" selected="@Model.Status == " active"">Active</option>
-            <option value="inactive" selected="@Model.Status == " inactive"">Inactive</option>
+        <label asp-for="MaxScreens"></label>
+        <input asp-for="MaxScreens" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="VideoQuality"></label>
+        <select asp-for="VideoQuality" class="form-control">
+            <option value="SD">SD</option>
+            <option value="HD">HD</option>
+            <option value="Full HD">Full HD</option>
+            <option value="4K">4K</option>
         </select>
-        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DisplayOrder"></label>
+        <input asp-for="DisplayOrder" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="form-group form-check">
+        <input asp-for="IsActive" class="form-check-input" />  <!-- Fixed -->
+        <label asp-for="IsActive" class="form-check-label">Active</label>
     </div>
 
     <button type="submit" class="btn btn-success mt-2">Update</button>

@@ -1,45 +1,163 @@
-﻿@model MovieMania.Models.User
+﻿@model MovieMania.Models.AppUser
 
-<h2>Edit User</h2>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Edit User";
+}
 
-<form asp-action="Edit" method="post">
+<div class="container mt-5">
+    <div class="card card-dark p-4 shadow-lg">
+        <h2 class="mb-4 text-center text-light">
+            <i class="fas fa-user-edit me-2 text-warning"></i>Edit User
+        </h2>
 
-    <input type="hidden" asp-for="Id" />
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="Password" />
+            <input type="hidden" asp-for="TotalReferrals" />
+            <input type="hidden" asp-for="RewardPoints" />
 
-    <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="form-group">
-        <label>Full Name</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Name" class="form-label text-light"></label>
+                    <input asp-for="Name" class="form-control custom-input" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label text-light"></label>
+                    <input asp-for="Email" class="form-control custom-input" type="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Role" class="form-label text-light"></label>
+                    <select asp-for="Role" class="form-control custom-input">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ReferralCode" class="form-label text-light"></label>
+                    <input asp-for="ReferralCode" class="form-control custom-input" />
+                    <span asp-validation-for="ReferralCode" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ProfilePictureUrl" class="form-label text-light"></label>
+                    <input asp-for="ProfilePictureUrl" class="form-control custom-input" />
+                    <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="LastLoginAt" class="form-label text-light"></label>
+                    <input asp-for="LastLoginAt" class="form-control custom-input" type="datetime-local" />
+                    <span asp-validation-for="LastLoginAt" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label text-light">Active</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="info-box p-3" style="background: #2a2a2a; border-radius: 8px;">
+                        <small class="text-muted d-block">Total Referrals</small>
+                        <span class="text-light fw-bold">@Model.TotalReferrals</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="info-box p-3" style="background: #2a2a2a; border-radius: 8px;">
+                        <small class="text-muted d-block">Reward Points</small>
+                        <span class="text-light fw-bold">@Model.RewardPoints</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <button type="submit" class="btn btn-warning btn-custom px-5">
+                    <i class="fas fa-save me-2"></i>Update User
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light ms-2 btn-custom px-4">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="form-group mt-2">
-        <label>Email</label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+<style>
+    body {
+        background: #0f0f0f;
+    }
 
-    <div class="form-group mt-2">
-        <label>Password</label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 12px;
+        max-width: 800px;
+        margin: auto;
+    }
 
-    <div class="form-group mt-2">
-        <label>Role</label>
-        <select asp-for="Role" class="form-control">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-        </select>
-    </div>
+    .custom-input {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 8px;
+        padding: 10px;
+    }
 
-    <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Update</button>   
-        <a asp-action="Index" class="btn btn-secondary">Close</a>
-    </div>
+        .custom-input:focus {
+            background: #2a2a2a;
+            color: white;
+            border-color: #ffc107;
+            box-shadow: 0 0 8px rgba(255,193,7,0.4);
+        }
 
-</form>
+    .btn-custom {
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        border: none;
+        color: #000;
+    }
+
+        .btn-warning:hover {
+            background: #ffca2c;
+            transform: translateY(-2px);
+        }
+
+    .btn-outline-light:hover {
+        background: white;
+        color: black;
+        transform: translateY(-2px);
+    }
+
+    .info-box {
+        background: #2a2a2a;
+        border-radius: 8px;
+        text-align: center;
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -1,70 +1,99 @@
-﻿@model MovieMania.Models.User
+﻿@model MovieMania.Models.AppUser
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Create User";
 }
 
 <div class="container mt-5">
-
     <div class="card card-dark p-4 shadow-lg">
-        <h2 class="mb-4 text-center text-light">Create User</h2>
+        <h2 class="mb-4 text-center text-light">
+            <i class="fas fa-user-plus me-2 text-success"></i>Create New User
+        </h2>
 
-        <form method="post">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Name" class="form-label text-light"></label>
+                    <input asp-for="Name" class="form-control custom-input" placeholder="Enter full name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label text-light">Name</label>
-                <input asp-for="Name" class="form-control custom-input" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label text-light"></label>
+                    <input asp-for="Email" class="form-control custom-input" type="email" placeholder="user@example.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label text-light">Email</label>
-                <input asp-for="Email" class="form-control custom-input" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Password" class="form-label text-light"></label>
+                    <input asp-for="Password" type="password" class="form-control custom-input" placeholder="********" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Role" class="form-label text-light"></label>
+                    <select asp-for="Role" class="form-control custom-input">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label text-light">Password</label>
-                <input asp-for="Password" type="password" class="form-control custom-input" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ReferralCode" class="form-label text-light"></label>
+                    <input asp-for="ReferralCode" class="form-control custom-input" placeholder="Auto-generated if empty" />
+                    <span asp-validation-for="ReferralCode" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ProfilePictureUrl" class="form-label text-light"></label>
+                    <input asp-for="ProfilePictureUrl" class="form-control custom-input" placeholder="https://example.com/avatar.jpg" />
+                    <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label text-light">Role</label>
-                <select asp-for="Role" class="form-control custom-input">
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" checked />
+                        <label asp-for="IsActive" class="form-check-label text-light">Active</label>
+                    </div>
+                </div>
             </div>
 
-            <div class="mt-3 text-center">
-                <button type="submit" class="btn btn-success btn-custom">Create</button>
-                <a href="/Users" class="btn btn-outline-light ms-2 btn-custom">Close</a>
+            <div class="mt-4 text-center">
+                <button type="submit" class="btn btn-success btn-custom px-5">
+                    <i class="fas fa-save me-2"></i>Create User
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light ms-2 btn-custom px-4">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
             </div>
 
         </form>
     </div>
-
 </div>
 
 <style>
-
     body {
         background: #0f0f0f;
     }
 
-    /* Card */
     .card-dark {
         background: #1c1c1c;
         border: none;
         border-radius: 12px;
-        max-width: 600px;
+        max-width: 800px;
         margin: auto;
     }
 
-    /* Inputs */
     .custom-input {
         background: #2a2a2a;
         border: 1px solid #444;
@@ -80,9 +109,12 @@
             box-shadow: 0 0 8px rgba(13,110,253,0.4);
         }
 
-    /* Buttons */
+        .custom-input::placeholder {
+            color: #888;
+        }
+
     .btn-custom {
-        padding: 8px 20px;
+        padding: 10px 20px;
         border-radius: 8px;
         transition: 0.3s;
     }
@@ -94,13 +126,19 @@
 
         .btn-success:hover {
             background: #00e676;
+            transform: translateY(-2px);
         }
 
     .btn-outline-light:hover {
         background: white;
         color: black;
+        transform: translateY(-2px);
     }
 
+    .form-check-input:checked {
+        background-color: #00c853;
+        border-color: #00c853;
+    }
 </style>
 
 @section Scripts {

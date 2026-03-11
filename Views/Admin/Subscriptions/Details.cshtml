@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Subscription Plan Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <h2>Subscription Plan Details</h2>
@@ -9,8 +10,11 @@
 <div class="card p-3">
     <p><strong>Name:</strong> @Model.Name</p>
     <p><strong>Price:</strong> $@Model.Price</p>
-    <p><strong>Duration:</strong> @Model.DurationDays days</p>
-    <p><strong>Status:</strong> @Model.Status</p>
+    <p><strong>Duration:</strong> @Model.DurationInDays days</p>  <!-- Fixed -->
+    <p><strong>Max Screens:</strong> @Model.MaxScreens</p>
+    <p><strong>Video Quality:</strong> @Model.VideoQuality</p>
+    <p><strong>Status:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>  <!-- Fixed -->
+    <p><strong>Description:</strong> @Model.Description</p>
 </div>
 
 <a asp-action="Index" class="btn btn-secondary mt-2">Back</a>

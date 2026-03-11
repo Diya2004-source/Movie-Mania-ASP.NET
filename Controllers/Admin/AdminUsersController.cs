@@ -32,7 +32,7 @@ namespace MovieMania.Controllers
         // POST: /Users/Create
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(MovieMania.Models.User user)
+        public IActionResult Create(MovieMania.Models.AppUser user)
         {
             if (ModelState.IsValid)
             {
@@ -60,7 +60,7 @@ namespace MovieMania.Controllers
         // POST: /Users/Edit/5
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, MovieMania.Models.User user)
+        public IActionResult Edit(int id, MovieMania.Models.AppUser user)
         {
             if (id != user.Id)
                 return NotFound();

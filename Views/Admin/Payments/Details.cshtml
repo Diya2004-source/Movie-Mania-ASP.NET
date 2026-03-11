@@ -1,14 +1,190 @@
 ﻿@model MovieMania.Models.Payment
 
-<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <h2 class="mb-4">Payment Details</h2>
+@{
+    ViewData["Title"] = "Payment Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
 
-    <div class="card p-3 bg-dark text-white">
-        <p><strong>User:</strong> @Model.User?.Name ?? "Unknown"</p>
-        <p><strong>Amount:</strong> $@Model.Amount</p>
-        <p><strong>Payment Method:</strong> @Model.PaymentMethod</p>
-        <p><strong>Payment Date:</strong> @Model.PaymentDate.ToString("dd MMM yyyy HH:mm")</p>
+<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-receipt me-2"></i>Payment Details
+        </h2>
+        <span class="badge @(Model.Status == "Completed" ? "bg-success" : Model.Status == "Pending" ? "bg-warning" : "bg-secondary") p-3">
+            @Model.Status
+        </span>
     </div>
 
-    <a asp-action="Index" class="btn btn-secondary mt-2">Back</a>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>User Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Name:</th>
+                            <td class="fw-bold">@(Model.User?.Name ?? "Unknown")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Email:</th>
+                            <td>@(Model.User?.Email ?? "N/A")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">User ID:</th>
+                            <td>#@Model.UserId</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 140px;">Amount:</th>
+                            <td class="fw-bold text-success fs-5">$@Model.Amount.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Payment Method:</th>
+                            <td>
+                                @if (Model.PaymentMethod == "Card")
+                                {
+                                    <span><i class="fas fa-credit-card me-1"></i>Card</span>
+                                }
+                                else if (Model.PaymentMethod == "UPI")
+                                {
+                                    <span><i class="fas fa-mobile-alt me-1"></i>UPI</span>
+                                }
+                                else if (Model.PaymentMethod == "NetBanking")
+                                {
+                                    <span><i class="fas fa-university me-1"></i>NetBanking</span>
+                                }
+                                else
+                                {
+                                    <span>@Model.PaymentMethod</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Transaction ID:</th>
+                            <td><code>@(Model.TransactionId ?? "N/A")</code></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Payment Date:</th>
+                            <td>@Model.PaymentDate.ToString("dd MMMM yyyy HH:mm:ss")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Subscription Details</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.SubscriptionPlan != null)
+                    {
+                        <table class="table table-dark table-borderless">
+                            <tr>
+                                <th class="text-muted" style="width: 120px;">Plan:</th>
+                                <td class="fw-bold">@Model.SubscriptionPlan.Name</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Duration:</th>
+                                <td>@Model.SubscriptionPlan.DurationInDays days</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Quality:</th>
+                                <td>@Model.SubscriptionPlan.VideoQuality</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Max Screens:</th>
+                                <td>@Model.SubscriptionPlan.MaxScreens</td>
+                            </tr>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No subscription plan associated</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Additional Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Payment ID:</th>
+                            <td>#@Model.Id</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Status:</th>
+                            <td>
+                                @if (Model.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">Completed</span>
+                                }
+                                else if (Model.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning">Pending</span>
+                                }
+                                else if (Model.Status == "Failed")
+                                {
+                                    <span class="badge bg-danger">Failed</span>
+                                }
+                                else if (Model.Status == "Refunded")
+                                {
+                                    <span class="badge bg-secondary">Refunded</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Payment Details:</th>
+                            <td>
+                                @if (!string.IsNullOrEmpty(Model.PaymentDetails))
+                                {
+                                    <pre class="text-muted small">@Model.PaymentDetails</pre>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No additional details</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+        @if (Model.Status == "Completed" && Model.PaymentDate.AddDays(7) >= DateTime.Now)
+        {
+            <a asp-action="Refund" asp-route-id="@Model.Id" class="btn btn-warning ms-2">
+                <i class="fas fa-undo-alt me-1"></i>Process Refund
+            </a>
+        }
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger ms-2">
+            <i class="fas fa-trash me-1"></i>Delete
+        </a>
+    </div>
 </div>

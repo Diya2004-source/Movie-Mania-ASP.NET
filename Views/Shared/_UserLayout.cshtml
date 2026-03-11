@@ -1,5 +1,224 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿<!-- Views/Shared/_UserLayout.cshtml -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MOVIE MANIA</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/user-style.css" asp-append-version="true" />
+</head>
+<body class="dark-theme">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home", new { area = "User" })">
+                <span class="brand-text">MOVIE<span class="text-danger">MANIA</span></span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")"
+                           href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "Movies" ? "active" : "")"
+                           href="@Url.Action("Movies", "Home")">
+                            <i class="fas fa-film"></i> Movies
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "Shows" ? "active" : "")"
+                           href="@Url.Action("Shows", "Home")">
+                            <i class="fas fa-tv"></i> TV Shows
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Wishlist" ? "active" : "")"
+                           href="@Url.Action("Index", "Wishlist")">
+                            <i class="fas fa-heart"></i> My List
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Categories", "Home")">
+                            <i class="fas fa-th-large"></i> Categories
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="navbar-nav ms-auto">
+                    <!-- Search -->
+                    <div class="nav-item dropdown search-dropdown">
+                        <a class="nav-link" href="#" id="searchDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-search"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end search-dropdown-menu">
+                            <form class="px-3 py-2" action="@Url.Action("Movies", "Home")" method="get">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="search"
+                                           placeholder="Search movies, actors, or directors...">
+                                    <button class="btn btn-danger" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge bg-danger">3</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">
+                                <h6 class="mb-0">Notifications</h6>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-gift text-warning"></i>
+                                <div class="notification-content">
+                                    <small><strong>New Episode Available</strong></small>
+                                    <small class="text-muted">The Mandalorian S3E8</small>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-tag text-info"></i>
+                                <div class="notification-content">
+                                    <small><strong>Limited Offer!</strong></small>
+                                    <small class="text-muted">50% off on annual plan</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span>@User.Identity.Name</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Index", "Profile")">
+                                    <i class="fas fa-id-card"></i> Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Referral", "Profile")">
+                                    <i class="fas fa-gift"></i> Referral Program
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Subscription", "Profile")">
+                                    <i class="fas fa-crown"></i> Premium
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Settings", "Profile")">
+                                    <i class="fas fa-cog"></i> Settings
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5 class="brand-text">MOVIE<span class="text-danger">MANIA</span></h5>
+                    <p class="text-muted small">Your ultimate destination for unlimited entertainment. Stream thousands of movies and TV shows in stunning 4K quality.</p>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">About Us</a></li>
+                        <li><a href="#" class="text-muted">Contact</a></li>
+                        <li><a href="#" class="text-muted">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h6>Legal</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">Privacy Policy</a></li>
+                        <li><a href="#" class="text-muted">Terms of Service</a></li>
+                        <li><a href="#" class="text-muted">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Connect With Us</h6>
+                    <div class="social-links">
+                        <a href="#" class="text-muted me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="text-center">
+                <small class="text-muted">© @DateTime.Now.Year Movie Mania OTT Platform. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/user-script.js" asp-append-version="true"></script>
+
+    <script>
+        function logout() {
+            $.post('@Url.Action("Logout", "Auth", new { area = "" })', function() {
+                window.location.href = '@Url.Action("Index", "Home", new { area = "Guest" })';
+            });
+        }
+
+        // Update wishlist count
+        function updateWishlistCount() {
+            $.get('@Url.Action("GetWishlistCount", "Wishlist")', function(count) {
+                $('.wishlist-count').text(count);
+            });
+        }
+
+        $(document).ready(function() {
+            updateWishlistCount();
+
+            // Add active class to current nav
+            var currentUrl = window.location.pathname;
+            $('.navbar-nav .nav-link').each(function() {
+                if ($(this).attr('href') === currentUrl) {
+                    $(this).addClass('active');
+                }
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

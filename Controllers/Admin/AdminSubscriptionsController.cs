@@ -1,108 +1,156 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 
 namespace MovieMania.Controllers.Admin
 {
-    [Route("SubscriptionPlans")]
     public class AdminSubscriptionsController : Controller
     {
-        private static List<SubscriptionPlan> _plans = new List<SubscriptionPlan>
-        {
-            new SubscriptionPlan { Id = 1, Name = "Basic", Price = 9.99m, DurationDays = 30 },
-            new SubscriptionPlan { Id = 2, Name = "Standard", Price = 19.99m, DurationDays = 90 },
-            new SubscriptionPlan { Id = 3, Name = "Premium", Price = 49.99m, DurationDays = 365 }
-        };
+        private readonly ApplicationDbContext _context;
 
-        private readonly string viewFolder = "~/Views/Admin/Subscriptions/";
-
-        // GET: /SubscriptionPlans
-        [HttpGet("")]
-        public IActionResult Index()
+        public AdminSubscriptionsController(ApplicationDbContext context)
         {
-            return View(viewFolder + "Index.cshtml", _plans);
+            _context = context;
         }
 
-        // GET: /SubscriptionPlans/Details/5
-        [HttpGet("Details/{id}")]
-        public IActionResult Details(int id)
+        // GET: AdminSubscriptions
+        public async Task<IActionResult> Index()
         {
-            var plan = _plans.FirstOrDefault(p => p.Id == id);
-            if (plan == null) return NotFound();
-            return View(viewFolder + "Details.cshtml", plan);
+            var plans = await _context.SubscriptionPlans
+                .OrderBy(p => p.DisplayOrder)
+                .ToListAsync();
+            return View(plans);
         }
 
-        // GET: /SubscriptionPlans/Create
-        [HttpGet("Create")]
+        // GET: AdminSubscriptions/Create
         public IActionResult Create()
         {
-            return View(viewFolder + "Create.cshtml");
+            return View();
         }
 
-        // POST: /SubscriptionPlans/Create
-        [HttpPost("Create")]
+        // POST: AdminSubscriptions/Create
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreatePost(SubscriptionPlan plan)
+        public async Task<IActionResult> Create(SubscriptionPlan plan)
         {
             if (ModelState.IsValid)
             {
-                plan.Id = _plans.Any() ? _plans.Max(p => p.Id) + 1 : 1;
-                _plans.Add(plan);
+                plan.CreatedAt = DateTime.Now;
+                _context.Add(plan);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Subscription plan created successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            return View(viewFolder + "Create.cshtml", plan);
+            return View(plan);
         }
 
-        // GET: /SubscriptionPlans/Edit/5
-        [HttpGet("Edit/{id}")]
-        public IActionResult Edit(int id)
+        // GET: AdminSubscriptions/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            var plan = _plans.FirstOrDefault(p => p.Id == id);
-            if (plan == null) return NotFound();
-            return View(viewFolder + "Edit.cshtml", plan);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var plan = await _context.SubscriptionPlans.FindAsync(id);
+            if (plan == null)
+            {
+                return NotFound();
+            }
+            return View(plan);
         }
 
-        // POST: /SubscriptionPlans/Edit/5
-        [HttpPost("Edit/{id}")]
+        // POST: AdminSubscriptions/Edit/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditPost(int id, SubscriptionPlan plan)
+        public async Task<IActionResult> Edit(int id, SubscriptionPlan plan)
         {
-            if (id != plan.Id) return BadRequest();
+            if (id != plan.Id)
+            {
+                return NotFound();
+            }
 
             if (ModelState.IsValid)
             {
-                var existing = _plans.FirstOrDefault(p => p.Id == id);
-                if (existing == null) return NotFound();
-
-                existing.Name = plan.Name;
-                existing.Price = plan.Price;
-                existing.DurationDays = plan.DurationDays;
-                existing.Status = plan.Status;
-
+                try
+                {
+                    plan.UpdatedAt = DateTime.Now;
+                    _context.Update(plan);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Subscription plan updated successfully!";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!SubscriptionPlanExists(plan.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(viewFolder + "Edit.cshtml", plan);
+            return View(plan);
         }
 
-        // GET: /SubscriptionPlans/Delete/5
-        [HttpGet("Delete/{id}")]
-        public IActionResult Delete(int id)
+        // GET: AdminSubscriptions/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            var plan = _plans.FirstOrDefault(p => p.Id == id);
-            if (plan == null) return NotFound();
-            return View(viewFolder + "Delete.cshtml", plan);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var plan = await _context.SubscriptionPlans
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (plan == null)
+            {
+                return NotFound();
+            }
+
+            return View(plan);
         }
 
-        // POST: /SubscriptionPlans/Delete/5
-        [HttpPost("Delete/{id}")]
+        // POST: AdminSubscriptions/Delete/5
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var plan = _plans.FirstOrDefault(p => p.Id == id);
-            if (plan != null) _plans.Remove(plan);
-
+            var plan = await _context.SubscriptionPlans.FindAsync(id);
+            if (plan != null)
+            {
+                _context.SubscriptionPlans.Remove(plan);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Subscription plan deleted successfully!";
+            }
             return RedirectToAction(nameof(Index));
+        }
+
+        private bool SubscriptionPlanExists(int id)
+        {
+            return _context.SubscriptionPlans.Any(e => e.Id == id);
+        }
+
+        // GET: AdminSubscriptions/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var plan = await _context.SubscriptionPlans
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (plan == null)
+            {
+                return NotFound();
+            }
+
+            return View(plan);
         }
     }
 }

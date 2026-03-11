@@ -1,12 +1,16 @@
-﻿@model IEnumerable<MovieMania.Models.Movie>
+@model IEnumerable<MovieMania.Models.Movie>
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container mt-4 text-white">
-
-    <h2 class="mb-4">Movies List</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Movies List</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            + Add New Movie
+        </a>
+    </div>
 
     @if (TempData["Success"] != null)
     {
@@ -15,12 +19,7 @@
         </div>
     }
 
-    <a asp-action="Create" class="btn btn-primary mb-3">
-        + Add New Movie
-    </a>
-
     <table class="table table-dark table-striped table-bordered">
-
         <thead>
             <tr>
                 <th>Thumbnail</th>
@@ -32,49 +31,27 @@
                 <th>Actions</th>
             </tr>
         </thead>
-
         <tbody>
-
             @foreach (var movie in Model)
             {
                 <tr>
-
                     <td>
-                        @if (!string.IsNullOrEmpty(movie.Thumbnail))
-                        {
-                            <img src="~/images/movies/@movie.Thumbnail"
-                                 width="100"
-                                 style="border-radius:8px;" />
-                        }
+                        @if (!string.IsNullOrEmpty(movie.ThumbnailUrl))
+        {
+            <img src="@movie.ThumbnailUrl" width="100" style="border-radius:8px;" />
+        }
                     </td>
-
                     <td>@movie.Title</td>
                     <td>@movie.Genre</td>
                     <td>@movie.ReleaseYear</td>
                     <td>@movie.Duration min</td>
-                    <td>@movie.Rating ⭐</td>
-
+                    <td>@movie.Rating ?</td>
                     <td>
-
-                        <a asp-action="Edit"
-                           asp-route-id="@movie.Id"
-                           class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
-
-                        <a asp-action="Delete"
-                           asp-route-id="@movie.Id"
-                           class="btn btn-danger btn-sm">
-                            Delete
-                        </a>
-
+                        <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@movie.Id" class="btn btn-danger btn-sm">Delete</a>
                     </td>
-
                 </tr>
             }
-
         </tbody>
-
     </table>
-
 </div>

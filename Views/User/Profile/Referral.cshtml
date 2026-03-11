@@ -1,0 +1,191 @@
+﻿<!-- Views/User/Profile/Referral.cshtml -->
+@model ReferralViewModel
+
+@{
+    ViewData["Title"] = "REFERRAL PROGRAM";
+    Layout = "_UserLayout";
+}
+
+<div class="referral-page container py-5">
+    <!-- Hero Section -->
+    <div class="referral-hero text-center mb-5">
+        <h1 class="display-4 mb-3">🎁 Referral Program</h1>
+        <h2 class="h3 text-danger">Invite your squad, watch for free</h2>
+        <p class="lead text-muted">
+            Share the magic of Movie Mania with your friends and unlock premium
+            4K subscription credits for every successful referral.
+        </p>
+        <a href="#how-it-works" class="btn btn-outline-danger btn-lg mt-3">
+            <i class="fas fa-info-circle"></i> How it works
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Referral Code -->
+        <div class="col-lg-6 mb-4">
+            <div class="referral-card">
+                <h4 class="card-title">Your Unique Referral Code</h4>
+                <p class="text-muted">Share this code with your friends to give them 50% off their first month.</p>
+
+                <div class="referral-code-box">
+                    <div class="code">MOVIEMANIA-50</div>
+                    <button class="btn btn-danger copy-code" onclick="copyReferralCode()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+
+                <!-- Goal Progress -->
+                <div class="goal-progress mt-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Goal Progress</span>
+                        <span class="text-danger">75%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" style="width: 75%"></div>
+                    </div>
+                </div>
+
+                <!-- Invite via Email -->
+                <div class="invite-email mt-4">
+                    <h5>Invite via Email</h5>
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="friend@email.com" id="inviteEmail">
+                        <button class="btn btn-danger" onclick="sendInvite()">
+                            <i class="fas fa-paper-plane"></i> Send Invite
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Stats -->
+        <div class="col-lg-6 mb-4">
+            <div class="stats-card">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <h3 class="text-danger">42</h3>
+                            <p class="text-muted">Total Friends Invited</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <h3 class="text-danger">12,450</h3>
+                            <p class="text-muted">Reward Points Earned</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <h3 class="text-danger">28</h3>
+                            <p class="text-muted">Active Referrals</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewards Section -->
+    <div class="rewards-section mt-5">
+        <h3 class="text-center mb-4">Upcoming Rewards</h3>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="reward-card claimed">
+                    <div class="reward-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h5>5 Referrals</h5>
+                    <p>1 Week 4K Pass</p>
+                    <span class="badge bg-success">CLAIMED</span>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="reward-card ready">
+                    <div class="reward-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h5>10 Referrals</h5>
+                    <p>1 Month Premium</p>
+                    <span class="badge bg-warning">READY</span>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="reward-card locked">
+                    <div class="reward-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h5>25 Referrals</h5>
+                    <p>Exclusive Early Access</p>
+                    <span class="badge bg-secondary">LOCKED</span>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="reward-card locked">
+                    <div class="reward-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h5>50 Referrals</h5>
+                    <p>Lifetime Basic Membership</p>
+                    <span class="badge bg-secondary">LOCKED</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral History -->
+    <div class="referral-history mt-5">
+        <h4>Recent Referrals</h4>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>Friend</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Reward</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>john.doe@email.com</td>
+                        <td>Mar 1, 2026</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                        <td>50 Points</td>
+                    </tr>
+                    <tr>
+                        <td>jane.smith@email.com</td>
+                        <td>Feb 28, 2026</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                        <td>50 Points</td>
+                    </tr>
+                    <tr>
+                        <td>bob.wilson@email.com</td>
+                        <td>Feb 25, 2026</td>
+                        <td><span class="badge bg-warning">Pending</span></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyReferralCode() {
+            navigator.clipboard.writeText('MOVIEMANIA-50');
+            showToast('Referral code copied!', 'success');
+        }
+
+        function sendInvite() {
+            var email = $('#inviteEmail').val();
+            if (email) {
+                $.post('@Url.Action("SendReferralInvite")', { email: email })
+                    .done(function() {
+                        showToast('Invitation sent successfully!', 'success');
+                        $('#inviteEmail').val('');
+                    });
+            }
+        }
+    </script>
+}

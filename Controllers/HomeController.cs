@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using movie.Models;
+using MovieMania.Models;
+using MovieMania.ViewModels;  // Added for ErrorViewModel
 
-namespace movie.Controllers
+namespace MovieMania.Controllers  // Fixed namespace
 {
     public class HomeController : Controller
     {

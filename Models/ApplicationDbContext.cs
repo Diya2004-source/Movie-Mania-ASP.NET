@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using movie.Models;
+﻿// Models/ApplicationDbContext.cs
+using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
 
 namespace MovieMania.Models
@@ -11,22 +11,48 @@ namespace MovieMania.Models
         {
         }
 
+        // Change DbSet<User> to DbSet<AppUser>
+        public DbSet<AppUser> Users { get; set; }  // This is the key change
+
         public DbSet<Movie> Movies { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<Referral> Referrals { get; set; }
+        public DbSet<Genre> Genres { get; set; }
+        public DbSet<Show> Shows { get; set; }
+        public DbSet<Episode> Episodes { get; set; }
+        public DbSet<MovieReview> MovieReviews { get; set; }
+        public DbSet<ShowReview> ShowReviews { get; set; }
+        public DbSet<EpisodeComment> EpisodeComments { get; set; }
+        public DbSet<WishlistShow> WishlistShows { get; set; }
+        public DbSet<UserActivity> UserActivities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ============================
-            // Referral Configuration
-            // ============================
+            // Update all relationships to use AppUser
+            modelBuilder.Entity<Wishlist>()
+                .HasOne(w => w.User)
+                .WithMany(u => u.Wishlists)
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserSubscription>()
+                .HasOne(us => us.User)
+                .WithMany(u => u.Subscriptions)
+                .HasForeignKey(us => us.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Payments)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Referral>()
                 .HasOne(r => r.Referrer)
                 .WithMany(u => u.ReferralsMade)
@@ -39,59 +65,7 @@ namespace MovieMania.Models
                 .HasForeignKey(r => r.ReferredUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ============================
-            // Wishlist Configuration
-            // ============================
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.User)
-                .WithMany(u => u.Wishlists)
-                .HasForeignKey(w => w.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.Movie)
-                .WithMany()
-                .HasForeignKey(w => w.MovieId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // ============================
-            // UserSubscription Configuration
-            // ============================
-            modelBuilder.Entity<UserSubscription>()
-                .HasOne(us => us.User)
-                .WithMany(u => u.Subscriptions)
-                .HasForeignKey(us => us.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<UserSubscription>()
-                .HasOne(us => us.SubscriptionPlan)
-                .WithMany()
-                .HasForeignKey(us => us.SubscriptionPlanId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // ============================
-            // Payment Configuration
-            // ============================
-            modelBuilder.Entity<Payment>()
-                .HasOne(p => p.User)
-                .WithMany(u => u.Payments)
-                .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // ============================
-            // Decimal Precision (Important)
-            // ============================
-            modelBuilder.Entity<Payment>()
-                .Property(p => p.Amount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<SubscriptionPlan>()
-                .Property(s => s.Price)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Referral>()
-                .Property(r => r.RewardAmount)
-                .HasColumnType("decimal(18,2)");
+            // Add other configurations...
         }
     }
 }

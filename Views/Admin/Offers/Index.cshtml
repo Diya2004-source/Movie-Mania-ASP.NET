@@ -1,7 +1,6 @@
-﻿
-@model IEnumerable<MovieMania.Models.Offer>
+﻿@model IEnumerable<MovieMania.Models.Offer>
 
-    @{
+@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -9,17 +8,39 @@
     <div class="card card-dark p-4">
 
         <div class="d-flex justify-content-between mb-3">
-            <h2>Offers Management</h2>
-            <a href="/Offers/Create" class="btn btn-primary">+ Create Offer</a>
+            <h2 class="text-light">Offers Management</h2>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Offer
+            </a>
         </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
 
         <table class="table table-dark-custom table-hover">
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Discount %</th>
-                    <th>Expiry</th>
-                    <th width="180">Actions</th>
+                    <th>Code</th>
+                    <th>Discount</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Uses</th>
+                    <th width="200">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,19 +49,129 @@
                     <tr>
                         <td>@offer.Title</td>
                         <td>
+                            @if (!string.IsNullOrEmpty(offer.OfferCode))
+                            {
+                                <span class="badge bg-secondary">@offer.OfferCode</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
                             <span class="badge bg-success">
-                                @offer.DiscountPercentage %
+                                @offer.DiscountPercentage%
                             </span>
                         </td>
-                        <td>@offer.ExpiryDate.ToString("dd MMM yyyy")</td>
+                        <td>@offer.StartDate.ToString("dd MMM yyyy")</td>
+                        <td>@offer.EndDate.ToString("dd MMM yyyy")</td>
                         <td>
-                            <a href="/Offers/Edit/@offer.Id" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="/Offers/Delete/@offer.Id" class="btn btn-sm btn-danger">Delete</a>
+                            @if (offer.IsActive && offer.EndDate >= DateTime.Now)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else if (!offer.IsActive)
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Expired</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @offer.CurrentUses / @(offer.MaxUses?.ToString() ?? "∞")
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@offer.Id"
+                               class="btn btn-sm btn-warning" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@offer.Id"
+                               class="btn btn-sm btn-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            @if (!offer.IsActive || offer.EndDate < DateTime.Now)
+                            {
+                                <a asp-action="Activate" asp-route-id="@offer.Id"
+                                   class="btn btn-sm btn-success" title="Activate">
+                                    <i class="fas fa-play"></i>
+                                </a>
+                            }
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
 
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-tags fa-3x mb-3"></i>
+                <h5>No offers found</h5>
+                <p>Click "Create Offer" to add your first offer.</p>
+            </div>
+        }
+
     </div>
 </div>
+
+<style>
+    body {
+        background: #0f0f0f;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 12px;
+    }
+
+    .table-dark-custom {
+        color: #fff;
+        background-color: transparent;
+    }
+
+        .table-dark-custom thead th {
+            border-bottom-color: #444;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .table-dark-custom td {
+            border-bottom-color: #333;
+            vertical-align: middle;
+        }
+
+        .table-dark-custom tbody tr:hover {
+            background-color: #2a2a2a;
+        }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 5px 8px;
+    }
+
+    .btn-sm {
+        margin: 0 2px;
+        border-radius: 6px;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        border: none;
+        color: #000;
+    }
+
+        .btn-warning:hover {
+            background: #ffca2c;
+        }
+
+    .btn-danger:hover {
+        background: #bb2d3b;
+    }
+
+    .btn-success:hover {
+        background: #157347;
+    }
+</style>

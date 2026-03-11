@@ -1,18 +1,51 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieMania.Models
 {
+    [Table("Payments")]
     public class Payment
     {
+        [Key]
         public int Id { get; set; }
 
+        [Required]
         public int UserId { get; set; }
-        public User User { get; set; }   // ✅ REQUIRED
 
+        public int? SubscriptionPlanId { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        [Range(0.01, 9999.99, ErrorMessage = "Amount must be between 0.01 and 9999.99")]
+        [Display(Name = "Amount")]
         public decimal Amount { get; set; }
 
-        public string PaymentMethod { get; set; }
-
+        [Display(Name = "Payment Date")]
+        [DataType(DataType.DateTime)]
         public DateTime PaymentDate { get; set; } = DateTime.Now;
+
+        [StringLength(50)]
+        [Display(Name = "Payment Method")]
+        public string PaymentMethod { get; set; } // Card, UPI, NetBanking
+
+        [StringLength(100)]
+        [Display(Name = "Transaction ID")]
+        public string TransactionId { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        [Display(Name = "Status")]
+        public string Status { get; set; } = "Pending"; // Pending, Completed, Failed, Refunded
+
+        [Display(Name = "Payment Details")]
+        public string PaymentDetails { get; set; } // JSON string
+
+        // Navigation Properties
+        [ForeignKey("UserId")]
+        public virtual AppUser User { get; set; }
+
+        [ForeignKey("SubscriptionPlanId")]
+        public virtual SubscriptionPlan SubscriptionPlan { get; set; }
     }
 }
