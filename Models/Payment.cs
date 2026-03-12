@@ -27,25 +27,25 @@ namespace MovieMania.Models
 
         [StringLength(50)]
         [Display(Name = "Payment Method")]
-        public string PaymentMethod { get; set; } // Card, UPI, NetBanking
+        public string? PaymentMethod { get; set; }
 
         [StringLength(100)]
         [Display(Name = "Transaction ID")]
-        public string TransactionId { get; set; }
+        public string? TransactionId { get; set; }
 
         [Required]
         [StringLength(20)]
         [Display(Name = "Status")]
-        public string Status { get; set; } = "Pending"; // Pending, Completed, Failed, Refunded
+        public string Status { get; set; } = "Pending";
 
         [Display(Name = "Payment Details")]
-        public string PaymentDetails { get; set; } // JSON string
+        public string? PaymentDetails { get; set; }
 
         // Navigation Properties
         [ForeignKey("UserId")]
-        public virtual AppUser User { get; set; }
+        public virtual AppUser? User { get; set; }
 
         [ForeignKey("SubscriptionPlanId")]
-        public virtual SubscriptionPlan SubscriptionPlan { get; set; }
+        public virtual SubscriptionPlan? SubscriptionPlan { get; set; }
     }
 }

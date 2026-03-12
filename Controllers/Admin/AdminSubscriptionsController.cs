@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
 using System.Threading.Tasks;
@@ -6,6 +7,8 @@ using System.Linq;
 
 namespace MovieMania.Controllers.Admin
 {
+    [Authorize(Roles = "admin")]
+    [Route("Admin/Subscriptions")]
     public class AdminSubscriptionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,55 +18,75 @@ namespace MovieMania.Controllers.Admin
             _context = context;
         }
 
-        // GET: AdminSubscriptions
+        // GET: Admin/Subscriptions
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             var plans = await _context.SubscriptionPlans
                 .OrderBy(p => p.DisplayOrder)
                 .ToListAsync();
-            return View(plans);
+            return View("~/Views/Admin/Subscriptions/Index.cshtml", plans);
         }
 
-        // GET: AdminSubscriptions/Create
+        // GET: Admin/Subscriptions/Create
+        [HttpGet("Create")]
         public IActionResult Create()
         {
-            return View();
+            return View("~/Views/Admin/Subscriptions/Create.cshtml");
         }
 
-        // POST: AdminSubscriptions/Create
-        [HttpPost]
+        // POST: Admin/Subscriptions/Create
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SubscriptionPlan plan)
         {
-            if (ModelState.IsValid)
+            try
             {
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                    string errorMessage = string.Join("<br/>", errors);
+                    TempData["Error"] = $"❌ Validation failed: <br/>{errorMessage}";
+                    return View("~/Views/Admin/Subscriptions/Create.cshtml", plan);
+                }
+
                 plan.CreatedAt = DateTime.Now;
-                _context.Add(plan);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Subscription plan created successfully!";
-                return RedirectToAction(nameof(Index));
+                await _context.SubscriptionPlans.AddAsync(plan);
+                int result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["Success"] = $"✅ Plan '{plan.Name}' created successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["Error"] = "❌ Plan was not created. Please try again.";
+                    return View("~/Views/Admin/Subscriptions/Create.cshtml", plan);
+                }
             }
-            return View(plan);
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"❌ Error: {ex.Message}";
+                return View("~/Views/Admin/Subscriptions/Create.cshtml", plan);
+            }
         }
 
-        // GET: AdminSubscriptions/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: Admin/Subscriptions/Edit/5
+        [HttpGet("Edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var plan = await _context.SubscriptionPlans.FindAsync(id);
             if (plan == null)
             {
-                return NotFound();
+                TempData["Error"] = $"❌ Plan with ID {id} not found.";
+                return RedirectToAction(nameof(Index));
             }
-            return View(plan);
+            return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
         }
 
-        // POST: AdminSubscriptions/Edit/5
-        [HttpPost]
+        // POST: Admin/Subscriptions/Edit/5
+        [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SubscriptionPlan plan)
         {
@@ -72,85 +95,142 @@ namespace MovieMania.Controllers.Admin
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                if (!ModelState.IsValid)
                 {
-                    plan.UpdatedAt = DateTime.Now;
-                    _context.Update(plan);
-                    await _context.SaveChangesAsync();
-                    TempData["Success"] = "Subscription plan updated successfully!";
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                    string errorMessage = string.Join("<br/>", errors);
+                    TempData["Error"] = $"❌ Validation failed: <br/>{errorMessage}";
+                    return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
                 }
-                catch (DbUpdateConcurrencyException)
+
+                var existingPlan = await _context.SubscriptionPlans.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                if (existingPlan == null)
                 {
-                    if (!SubscriptionPlanExists(plan.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    TempData["Error"] = $"❌ Plan with ID {id} not found.";
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+
+                plan.CreatedAt = existingPlan.CreatedAt;
+                plan.UpdatedAt = DateTime.Now;
+
+                _context.SubscriptionPlans.Update(plan);
+                int result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["Success"] = $"✅ Plan '{plan.Name}' updated successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["Error"] = "❌ No changes were saved.";
+                    return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
+                }
             }
-            return View(plan);
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"❌ Error: {ex.Message}";
+                return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
+            }
         }
 
-        // GET: AdminSubscriptions/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Admin/Subscriptions/Delete/5
+        [HttpGet("Delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var plan = await _context.SubscriptionPlans
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var plan = await _context.SubscriptionPlans.FindAsync(id);
             if (plan == null)
             {
-                return NotFound();
+                TempData["Error"] = $"❌ Plan with ID {id} not found.";
+                return RedirectToAction(nameof(Index));
             }
-
-            return View(plan);
+            return View("~/Views/Admin/Subscriptions/Delete.cshtml", plan);
         }
 
-        // POST: AdminSubscriptions/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Admin/Subscriptions/Delete/5
+        [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var plan = await _context.SubscriptionPlans.FindAsync(id);
-            if (plan != null)
+            try
             {
+                var plan = await _context.SubscriptionPlans.FindAsync(id);
+                if (plan == null)
+                {
+                    TempData["Error"] = $"❌ Plan with ID {id} not found.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 _context.SubscriptionPlans.Remove(plan);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Subscription plan deleted successfully!";
+                int result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["Success"] = $"✅ Plan '{plan.Name}' deleted successfully!";
+                }
+                else
+                {
+                    TempData["Error"] = "❌ Plan was not deleted.";
+                }
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"❌ Error: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool SubscriptionPlanExists(int id)
+        // POST: Admin/Subscriptions/ToggleStatus/5
+        [HttpPost("ToggleStatus/{id}")]
+        public async Task<IActionResult> ToggleStatus(int id)
         {
-            return _context.SubscriptionPlans.Any(e => e.Id == id);
+            try
+            {
+                var plan = await _context.SubscriptionPlans.FindAsync(id);
+                if (plan == null)
+                {
+                    return Json(new { success = false, message = "Plan not found" });
+                }
+
+                plan.IsActive = !plan.IsActive;
+                plan.UpdatedAt = DateTime.Now;
+                int result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    string status = plan.IsActive ? "activated" : "deactivated";
+                    return Json(new
+                    {
+                        success = true,
+                        message = $"✅ Plan '{plan.Name}' {status} successfully!",
+                        isActive = plan.IsActive
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "❌ No changes were saved." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"❌ Error: {ex.Message}" });
+            }
         }
 
-        // GET: AdminSubscriptions/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: Admin/Subscriptions/Details/5
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var plan = await _context.SubscriptionPlans
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var plan = await _context.SubscriptionPlans.FindAsync(id);
             if (plan == null)
             {
-                return NotFound();
+                TempData["Error"] = $"❌ Plan with ID {id} not found.";
+                return RedirectToAction(nameof(Index));
             }
-
-            return View(plan);
+            return View("~/Views/Admin/Subscriptions/Details.cshtml", plan);
         }
     }
 }

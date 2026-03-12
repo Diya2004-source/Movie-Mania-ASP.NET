@@ -59,6 +59,15 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ✅ Add cache prevention middleware
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    context.Response.Headers["Pragma"] = "no-cache";
+    context.Response.Headers["Expires"] = "-1";
+    await next();
+});
+
 // ✅ Area routes and default
 app.MapControllerRoute(
     name: "areas",

@@ -1,152 +1,103 @@
-﻿//using Microsoft.AspNetCore.Mvc;
-//using MovieMania.Models;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System;
-
-//namespace MovieMania.Controllers.Admin
-//{
-//    [Route("Payments")]
-//    public class AdminPaymentsController : Controller
-//    {
-//        // Fake in-memory database for demonstration
-//        private static List<Payment> _payments = new List<Payment>
-//        {
-//            new Payment { Id = 1, UserId = 1, User = new User { Id = 1, Name = "John Doe" }, Amount = 49.99m, PaymentMethod = "Credit Card", PaymentDate = DateTime.Now.AddDays(-5) },
-//            new Payment { Id = 2, UserId = 2, User = new User { Id = 2, Name = "Jane Smith" }, Amount = 19.99m, PaymentMethod = "PayPal", PaymentDate = DateTime.Now.AddDays(-2) },
-//            new Payment { Id = 3, UserId = 1, User = new User { Id = 1, Name = "John Doe" }, Amount = 9.99m, PaymentMethod = "Credit Card", PaymentDate = DateTime.Now }
-//        };
-
-//        private readonly string viewFolder = "~/Views/Admin/Payments/";
-
-//        // GET: /Payments
-//        [HttpGet("")]
-//        public IActionResult Index()
-//        {
-//            return View(viewFolder + "Index.cshtml", _payments.OrderByDescending(p => p.PaymentDate).ToList());
-//        }
-
-//        // GET: /Payments/Details/5
-//        [HttpGet("Details/{id}")]
-//        public IActionResult Details(int id)
-//        {
-//            var payment = _payments.FirstOrDefault(p => p.Id == id);
-//            if (payment == null) return NotFound();
-//            return View(viewFolder + "Details.cshtml", payment);
-//        }
-
-//        // GET: /Payments/Delete/5
-//        [HttpGet("Delete/{id}")]
-//        public IActionResult Delete(int id)
-//        {
-//            var payment = _payments.FirstOrDefault(p => p.Id == id);
-//            if (payment == null) return NotFound();
-//            return View(viewFolder + "Delete.cshtml", payment);
-//        }
-
-//        // POST: /Payments/Delete/5
-//        [HttpPost("Delete/{id}")]
-//        [ValidateAntiForgeryToken]
-//        public IActionResult DeleteConfirmed(int id)
-//        {
-//            var payment = _payments.FirstOrDefault(p => p.Id == id);
-//            if (payment != null)
-//            {
-//                _payments.Remove(payment);
-//            }
-//            return RedirectToAction(nameof(Index));
-//        }
-//    }
-//}
-
-
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
-using System.Collections.Generic;
 using System.Linq;
-using System;
+using System.Threading.Tasks;
 
 namespace MovieMania.Controllers.Admin
 {
-    [Route("Payments")]
+    [Authorize(Roles = "admin")]
+    [Route("Admin/Payments")]
     public class AdminPaymentsController : Controller
     {
-        // Fake in-memory database for demonstration
-        private static List<Payment> _payments = new List<Payment>
-        {
-            new Payment
-            {
-                Id = 1,
-                UserId = 1,
-                User = new MovieMania.Models.AppUser { Id = 1, Name = "John Doe" },
-                Amount = 49.99m,
-                PaymentMethod = "Credit Card",
-                PaymentDate = DateTime.Now.AddDays(-5)
-            },
-            new Payment
-            {
-                Id = 2,
-                UserId = 2,
-                User = new MovieMania.Models.AppUser { Id = 2, Name = "Jane Smith" },
-                Amount = 19.99m,
-                PaymentMethod = "PayPal",
-                PaymentDate = DateTime.Now.AddDays(-2)
-            },
-            new Payment
-            {
-                Id = 3,
-                UserId = 1,
-                User = new MovieMania.Models.AppUser { Id = 1, Name = "John Doe" },
-                Amount = 9.99m,
-                PaymentMethod = "Credit Card",
-                PaymentDate = DateTime.Now
-            }
-        };
-
+        private readonly ApplicationDbContext _context;
         private readonly string viewFolder = "~/Views/Admin/Payments/";
 
-        // GET: /Payments
-        [HttpGet("")]
-        public IActionResult Index()
+        public AdminPaymentsController(ApplicationDbContext context)
         {
-            var payments = _payments.OrderByDescending(p => p.PaymentDate).ToList();
+            _context = context;
+        }
+
+        // GET: Admin/Payments
+        [HttpGet("")]
+        public async Task<IActionResult> Index()
+        {
+            var payments = await _context.Payments
+                .Include(p => p.User)
+                .Include(p => p.SubscriptionPlan)
+                .OrderByDescending(p => p.PaymentDate)
+                .ToListAsync();
+
             return View(viewFolder + "Index.cshtml", payments);
         }
 
-        // GET: /Payments/Details/5
+        // GET: Admin/Payments/Details/5
         [HttpGet("Details/{id}")]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var payment = _payments.FirstOrDefault(p => p.Id == id);
+            var payment = await _context.Payments
+                .Include(p => p.User)
+                .Include(p => p.SubscriptionPlan)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (payment == null)
-                return NotFound();
+            {
+                TempData["Error"] = $"❌ Payment with ID {id} not found.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(viewFolder + "Details.cshtml", payment);
         }
 
-        // GET: /Payments/Delete/5
+        // GET: Admin/Payments/Delete/5
         [HttpGet("Delete/{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var payment = _payments.FirstOrDefault(p => p.Id == id);
+            var payment = await _context.Payments
+                .Include(p => p.User)
+                .Include(p => p.SubscriptionPlan)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (payment == null)
-                return NotFound();
+            {
+                TempData["Error"] = $"❌ Payment with ID {id} not found.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(viewFolder + "Delete.cshtml", payment);
         }
 
-        // POST: /Payments/Delete/5
+        // POST: Admin/Payments/Delete/5
         [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var payment = _payments.FirstOrDefault(p => p.Id == id);
-
-            if (payment != null)
+            try
             {
-                _payments.Remove(payment);
+                var payment = await _context.Payments.FindAsync(id);
+
+                if (payment == null)
+                {
+                    TempData["Error"] = $"❌ Payment with ID {id} not found.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.Payments.Remove(payment);
+                int result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["Success"] = $"✅ Payment #{id} deleted successfully!";
+                }
+                else
+                {
+                    TempData["Error"] = "❌ Payment was not deleted.";
+                }
+            }
+            catch (System.Exception ex)
+            {
+                TempData["Error"] = $"❌ Error deleting payment: {ex.Message}";
             }
 
             return RedirectToAction(nameof(Index));

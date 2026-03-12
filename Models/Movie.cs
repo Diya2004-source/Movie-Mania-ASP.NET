@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;  // Fixed: added 'using' keyword
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieMania.Models
@@ -19,17 +19,17 @@ namespace MovieMania.Models
         [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
         [DataType(DataType.MultilineText)]
         [Display(Name = "Description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [StringLength(50, ErrorMessage = "Genre cannot exceed 50 characters")]
         [Display(Name = "Genre")]
-        public string Genre { get; set; }
+        public string? Genre { get; set; }
 
         [Display(Name = "Genre")]
         public int? GenreId { get; set; }
 
         [ForeignKey("GenreId")]
-        public virtual Genre GenreNavigation { get; set; }
+        public virtual Genre? GenreNavigation { get; set; }  // Made nullable
 
         [DataType(DataType.Date)]
         [Display(Name = "Release Date")]
@@ -50,11 +50,11 @@ namespace MovieMania.Models
         [Display(Name = "Thumbnail URL")]
         [Url(ErrorMessage = "Please enter a valid URL")]
         [StringLength(500)]
-        public string ThumbnailUrl { get; set; }
+        public string? ThumbnailUrl { get; set; }
 
         // Backward compatibility property
         [NotMapped]
-        public string Thumbnail
+        public string? Thumbnail
         {
             get { return ThumbnailUrl; }
             set { ThumbnailUrl = value; }
@@ -63,28 +63,28 @@ namespace MovieMania.Models
         [Display(Name = "Video URL")]
         [Url(ErrorMessage = "Please enter a valid URL")]
         [StringLength(500)]
-        public string VideoUrl { get; set; }
+        public string? VideoUrl { get; set; }
 
         [Display(Name = "Trailer URL")]
         [Url(ErrorMessage = "Please enter a valid URL")]
         [StringLength(500)]
-        public string TrailerUrl { get; set; }
+        public string? TrailerUrl { get; set; }
 
         [Display(Name = "Cast")]
         [StringLength(500)]
-        public string Cast { get; set; }
+        public string? Cast { get; set; }
 
         [Display(Name = "Director")]
         [StringLength(200)]
-        public string Director { get; set; }
+        public string? Director { get; set; }
 
         [Display(Name = "Language")]
         [StringLength(50)]
-        public string Language { get; set; }
+        public string? Language { get; set; }
 
         [Display(Name = "Country")]
         [StringLength(100)]
-        public string Country { get; set; }
+        public string? Country { get; set; }
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
@@ -104,7 +104,7 @@ namespace MovieMania.Models
         public DateTime? UpdatedAt { get; set; }
 
         // Navigation Properties
-        public virtual ICollection<MovieReview> Reviews { get; set; } = new List<MovieReview>();
-        public virtual ICollection<UserActivity> UserActivities { get; set; } = new List<UserActivity>();
+        public virtual ICollection<MovieReview>? Reviews { get; set; } = new List<MovieReview>();
+        public virtual ICollection<UserActivity>? UserActivities { get; set; } = new List<UserActivity>();
     }
 }

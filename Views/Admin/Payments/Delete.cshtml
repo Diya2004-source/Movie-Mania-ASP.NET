@@ -5,103 +5,109 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card bg-dark border-0 shadow">
-                <div class="card-header bg-danger bg-opacity-25 border-bottom border-danger">
-                    <h3 class="mb-0 text-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Payment
-                    </h3>
+            <div class="card card-dark p-4 shadow-lg">
+                <h2 class="text-center text-danger mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Payment
+                </h2>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Are you sure you want to delete this payment record?
+                    <strong>This action cannot be undone.</strong>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        Are you sure you want to delete this payment record?
-                        <strong>This action cannot be undone.</strong>
-                    </div>
 
-                    <div class="payment-details p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
-                        <h5 class="text-center text-light mb-3">Payment Information</h5>
+                <div class="payment-details p-4 mb-4" style="background: #2a2a2a; border-radius: 10px;">
+                    <h5 class="text-center text-light mb-3">Payment Information</h5>
 
-                        <table class="table table-dark table-borderless">
-                            <tr>
-                                <th class="text-muted" style="width: 120px;">User:</th>
-                                <td class="fw-bold">@(Model.User?.Name ?? "Unknown")</td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Email:</th>
-                                <td>@(Model.User?.Email ?? "N/A")</td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Amount:</th>
-                                <td class="fw-bold text-danger">$@Model.Amount.ToString("N2")</td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Payment Method:</th>
-                                <td>@Model.PaymentMethod</td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Payment Date:</th>
-                                <td>@Model.PaymentDate.ToString("dd MMM yyyy HH:mm")</td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Status:</th>
-                                <td>
-                                    @if (Model.Status == "Completed")
-                                    {
-                                        <span class="badge bg-success">Completed</span>
-                                    }
-                                    else if (Model.Status == "Pending")
-                                    {
-                                        <span class="badge bg-warning">Pending</span>
-                                    }
-                                    else if (Model.Status == "Failed")
-                                    {
-                                        <span class="badge bg-danger">Failed</span>
-                                    }
-                                    else if (Model.Status == "Refunded")
-                                    {
-                                        <span class="badge bg-secondary">Refunded</span>
-                                    }
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Transaction ID:</th>
-                                <td><code>@(Model.TransactionId ?? "N/A")</code></td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <form asp-action="Delete" method="post">
-                        <input type="hidden" asp-for="Id" />
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-danger btn-lg px-5">
-                                <i class="fas fa-trash me-2"></i>Confirm Delete
-                            </button>
-                            <a asp-action="Index" class="btn btn-outline-light btn-lg px-5 ms-2">
-                                <i class="fas fa-times me-2"></i>Cancel
-                            </a>
-                        </div>
-                    </form>
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">User:</th>
+                            <td class="fw-bold text-white">@(Model.User?.Name ?? "Unknown")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Email:</th>
+                            <td class="text-white">@(Model.User?.Email ?? "N/A")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Amount:</th>
+                            <td class="fw-bold text-danger">$@Model.Amount.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Payment Method:</th>
+                            <td class="text-white">@Model.PaymentMethod</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Payment Date:</th>
+                            <td class="text-white">@Model.PaymentDate.ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Status:</th>
+                            <td>
+                                @if (Model.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">Completed</span>
+                                }
+                                else if (Model.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning">Pending</span>
+                                }
+                                else if (Model.Status == "Failed")
+                                {
+                                    <span class="badge bg-danger">Failed</span>
+                                }
+                                else if (Model.Status == "Refunded")
+                                {
+                                    <span class="badge bg-secondary">Refunded</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Transaction ID:</th>
+                            <td><code class="text-white">@(Model.TransactionId ?? "N/A")</code></td>
+                        </tr>
+                    </table>
                 </div>
+
+                <form asp-action="Delete" method="post" class="text-center">
+                    <input type="hidden" asp-for="Id" />
+
+                    <button type="submit" class="btn btn-danger btn-lg px-5">
+                        <i class="fas fa-trash me-2"></i>Confirm Delete
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-light btn-lg px-5 ms-2">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .btn-danger {
-        background: #dc3545;
+    body {
+        background: #0f0f0f;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
         border: none;
-        transition: 0.3s;
+        border-radius: 15px;
+    }
+
+    .btn-danger {
+        background: #ff4d4d;
+        border: none;
+        transition: all 0.3s;
     }
 
         .btn-danger:hover {
-            background: #bb2d3b;
+            background: #ff3333;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
+            box-shadow: 0 5px 15px rgba(255,77,77,0.3);
         }
 
     .btn-outline-light:hover {
@@ -110,7 +116,12 @@
         transform: translateY(-2px);
     }
 
-    .table-dark {
-        --bs-table-bg: transparent;
+    .badge {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+    }
+
+    .payment-details {
+        background: #2a2a2a;
     }
 </style>

@@ -2,88 +2,100 @@
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Create Offer";
 }
 
 <div class="container mt-5">
     <div class="card card-dark p-4 shadow-lg">
-        <h2 class="mb-4 text-center text-light">Edit Offer</h2>
+        <h2 class="mb-4 text-center text-light">
+            <i class="fas fa-plus-circle me-2 text-success"></i>Create New Offer
+        </h2>
 
-        <form method="post" asp-action="Edit">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CreatedAt" />
-            <input type="hidden" asp-for="CurrentUses" />
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken() 
 
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label text-light"></label>
-                <input asp-for="Title" class="form-control custom-input" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Title" class="form-label text-light"></label>
+                    <input asp-for="Title" class="form-control custom-input" placeholder="Enter offer title" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="OfferCode" class="form-label text-light"></label>
+                    <input asp-for="OfferCode" class="form-control custom-input" placeholder="e.g., SUMMER2024" />
+                    <span asp-validation-for="OfferCode" class="text-danger"></span>
+                    <small class="text-muted">Unique code for this offer</small>
+                </div>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Description" class="form-label text-light"></label>
-                <textarea asp-for="Description" class="form-control custom-input" rows="3"></textarea>
+                <textarea asp-for="Description" class="form-control custom-input" rows="3" placeholder="Offer description..."></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label asp-for="DiscountPercentage" class="form-label text-light"></label>
-                    <input asp-for="DiscountPercentage" class="form-control custom-input" type="number" min="1" max="100" />
+                    <div class="input-group">
+                        <input asp-for="DiscountPercentage" class="form-control custom-input" type="number" min="1" max="100" placeholder="10" />
+                        <span class="input-group-text bg-secondary text-white border-0">%</span>
+                    </div>
                     <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label asp-for="OfferCode" class="form-label text-light"></label>
-                    <input asp-for="OfferCode" class="form-control custom-input" />
-                    <span asp-validation-for="OfferCode" class="text-danger"></span>
+                    <label asp-for="MaxUses" class="form-label text-light"></label>
+                    <input asp-for="MaxUses" class="form-control custom-input" type="number" min="1" placeholder="100" />
+                    <span asp-validation-for="MaxUses" class="text-danger"></span>
+                    <small class="text-muted">Leave empty for unlimited</small>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label asp-for="MaxUses" class="form-label text-light"></label>
-                    <input asp-for="MaxUses" class="form-control custom-input" type="number" min="1" />
-                    <span asp-validation-for="MaxUses" class="text-danger"></span>
+                    <label asp-for="SubscriptionPlanId" class="form-label text-light"></label>
+                    <select asp-for="SubscriptionPlanId" class="form-control custom-input">
+                        <option value="">All Plans (Global Offer)</option>
+                        @if (ViewBag.SubscriptionPlans != null)
+                        {
+                            foreach (var plan in ViewBag.SubscriptionPlans)
+                            {
+                                <option value="@plan.Id">@plan.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="SubscriptionPlanId" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="StartDate" class="form-label text-light"></label>
-                    <input asp-for="StartDate" type="date" class="form-control custom-input" />
+                    <input asp-for="StartDate" type="date" class="form-control custom-input" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="StartDate" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label asp-for="EndDate" class="form-label text-light"></label>
-                    <input asp-for="EndDate" type="date" class="form-control custom-input" />
+                    <input asp-for="EndDate" type="date" class="form-control custom-input" value="@DateTime.Now.AddMonths(1).ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="EndDate" class="text-danger"></span>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="SubscriptionPlanId" class="form-label text-light"></label>
-                    <select asp-for="SubscriptionPlanId" class="form-control custom-input" asp-items="ViewBag.Plans">
-                        <option value="">-- Select Plan (Optional) --</option>
-                    </select>
-                    <span asp-validation-for="SubscriptionPlanId" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="CurrentUses" class="form-label text-light"></label>
-                    <input asp-for="CurrentUses" class="form-control custom-input" type="number" min="0" readonly disabled />
-                </div>
-            </div>
-
             <div class="mb-3 form-check">
-                <input asp-for="IsActive" class="form-check-input" />
+                <input asp-for="IsActive" class="form-check-input" checked />
                 <label asp-for="IsActive" class="form-check-label text-light">Active</label>
             </div>
 
             <div class="text-center mt-4">
-                <button type="submit" class="btn btn-warning btn-custom px-5">Update Offer</button>
-                <a asp-action="Index" class="btn btn-outline-light ms-2 btn-custom px-4">Cancel</a>
+                <button type="submit" class="btn btn-success btn-custom px-5">
+                    <i class="fas fa-save me-2"></i>Create Offer
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light btn-custom px-4 ms-2">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
             </div>
 
         </form>
@@ -98,8 +110,8 @@
     .card-dark {
         background: #1c1c1c;
         border: none;
-        border-radius: 12px;
-        max-width: 800px;
+        border-radius: 15px;
+        max-width: 900px;
         margin: auto;
     }
 
@@ -114,26 +126,35 @@
         .custom-input:focus {
             background: #2a2a2a;
             color: white;
-            border-color: #ffc107;
-            box-shadow: 0 0 8px rgba(255,193,7,0.4);
+            border-color: #00c853;
+            box-shadow: 0 0 8px rgba(0,200,83,0.4);
         }
+
+        .custom-input::placeholder {
+            color: #666;
+        }
+
+    .input-group-text {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-left: none;
+    }
 
     .btn-custom {
         padding: 10px 20px;
         border-radius: 8px;
-        transition: 0.3s;
-        font-weight: 500;
+        transition: all 0.3s;
     }
 
-    .btn-warning {
-        background: #ffc107;
+    .btn-success {
+        background: #00c853;
         border: none;
-        color: #000;
     }
 
-        .btn-warning:hover {
-            background: #ffca2c;
+        .btn-success:hover {
+            background: #00e676;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,200,83,0.3);
         }
 
     .btn-outline-light:hover {
@@ -142,10 +163,13 @@
         transform: translateY(-2px);
     }
 
-    input:disabled, input[readonly] {
-        background: #333 !important;
-        color: #888 !important;
-        cursor: not-allowed;
+    .form-check-input:checked {
+        background-color: #00c853;
+        border-color: #00c853;
+    }
+
+    .text-danger {
+        font-size: 0.85rem;
     }
 </style>
 

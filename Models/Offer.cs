@@ -18,7 +18,7 @@ namespace MovieMania.Models
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
         [DataType(DataType.MultilineText)]
         [Display(Name = "Description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         [Display(Name = "Discount Percentage")]
@@ -43,7 +43,7 @@ namespace MovieMania.Models
 
         [StringLength(50)]
         [Display(Name = "Offer Code")]
-        public string OfferCode { get; set; }
+        public string? OfferCode { get; set; }
 
         [Display(Name = "Max Uses")]
         public int? MaxUses { get; set; }
@@ -59,8 +59,8 @@ namespace MovieMania.Models
         [DataType(DataType.DateTime)]
         public DateTime? UpdatedAt { get; set; }
 
-        // Navigation property
+        // Navigation property - make it nullable
         [ForeignKey("SubscriptionPlanId")]
-        public virtual SubscriptionPlan SubscriptionPlan { get; set; }
+        public virtual SubscriptionPlan? SubscriptionPlan { get; set; }
     }
 }

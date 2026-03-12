@@ -1,0 +1,111 @@
+﻿@model MovieMania.Models.Show
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Delete Show";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card card-dark p-4 shadow-lg">
+                <h2 class="text-center text-danger mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Show
+                </h2>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Are you sure you want to delete this show?
+                    <strong>This action cannot be undone.</strong>
+                </div>
+
+                <div class="show-details p-3 mb-4" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-center text-light mb-3">Show Details</h5>
+
+                    <div class="text-center mb-3">
+                        @if (!string.IsNullOrEmpty(Model.PosterUrl))
+                        {
+                            <img src="@Model.PosterUrl" width="150" style="border-radius:8px;" />
+                        }
+                    </div>
+
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Title:</th>
+                            <td class="fw-bold text-light">@Model.Title</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Genre:</th>
+                            <td>@Model.Genre</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Seasons:</th>
+                            <td>@Model.TotalSeasons</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Episodes:</th>
+                            <td>@Model.TotalEpisodes</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Rating:</th>
+                            <td>
+                                @if (Model.Rating.HasValue)
+                                {
+                                    <span class="badge bg-warning">@Model.Rating.Value.ToString("F1")</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger btn-lg px-5">
+                            <i class="fas fa-trash me-2"></i>Confirm Delete
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-light btn-lg px-5 ms-2">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: #0f0f0f;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 15px;
+    }
+
+    .btn-danger {
+        background: #ff4d4d;
+        border: none;
+        transition: all 0.3s;
+    }
+
+        .btn-danger:hover {
+            background: #ff3333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,77,77,0.3);
+        }
+
+    .btn-outline-light:hover {
+        background: white;
+        color: black;
+        transform: translateY(-2px);
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+    }
+</style>

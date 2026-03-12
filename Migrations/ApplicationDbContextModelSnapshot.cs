@@ -223,12 +223,10 @@ namespace movie.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Cast")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -236,12 +234,10 @@ namespace movie.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Director")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -249,7 +245,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Genre")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -263,12 +258,12 @@ namespace movie.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Language")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal?>("Rating")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<DateTime?>("ReleaseDate")
                         .HasColumnType("datetime2");
@@ -277,7 +272,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -287,7 +281,6 @@ namespace movie.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("TrailerUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -295,7 +288,6 @@ namespace movie.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VideoUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -327,7 +319,8 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Rating")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<DateTime>("ReviewDate")
                         .HasColumnType("datetime2");
@@ -364,7 +357,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -381,7 +373,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("OfferCode")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -415,17 +406,16 @@ namespace movie.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentDetails")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -438,7 +428,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TransactionId")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -485,6 +474,7 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("RewardAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Status")
@@ -510,12 +500,10 @@ namespace movie.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Cast")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -523,12 +511,10 @@ namespace movie.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Director")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -547,17 +533,16 @@ namespace movie.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Language")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PosterUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal?>("Rating")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<DateTime?>("ReleaseDate")
                         .HasColumnType("datetime2");
@@ -566,7 +551,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -582,7 +566,6 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TrailerUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -614,7 +597,8 @@ namespace movie.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Rating")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<DateTime>("ReviewDate")
                         .HasColumnType("datetime2");
@@ -677,6 +661,7 @@ namespace movie.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -839,7 +824,8 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("UserRating")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<DateTime?>("WatchedDate")
                         .HasColumnType("datetime2");
@@ -908,12 +894,13 @@ namespace movie.Migrations
 
                     b.HasOne("MovieMania.Models.EpisodeComment", "ParentComment")
                         .WithMany("Replies")
-                        .HasForeignKey("ParentCommentId");
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MovieMania.Models.AppUser", "User")
                         .WithMany("EpisodeComments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Episode");
@@ -927,7 +914,8 @@ namespace movie.Migrations
                 {
                     b.HasOne("MovieMania.Models.Genre", "GenreNavigation")
                         .WithMany("Movies")
-                        .HasForeignKey("GenreId");
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("GenreNavigation");
                 });
@@ -955,7 +943,8 @@ namespace movie.Migrations
                 {
                     b.HasOne("MovieMania.Models.SubscriptionPlan", "SubscriptionPlan")
                         .WithMany()
-                        .HasForeignKey("SubscriptionPlanId");
+                        .HasForeignKey("SubscriptionPlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("SubscriptionPlan");
                 });
@@ -999,7 +988,8 @@ namespace movie.Migrations
                 {
                     b.HasOne("MovieMania.Models.Genre", "GenreNavigation")
                         .WithMany("Shows")
-                        .HasForeignKey("GenreId");
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("GenreNavigation");
                 });
@@ -1015,7 +1005,7 @@ namespace movie.Migrations
                     b.HasOne("MovieMania.Models.AppUser", "User")
                         .WithMany("ShowReviews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Show");
@@ -1027,11 +1017,13 @@ namespace movie.Migrations
                 {
                     b.HasOne("MovieMania.Models.Episode", "Episode")
                         .WithMany("UserActivities")
-                        .HasForeignKey("EpisodeId");
+                        .HasForeignKey("EpisodeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MovieMania.Models.Movie", "Movie")
                         .WithMany("UserActivities")
-                        .HasForeignKey("MovieId");
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MovieMania.Models.AppUser", "User")
                         .WithMany("Activities")

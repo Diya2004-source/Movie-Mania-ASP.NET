@@ -5,47 +5,41 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-4 text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">
-            <i class="fas fa-receipt me-2"></i>Payment Details
-        </h2>
-        <span class="badge @(Model.Status == "Completed" ? "bg-success" : Model.Status == "Pending" ? "bg-warning" : "bg-secondary") p-3">
-            @Model.Status
-        </span>
-    </div>
+<div class="container mt-4">
+    <div class="card card-dark p-4 shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-light">
+                <i class="fas fa-receipt me-2 text-primary"></i>Payment Details
+            </h2>
+            <span class="badge @(Model.Status == "Completed" ? "bg-success" : Model.Status == "Pending" ? "bg-warning" : "bg-secondary") p-3">
+                @Model.Status
+            </span>
+        </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card bg-dark border-0 shadow mb-4">
-                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
-                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>User Information</h5>
-                </div>
-                <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-primary mb-3"><i class="fas fa-user me-2"></i>User Information</h5>
                     <table class="table table-dark table-borderless">
                         <tr>
                             <th class="text-muted" style="width: 120px;">Name:</th>
-                            <td class="fw-bold">@(Model.User?.Name ?? "Unknown")</td>
+                            <td class="fw-bold text-white">@(Model.User?.Name ?? "Unknown")</td>
                         </tr>
                         <tr>
                             <th class="text-muted">Email:</th>
-                            <td>@(Model.User?.Email ?? "N/A")</td>
+                            <td class="text-white">@(Model.User?.Email ?? "N/A")</td>
                         </tr>
                         <tr>
                             <th class="text-muted">User ID:</th>
-                            <td>#@Model.UserId</td>
+                            <td class="text-white">#@Model.UserId</td>
                         </tr>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="card bg-dark border-0 shadow mb-4">
-                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
-                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
-                </div>
-                <div class="card-body">
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-primary mb-3"><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
                     <table class="table table-dark table-borderless">
                         <tr>
                             <th class="text-muted" style="width: 140px;">Amount:</th>
@@ -53,18 +47,18 @@
                         </tr>
                         <tr>
                             <th class="text-muted">Payment Method:</th>
-                            <td>
+                            <td class="text-white">
                                 @if (Model.PaymentMethod == "Card")
                                 {
-                                    <span><i class="fas fa-credit-card me-1"></i>Card</span>
+                                    <span><i class="fas fa-credit-card me-2"></i>Card</span>
                                 }
                                 else if (Model.PaymentMethod == "UPI")
                                 {
-                                    <span><i class="fas fa-mobile-alt me-1"></i>UPI</span>
+                                    <span><i class="fas fa-mobile-alt me-2"></i>UPI</span>
                                 }
                                 else if (Model.PaymentMethod == "NetBanking")
                                 {
-                                    <span><i class="fas fa-university me-1"></i>NetBanking</span>
+                                    <span><i class="fas fa-university me-2"></i>NetBanking</span>
                                 }
                                 else
                                 {
@@ -74,43 +68,39 @@
                         </tr>
                         <tr>
                             <th class="text-muted">Transaction ID:</th>
-                            <td><code>@(Model.TransactionId ?? "N/A")</code></td>
+                            <td><code class="text-white">@(Model.TransactionId ?? "N/A")</code></td>
                         </tr>
                         <tr>
                             <th class="text-muted">Payment Date:</th>
-                            <td>@Model.PaymentDate.ToString("dd MMMM yyyy HH:mm:ss")</td>
+                            <td class="text-white">@Model.PaymentDate.ToString("dd MMMM yyyy HH:mm:ss")</td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card bg-dark border-0 shadow mb-4">
-                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
-                    <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Subscription Details</h5>
-                </div>
-                <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-primary mb-3"><i class="fas fa-crown me-2"></i>Subscription Details</h5>
                     @if (Model.SubscriptionPlan != null)
                     {
                         <table class="table table-dark table-borderless">
                             <tr>
                                 <th class="text-muted" style="width: 120px;">Plan:</th>
-                                <td class="fw-bold">@Model.SubscriptionPlan.Name</td>
+                                <td class="fw-bold text-white">@Model.SubscriptionPlan.Name</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Duration:</th>
-                                <td>@Model.SubscriptionPlan.DurationInDays days</td>
+                                <td class="text-white">@Model.SubscriptionPlan.DurationInDays days</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Quality:</th>
-                                <td>@Model.SubscriptionPlan.VideoQuality</td>
+                                <td class="text-white">@Model.SubscriptionPlan.VideoQuality</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Max Screens:</th>
-                                <td>@Model.SubscriptionPlan.MaxScreens</td>
+                                <td class="text-white">@Model.SubscriptionPlan.MaxScreens</td>
                             </tr>
                         </table>
                     }
@@ -120,18 +110,14 @@
                     }
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="card bg-dark border-0 shadow mb-4">
-                <div class="card-header bg-secondary bg-opacity-25 border-bottom border-secondary">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Additional Details</h5>
-                </div>
-                <div class="card-body">
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Additional Details</h5>
                     <table class="table table-dark table-borderless">
                         <tr>
                             <th class="text-muted" style="width: 120px;">Payment ID:</th>
-                            <td>#@Model.Id</td>
+                            <td class="text-white">#@Model.Id</td>
                         </tr>
                         <tr>
                             <th class="text-muted">Status:</th>
@@ -171,20 +157,42 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="mt-3">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i>Back to List
-        </a>
-        @if (Model.Status == "Completed" && Model.PaymentDate.AddDays(7) >= DateTime.Now)
-        {
-            <a asp-action="Refund" asp-route-id="@Model.Id" class="btn btn-warning ms-2">
-                <i class="fas fa-undo-alt me-1"></i>Process Refund
+        <div class="text-center mt-4">
+            <a asp-action="Index" class="btn btn-outline-light btn-lg px-4">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
             </a>
-        }
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger ms-2">
-            <i class="fas fa-trash me-1"></i>Delete
-        </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-lg px-4 ms-2">
+                <i class="fas fa-trash me-2"></i>Delete Payment
+            </a>
+        </div>
     </div>
 </div>
+
+<style>
+    body {
+        background: #0f0f0f;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 15px;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .info-section {
+        background: #2a2a2a;
+        border-radius: 8px;
+    }
+
+    .table-dark {
+        --bs-table-bg: transparent;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+</style>

@@ -2,23 +2,34 @@
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Edit Offer";
 }
 
 <div class="container mt-5">
     <div class="card card-dark p-4 shadow-lg">
-        <h2 class="mb-4 text-center text-light">Edit Offer</h2>
+        <h2 class="mb-4 text-center text-light">
+            <i class="fas fa-edit me-2 text-warning"></i>Edit Offer
+        </h2>
 
-        <form method="post" asp-action="Edit">
+        <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="CreatedAt" />
             <input type="hidden" asp-for="CurrentUses" />
 
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label text-light"></label>
-                <input asp-for="Title" class="form-control custom-input" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Title" class="form-label text-light"></label>
+                    <input asp-for="Title" class="form-control custom-input" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="OfferCode" class="form-label text-light"></label>
+                    <input asp-for="OfferCode" class="form-control custom-input" />
+                    <span asp-validation-for="OfferCode" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -30,20 +41,32 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label asp-for="DiscountPercentage" class="form-label text-light"></label>
-                    <input asp-for="DiscountPercentage" class="form-control custom-input" type="number" min="1" max="100" />
+                    <div class="input-group">
+                        <input asp-for="DiscountPercentage" class="form-control custom-input" type="number" min="1" max="100" />
+                        <span class="input-group-text bg-secondary text-white border-0">%</span>
+                    </div>
                     <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label asp-for="OfferCode" class="form-label text-light"></label>
-                    <input asp-for="OfferCode" class="form-control custom-input" />
-                    <span asp-validation-for="OfferCode" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label asp-for="MaxUses" class="form-label text-light"></label>
                     <input asp-for="MaxUses" class="form-control custom-input" type="number" min="1" />
                     <span asp-validation-for="MaxUses" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="SubscriptionPlanId" class="form-label text-light"></label>
+                    <select asp-for="SubscriptionPlanId" class="form-control custom-input">
+                        <option value="">All Plans (Global Offer)</option>
+                        @if (ViewBag.SubscriptionPlans != null)
+                        {
+                            foreach (var plan in ViewBag.SubscriptionPlans)
+                            {
+                                <option value="@plan.Id">@plan.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="SubscriptionPlanId" class="text-danger"></span>
                 </div>
             </div>
 
@@ -63,27 +86,26 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="SubscriptionPlanId" class="form-label text-light"></label>
-                    <select asp-for="SubscriptionPlanId" class="form-control custom-input" asp-items="ViewBag.Plans">
-                        <option value="">-- Select Plan (Optional) --</option>
-                    </select>
-                    <span asp-validation-for="SubscriptionPlanId" class="text-danger"></span>
+                    <div class="info-box p-3" style="background: #2a2a2a; border-radius: 8px;">
+                        <small class="text-muted d-block">Current Uses</small>
+                        <span class="text-light fw-bold">@Model.CurrentUses</span>
+                    </div>
                 </div>
-
                 <div class="col-md-6 mb-3">
-                    <label asp-for="CurrentUses" class="form-label text-light"></label>
-                    <input asp-for="CurrentUses" class="form-control custom-input" type="number" min="0" readonly disabled />
+                    <div class="form-check mt-4">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label text-light">Active</label>
+                    </div>
                 </div>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input asp-for="IsActive" class="form-check-input" />
-                <label asp-for="IsActive" class="form-check-label text-light">Active</label>
             </div>
 
             <div class="text-center mt-4">
-                <button type="submit" class="btn btn-warning btn-custom px-5">Update Offer</button>
-                <a asp-action="Index" class="btn btn-outline-light ms-2 btn-custom px-4">Cancel</a>
+                <button type="submit" class="btn btn-warning btn-custom px-5">
+                    <i class="fas fa-save me-2"></i>Update Offer
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light btn-custom px-4 ms-2">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
             </div>
 
         </form>
@@ -98,8 +120,8 @@
     .card-dark {
         background: #1c1c1c;
         border: none;
-        border-radius: 12px;
-        max-width: 800px;
+        border-radius: 15px;
+        max-width: 900px;
         margin: auto;
     }
 
@@ -118,11 +140,16 @@
             box-shadow: 0 0 8px rgba(255,193,7,0.4);
         }
 
+    .input-group-text {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-left: none;
+    }
+
     .btn-custom {
         padding: 10px 20px;
         border-radius: 8px;
-        transition: 0.3s;
-        font-weight: 500;
+        transition: all 0.3s;
     }
 
     .btn-warning {
@@ -134,6 +161,7 @@
         .btn-warning:hover {
             background: #ffca2c;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,193,7,0.3);
         }
 
     .btn-outline-light:hover {
@@ -142,10 +170,15 @@
         transform: translateY(-2px);
     }
 
-    input:disabled, input[readonly] {
-        background: #333 !important;
-        color: #888 !important;
-        cursor: not-allowed;
+    .info-box {
+        background: #2a2a2a;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .form-check-input:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
     }
 </style>
 
