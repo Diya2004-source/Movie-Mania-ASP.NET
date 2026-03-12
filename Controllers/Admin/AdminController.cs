@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using MovieMania.Models;  // Change from movie_mania.Models
+using MovieMania.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.Admin
+namespace MovieMania.Controllers.Admin
 {
     public class AdminController : Controller
     {
@@ -26,8 +26,7 @@ namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.A
         [HttpGet]
         public IActionResult Login()
         {
-            // If already logged in as admin, redirect to dashboard
-            if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+            if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("admin"))
             {
                 return RedirectToAction("Index", "AdminDashboard");
             }
@@ -43,7 +42,6 @@ namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.A
                 return View();
             }
 
-            // Check if user exists in database with admin role
             var admin = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == Email &&
                                          u.Role == "admin" &&
@@ -55,25 +53,21 @@ namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.A
                 return View();
             }
 
-            // In production, verify password hash
-            // For now, using direct comparison (you should hash passwords in production)
             if (admin.Password != Password)
             {
                 ViewBag.Error = "Invalid email or password";
                 return View();
             }
 
-            // Update last login
             admin.LastLoginAt = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            // Create claims
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, admin.Id.ToString()),
-                new Claim(ClaimTypes.Name, admin.Name),
-                new Claim(ClaimTypes.Email, admin.Email),
-                new Claim(ClaimTypes.Role, admin.Role),  // "admin"
+                new Claim(ClaimTypes.Name, admin.Name ?? ""),
+                new Claim(ClaimTypes.Email, admin.Email ?? ""),
+                new Claim(ClaimTypes.Role, admin.Role ?? "admin"),
                 new Claim("ProfilePicture", admin.ProfilePictureUrl ?? "")
             };
 
@@ -83,7 +77,6 @@ namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.A
 
             var principal = new ClaimsPrincipal(identity);
 
-            // Sign in
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal,
@@ -104,10 +97,8 @@ namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.A
             return RedirectToAction("Login");
         }
 
-        // Optional: Method to create first admin (run once)
         public async Task<IActionResult> CreateFirstAdmin()
         {
-            // Check if any admin exists
             var adminExists = await _context.Users
                 .AnyAsync(u => u.Role == "admin");
 
@@ -117,10 +108,14 @@ namespace MovieMania.Controllers.Admin  // Change from movie_mania.Controllers.A
                 {
                     Name = "Administrator",
                     Email = "admin@moviemania.com",
-                    Password = "Admin@123", // In production, hash this
+                    Password = "Admin@123",
                     Role = "admin",
                     IsActive = true,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Now,
+                    ProfilePictureUrl = "",
+                    ReferralCode = "ADMIN001",
+                    TotalReferrals = 0,
+                    RewardPoints = 0
                 };
 
                 _context.Users.Add(admin);

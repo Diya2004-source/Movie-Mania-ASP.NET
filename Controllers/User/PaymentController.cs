@@ -21,7 +21,12 @@ namespace MovieMania.Controllers.User
         // GET: User/Payment/Checkout
         public async Task<IActionResult> Checkout(int? subscriptionId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             if (subscriptionId.HasValue)
             {
@@ -37,10 +42,10 @@ namespace MovieMania.Controllers.User
                 var viewModel = new CheckoutViewModel
                 {
                     SubscriptionId = subscription.Id,
-                    PlanName = subscription.SubscriptionPlan.Name,
-                    Amount = subscription.SubscriptionPlan.Price,
-                    UserEmail = User.FindFirstValue(ClaimTypes.Email),
-                    UserName = User.FindFirstValue(ClaimTypes.Name)
+                    PlanName = subscription.SubscriptionPlan?.Name ?? "Unknown Plan",
+                    Amount = subscription.SubscriptionPlan?.Price ?? 0,
+                    UserEmail = User.FindFirstValue(ClaimTypes.Email) ?? "",
+                    UserName = User.FindFirstValue(ClaimTypes.Name) ?? ""
                 };
 
                 return View(viewModel);
@@ -53,7 +58,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Process([FromBody] PaymentProcessViewModel model)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             if (!IsValidPaymentMethod(model))
             {
@@ -79,8 +89,8 @@ namespace MovieMania.Controllers.User
             var payment = new Payment
             {
                 UserId = userId,
-                SubscriptionPlanId = subscription.SubscriptionPlanId,  // Now this exists
-                Amount = subscription.SubscriptionPlan.Price,
+                SubscriptionPlanId = subscription.SubscriptionPlanId,
+                Amount = subscription.SubscriptionPlan?.Price ?? 0,
                 PaymentDate = DateTime.Now,
                 PaymentMethod = model.PaymentMethod,
                 TransactionId = GenerateTransactionId(),
@@ -107,11 +117,16 @@ namespace MovieMania.Controllers.User
         // GET: User/Payment/Confirmation/5
         public async Task<IActionResult> Confirmation(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             var payment = await _context.Payments
-                .Include(p => p.SubscriptionPlan)  // Now this works
-                .Include(p => p.User)  // This now references AppUser
+                .Include(p => p.SubscriptionPlan)
+                .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
 
             if (payment == null)
@@ -120,6 +135,35 @@ namespace MovieMania.Controllers.User
             }
 
             return View(payment);
+        }
+
+        // GET: User/Payment/History
+        public async Task<IActionResult> History(int page = 1)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
+
+            int pageSize = 10;
+
+            var query = _context.Payments
+                .Include(p => p.SubscriptionPlan)
+                .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.PaymentDate);
+
+            var totalItems = await query.CountAsync();
+            var payments = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            return View(payments);
         }
 
         // Helper methods

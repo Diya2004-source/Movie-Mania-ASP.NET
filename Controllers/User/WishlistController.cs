@@ -1,5 +1,4 @@
-﻿// Controllers/User/WishlistController.cs
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
@@ -21,7 +20,13 @@ namespace MovieMania.Controllers.User
         // GET: User/Wishlist
         public async Task<IActionResult> Index(string filter = "all", int page = 1)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
+
             int pageSize = 20;
 
             var query = _context.Wishlists
@@ -68,7 +73,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Add(int? movieId, int? showId, int priority = 1, string notes = "")
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             if (!movieId.HasValue && !showId.HasValue)
             {
@@ -122,7 +132,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] WishlistUpdateViewModel model)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .FirstOrDefaultAsync(w => w.Id == model.Id && w.UserId == userId);
@@ -151,7 +166,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> MarkAsWatched(int id, decimal? rating = null)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
@@ -194,7 +214,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> UpdateProgress(int id, int watchedSeasons, int watchedEpisodes)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .Include(w => w.Show)
@@ -231,7 +256,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Remove(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
@@ -256,7 +286,13 @@ namespace MovieMania.Controllers.User
         // GET: User/Wishlist/GetWishlistCount
         public async Task<IActionResult> GetWishlistCount()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(0);
+            }
+            var userId = int.Parse(userIdClaim);
+
             var count = await _context.Wishlists
                 .CountAsync(w => w.UserId == userId && w.IsActive);
             return Json(count);

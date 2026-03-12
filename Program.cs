@@ -8,24 +8,35 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Services
 // --------------------
 
-// Add MVC
 builder.Services.AddControllersWithViews();
 
-// Add Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
-// Add Authentication
+// ✅ FIXED: Changed LoginPath to Auth/Login for regular users
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Admin/Login";
-        options.AccessDeniedPath = "/Admin/Login";
+        options.LoginPath = "/Auth/Login";           // Changed from "/Admin/Login"
+        options.AccessDeniedPath = "/Auth/Login";    // Changed from "/Admin/Login"
+        options.LogoutPath = "/Auth/Logout";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(7);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -44,11 +55,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// VERY IMPORTANT ORDER
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Default Route → Guest
+// ✅ Area routes and default
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=GuestHome}/{action=Index}/{id?}");

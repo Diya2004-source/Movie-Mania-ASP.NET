@@ -13,12 +13,12 @@
 VALUES (
     'Test User', 
     'test@example.com', 
-    'Test@123', 
+    'Test@123',  -- This is the plain text password
     'user', 
     1, 
     GETDATE(),
     '',
-    'TEST' + CONVERT(VARCHAR, CAST(RAND() * 10000 AS INT)),
+    'TEST123',
     0,
     0
 );

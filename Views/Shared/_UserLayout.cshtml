@@ -25,25 +25,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")"
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
                            href="@Url.Action("Index", "Home")">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "Movies" ? "active" : "")"
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Movies" ? "active" : "")"
                            href="@Url.Action("Movies", "Home")">
                             <i class="fas fa-film"></i> Movies
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "Shows" ? "active" : "")"
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Shows" ? "active" : "")"
                            href="@Url.Action("Shows", "Home")">
                             <i class="fas fa-tv"></i> TV Shows
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Wishlist" ? "active" : "")"
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Wishlist" ? "active" : "")"
                            href="@Url.Action("Index", "Wishlist")">
                             <i class="fas fa-heart"></i> My List
                         </a>
@@ -106,7 +106,7 @@
                     <div class="nav-item dropdown">
                         <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle"></i>
-                            <span>@User.Identity.Name</span>
+                            <span>@(User.Identity?.Name ?? "User")</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>

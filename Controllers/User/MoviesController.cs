@@ -1,5 +1,4 @@
-﻿// Controllers/User/MoviesController.cs
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
@@ -9,7 +8,6 @@ using System.Security.Claims;
 namespace MovieMania.Controllers.User
 {
     [Authorize(Roles = "user")]
-    [Area("User")]
     public class MoviesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,7 +21,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> RateMovie([FromBody] MovieRatingViewModel model)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var review = await _context.MovieReviews
                 .FirstOrDefaultAsync(r => r.MovieId == model.MovieId && r.UserId == userId);
@@ -51,7 +54,6 @@ namespace MovieMania.Controllers.User
 
             await _context.SaveChangesAsync();
 
-            // Update movie average rating
             var movie = await _context.Movies.FindAsync(model.MovieId);
             if (movie != null)
             {
@@ -72,7 +74,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> MarkAsWatched(int movieId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var activity = new UserActivity
             {
@@ -86,7 +93,6 @@ namespace MovieMania.Controllers.User
 
             _context.UserActivities.Add(activity);
 
-            // Update movie views
             var movie = await _context.Movies.FindAsync(movieId);
             if (movie != null)
             {
@@ -111,7 +117,7 @@ namespace MovieMania.Controllers.User
                     r.Rating,
                     r.ReviewText,
                     r.ReviewDate,
-                    UserName = r.User.Name,
+                    UserName = r.User != null ? r.User.Name : "Anonymous",
                     r.HelpfulCount
                 })
                 .ToListAsync();

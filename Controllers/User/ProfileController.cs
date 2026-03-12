@@ -27,9 +27,14 @@ namespace MovieMania.Controllers.User
         // GET: User/Profile
         public async Task<IActionResult> Index()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
-            var user = await _context.Users  // Now using AppUser
+            var user = await _context.Users
                 .Include(u => u.Subscriptions)
                     .ThenInclude(s => s.SubscriptionPlan)
                 .Include(u => u.Payments)
@@ -49,6 +54,7 @@ namespace MovieMania.Controllers.User
                 Email = user.Email,
                 Role = user.Role,
                 CreatedAt = user.CreatedAt,
+                ProfilePictureUrl = user.ProfilePictureUrl ?? "",
 
                 CurrentSubscription = user.Subscriptions
                     .FirstOrDefault(s => s.Status == "Active"),
@@ -62,13 +68,12 @@ namespace MovieMania.Controllers.User
                     .Take(5)
                     .ToList(),
 
-                TotalWishlistItems = user.Wishlists.Count(w => w.IsActive),
-                TotalMoviesWatched = user.Activities
-                    .Count(a => a.MovieId != null && a.IsCompleted),
-                TotalEpisodesWatched = user.Activities
-                    .Count(a => a.EpisodeId != null && a.IsCompleted),
-                WatchTimeMinutes = user.Activities
-                    .Sum(a => a.WatchDuration ?? 0) / 60,
+                TotalWishlistItems = user.Wishlists?.Count(w => w.IsActive) ?? 0,
+                TotalMoviesWatched = user.Activities?
+                    .Count(a => a.MovieId != null && a.IsCompleted) ?? 0,
+                TotalEpisodesWatched = user.Activities?
+                    .Count(a => a.EpisodeId != null && a.IsCompleted) ?? 0,
+                WatchTimeMinutes = (user.Activities?.Sum(a => a.WatchDuration ?? 0) ?? 0) / 60,
 
                 RecentlyWatched = await _context.UserActivities
                     .Include(ua => ua.Movie)
@@ -100,7 +105,13 @@ namespace MovieMania.Controllers.User
                 return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors) });
             }
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
+
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
@@ -136,7 +147,13 @@ namespace MovieMania.Controllers.User
                 return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors) });
             }
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
+
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
@@ -158,9 +175,18 @@ namespace MovieMania.Controllers.User
         // GET: User/Profile/Referral
         public async Task<IActionResult> Referral()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
             if (string.IsNullOrEmpty(user.ReferralCode))
             {
@@ -168,27 +194,23 @@ namespace MovieMania.Controllers.User
                 await _context.SaveChangesAsync();
             }
 
+            var referrals = await _context.Referrals
+                .Where(r => r.ReferrerId == userId)
+                .OrderByDescending(r => r.CreatedAt)
+                .Take(20)
+                .ToListAsync();
+
             var viewModel = new ReferralViewModel
             {
-                ReferralCode = user.ReferralCode,
+                ReferralCode = user.ReferralCode ?? "",
                 TotalReferrals = user.TotalReferrals,
                 RewardPoints = user.RewardPoints,
-
-                ReferralHistory = await _context.Referrals
-                    .Where(r => r.ReferrerId == userId)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Take(20)
-                    .ToListAsync(),
-
-                PendingReferrals = await _context.Referrals
-                    .CountAsync(r => r.ReferrerId == userId && r.Status == "Pending"),
-
-                CompletedReferrals = await _context.Referrals
-                    .CountAsync(r => r.ReferrerId == userId && r.Status == "Completed"),
-
-                TotalEarned = await _context.Referrals
-                    .Where(r => r.ReferrerId == userId && r.Status == "Completed")
-                    .SumAsync(r => r.RewardAmount)
+                ReferralHistory = referrals,
+                PendingReferrals = referrals.Count(r => r.Status == "Pending"),
+                CompletedReferrals = referrals.Count(r => r.Status == "Completed"),
+                TotalEarned = referrals
+                    .Where(r => r.Status == "Completed")
+                    .Sum(r => r.RewardAmount)
             };
 
             return View(viewModel);
@@ -198,8 +220,23 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> SendReferral(string email)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (string.IsNullOrEmpty(email))
+            {
+                return Json(new { success = false, message = "Email is required" });
+            }
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
+
             var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found" });
+            }
 
             var existing = await _context.Referrals
                 .FirstOrDefaultAsync(r => r.ReferrerId == userId && r.ReferredUserEmail == email);
@@ -213,7 +250,7 @@ namespace MovieMania.Controllers.User
             {
                 ReferrerId = userId,
                 ReferredUserEmail = email,
-                ReferralCode = user.ReferralCode,
+                ReferralCode = user.ReferralCode ?? GenerateReferralCode(),
                 Status = "Pending",
                 CreatedAt = DateTime.Now
             };
@@ -241,17 +278,25 @@ namespace MovieMania.Controllers.User
 
         private async Task UpdateUserClaims(AppUser user)
         {
-            var identity = (ClaimsIdentity)User.Identity;
-            identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
-            identity.RemoveClaim(identity.FindFirst(ClaimTypes.Email));
+            var identity = User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var nameClaim = identity.FindFirst(ClaimTypes.Name);
+                if (nameClaim != null)
+                    identity.RemoveClaim(nameClaim);
 
-            identity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
-            identity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
+                var emailClaim = identity.FindFirst(ClaimTypes.Email);
+                if (emailClaim != null)
+                    identity.RemoveClaim(emailClaim);
 
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity)
-            );
+                identity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
+                identity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity)
+                );
+            }
         }
     }
 }

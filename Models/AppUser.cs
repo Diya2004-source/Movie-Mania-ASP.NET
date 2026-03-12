@@ -14,18 +14,18 @@ namespace MovieMania.Models
         [Required(ErrorMessage = "Name is required")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters")]
         [Display(Name = "Full Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         [StringLength(150)]
         [Display(Name = "Email Address")]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [StringLength(255)]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         [StringLength(50)]
         [Display(Name = "Role")]
@@ -41,7 +41,7 @@ namespace MovieMania.Models
 
         [Display(Name = "Referral Code")]
         [StringLength(20)]
-        public string ReferralCode { get; set; }
+        public string? ReferralCode { get; set; }  // Made nullable
 
         [Display(Name = "Total Referrals")]
         public int TotalReferrals { get; set; } = 0;
@@ -55,7 +55,7 @@ namespace MovieMania.Models
         [Display(Name = "Profile Picture")]
         [StringLength(500)]
         [Url(ErrorMessage = "Invalid URL format")]
-        public string ProfilePictureUrl { get; set; }
+        public string? ProfilePictureUrl { get; set; }  // Made nullable
 
         // Navigation Properties
         public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();

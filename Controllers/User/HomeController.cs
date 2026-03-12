@@ -8,6 +8,7 @@ using System.Security.Claims;
 namespace MovieMania.Controllers.User
 {
     [Authorize(Roles = "user")]
+    [Area("User")]  // ✅ ADD THIS LINE - This is the fix!
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +20,12 @@ namespace MovieMania.Controllers.User
 
         public async Task<IActionResult> Index()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             var viewModel = new UserDashboardViewModel
             {
@@ -80,6 +86,13 @@ namespace MovieMania.Controllers.User
 
         public async Task<IActionResult> Movies(string search, string genre, string sortBy = "latest", int page = 1)
         {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
+
             int pageSize = 24;
             var query = _context.Movies.Where(m => m.IsActive);
 
@@ -128,7 +141,12 @@ namespace MovieMania.Controllers.User
 
         public async Task<IActionResult> MovieDetails(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             var movie = await _context.Movies
                 .Include(m => m.GenreNavigation)
@@ -169,7 +187,12 @@ namespace MovieMania.Controllers.User
 
         public async Task<IActionResult> ShowDetails(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             var show = await _context.Shows
                 .Include(s => s.GenreNavigation)

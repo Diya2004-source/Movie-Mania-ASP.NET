@@ -1,5 +1,4 @@
-﻿// Controllers/User/SubscriptionController.cs
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
@@ -21,10 +20,15 @@ namespace MovieMania.Controllers.User
         // GET: User/Subscription/Plans
         public async Task<IActionResult> Plans()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
 
             var plans = await _context.SubscriptionPlans
-                .Where(sp => sp.IsActive)  // Now this works
+                .Where(sp => sp.IsActive)
                 .OrderBy(sp => sp.Price)
                 .ToListAsync();
 
@@ -41,7 +45,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Cancel()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var subscription = await _context.UserSubscriptions
                 .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Active");
@@ -53,7 +62,7 @@ namespace MovieMania.Controllers.User
 
             subscription.Status = "Cancelled";
             subscription.EndDate = DateTime.Now;
-            subscription.CancelledAt = DateTime.Now;  // Now this works
+            subscription.CancelledAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -69,7 +78,12 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Reactivate()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Json(new { success = false, message = "User not authenticated" });
+            }
+            var userId = int.Parse(userIdClaim);
 
             var subscription = await _context.UserSubscriptions
                 .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Cancelled");
@@ -80,7 +94,7 @@ namespace MovieMania.Controllers.User
             }
 
             subscription.Status = "Active";
-            subscription.ReactivatedAt = DateTime.Now;  // Now this works
+            subscription.ReactivatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
