@@ -1,148 +1,427 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>MovieMania - @ViewData["Title"]</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieMania - @ViewData["Title"]</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Bootstrap & Fonts -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Toastr for notifications -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
     <style>
-        body {
-            background-color: #111;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --primary: #ff4d4d;
+            --primary-dark: #ff3333;
+            --secondary: #0dcaf0;
+            --dark: #0a0c0f;
+            --darker: #000000;
+            --light: #ffffff;
+            --gray: #9ca3af;
+            --card-bg: #1a1a1a;
+            --card-hover: #252525;
         }
 
-        .navbar {
-            background-color: #000;
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            padding-top: 76px; /* Account for fixed navbar */
+        }
+
+        /* ===== NAVBAR STYLES ===== */
+        .navbar {
+            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,77,77,0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+            .navbar.scrolled {
+                padding: 10px 0;
+                background: rgba(0,0,0,0.95);
+                backdrop-filter: blur(10px);
+            }
 
         .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff4d4d !important;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--light) !important;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 0;
         }
 
+            .navbar-brand span {
+                background: linear-gradient(135deg, var(--primary), #ff8c5a);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .navbar-brand i {
+                color: var(--primary);
+                margin-right: 8px;
+                font-size: 24px;
+            }
+
         .nav-link {
-            color: #fff !important;
-            margin: 0 10px;
-            transition: color 0.3s;
-            text-decoration: none;
+            color: var(--gray) !important;
+            font-weight: 500;
+            margin: 0 5px;
+            padding: 8px 16px !important;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.95rem;
         }
 
             .nav-link:hover {
-                color: #ff4d4d !important;
+                color: var(--light) !important;
+                background: rgba(255,77,77,0.1);
             }
 
-        .btn-login {
-            background: transparent;
-            border: 1px solid #ff4d4d;
-            color: white !important;
-            padding: 8px 20px;
-            border-radius: 5px;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-            .btn-login:hover {
-                background: #ff4d4d;
-                color: white !important;
-            }
-
-        .btn-register {
-            background: #ff4d4d;
-            border: none;
-            color: white !important;
-            padding: 8px 20px;
-            border-radius: 5px;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-            .btn-register:hover {
-                background: #ff3333;
-                transform: translateY(-2px);
+            .nav-link.active {
+                color: var(--light) !important;
+                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
                 box-shadow: 0 5px 15px rgba(255,77,77,0.3);
             }
 
-        .movie-card img {
-            height: 300px;
-            object-fit: cover;
+                .nav-link.active:hover {
+                    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+                }
+
+            .nav-link i {
+                margin-right: 6px;
+                font-size: 0.9rem;
+            }
+
+        /* Auth Buttons */
+        .btn-login {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--light) !important;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin: 0 5px;
         }
 
-        .card {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            background: #1a1a1a;
+            .btn-login:hover {
+                background: var(--primary);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(255,77,77,0.3);
+                color: var(--light) !important;
+            }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
+            color: var(--light) !important;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin: 0 5px;
+            box-shadow: 0 5px 15px rgba(255,77,77,0.3);
         }
 
-        footer {
-            background: #000;
-            padding: 20px 0;
-            margin-top: 50px;
-            text-align: center;
-            color: #888;
-        }
+            .btn-register:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(255,77,77,0.5);
+            }
 
+        /* User Dropdown */
         .dropdown-menu {
-            background: #1a1a1a;
-            border: 1px solid #333;
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 8px;
+            margin-top: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
         }
 
         .dropdown-item {
-            color: #fff;
-            text-decoration: none;
+            color: var(--gray);
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
 
-            .dropdown-item:hover {
-                background: #ff4d4d;
-                color: white;
+            .dropdown-item i {
+                margin-right: 10px;
+                width: 20px;
+                color: var(--primary);
             }
+
+            .dropdown-item:hover {
+                background: rgba(255,77,77,0.1);
+                color: var(--light);
+                transform: translateX(5px);
+            }
+
+        .dropdown-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 8px 0;
+        }
+
+        /* Main Content */
+        main {
+            min-height: calc(100vh - 300px);
+        }
+
+        /* ===== FOOTER STYLES ===== */
+        .footer {
+            background: linear-gradient(180deg, var(--darker) 0%, #000 100%);
+            padding: 60px 0 20px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(255,77,77,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            }
+
+            .footer h5 {
+                color: var(--light);
+                font-weight: 600;
+                margin-bottom: 20px;
+                position: relative;
+                padding-bottom: 10px;
+            }
+
+                .footer h5::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 50px;
+                    height: 2px;
+                    background: linear-gradient(90deg, var(--primary), transparent);
+                }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+            .footer-links li {
+                margin-bottom: 12px;
+            }
+
+            .footer-links a {
+                color: var(--gray);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                display: inline-block;
+            }
+
+                .footer-links a:hover {
+                    color: var(--primary);
+                    transform: translateX(5px);
+                }
+
+                .footer-links a i {
+                    margin-right: 8px;
+                    font-size: 0.8rem;
+                }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+            .social-links a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 50%;
+                color: var(--gray);
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+                .social-links a:hover {
+                    background: var(--primary);
+                    color: var(--light);
+                    transform: translateY(-3px);
+                    box-shadow: 0 5px 15px rgba(255,77,77,0.4);
+                }
+
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: var(--gray);
+        }
+
+            .footer-bottom a {
+                color: var(--gray);
+                text-decoration: none;
+                margin: 0 10px;
+                transition: color 0.3s ease;
+            }
+
+                .footer-bottom a:hover {
+                    color: var(--primary);
+                }
+
+        .newsletter-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 12px 20px;
+            color: var(--light);
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+            .newsletter-input:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(255,77,77,0.1);
+            }
+
+        .btn-newsletter {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 30px;
+            padding: 12px 30px;
+            color: var(--light);
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .btn-newsletter:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(255,77,77,0.4);
+            }
+
+        /* Toastr Customization */
+        .toast-success {
+            background-color: #00c853 !important;
+        }
+
+        .toast-error {
+            background-color: #ff4d4d !important;
+        }
+
+        .toast-warning {
+            background-color: #ffc107 !important;
+        }
+
+        .toast-info {
+            background-color: #0dcaf0 !important;
+        }
+
+        /* Responsive */
+        @@media (max-width: 991px) {
+            .navbar-collapse {
+                background: rgba(0,0,0,0.95);
+                padding: 20px;
+                border-radius: 12px;
+                margin-top: 10px;
+                backdrop-filter: blur(10px);
+            }
+
+            .nav-link {
+                text-align: center;
+            }
+
+            .btn-login, .btn-register {
+                display: block;
+                text-align: center;
+                margin: 10px 0;
+            }
+        }
     </style>
 
-    @* Render Styles section if defined *@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" asp-controller="GuestHome" asp-action="Index">
-                MovieMania
+                <i class="fas fa-film"></i> Movie<span>Mania</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="GuestHome" asp-action="Index">
-                            Home
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "GuestHome" ? "active" : "")"
+                           asp-controller="GuestHome" asp-action="Index">
+                            <i class="fas fa-home"></i> Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="GuestMovies" asp-action="Movies">
-                            Movies
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Movies" ? "active" : "")"
+                           asp-controller="GuestHome" asp-action="Movies">
+                            <i class="fas fa-film"></i> Movies
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="GuestMovies" asp-action="Shows">
-                            Shows
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Shows" ? "active" : "")"
+                           asp-controller="GuestHome" asp-action="Shows">
+                            <i class="fas fa-tv"></i> TV Shows
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="GuestMovies" asp-action="Anime">
-                            Anime
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Anime" ? "active" : "")"
+                           asp-controller="GuestHome" asp-action="Anime">
+                            <i class="fas fa-dragon"></i> Anime
                         </a>
                     </li>
+                </ul>
 
+                <div class="d-flex align-items-center">
                     @{
                         var isLoggedIn = Context.Session.GetInt32("UserId") != null;
                         var userName = Context.Session.GetString("UserName");
@@ -150,74 +429,170 @@
 
                     @if (isLoggedIn)
                     {
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                @userName
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-2"></i>
+                                <span>@userName</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="Index">
-                                        Dashboard
+                                        <i class="fas fa-tachometer-alt"></i> Dashboard
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" asp-area="User" asp-controller="Profile" asp-action="Index">
-                                        Profile
+                                        <i class="fas fa-id-card"></i> Profile
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" asp-area="User" asp-controller="Wishlist" asp-action="Index">
-                                        My List
+                                        <i class="fas fa-heart"></i> My List
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" asp-area="User" asp-controller="Profile" asp-action="Referral">
-                                        Referrals
+                                        <i class="fas fa-gift"></i> Referrals
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form asp-controller="Auth" asp-action="Logout" method="post" style="display: inline;">
                                         <button type="submit" class="dropdown-item text-danger">
-                                            Logout
+                                            <i class="fas fa-sign-out-alt"></i> Logout
                                         </button>
                                     </form>
                                 </li>
                             </ul>
-                        </li>
+                        </div>
                     }
                     else
                     {
-                        <li class="nav-item mx-1">
-                            <a class="nav-link btn-login" asp-controller="Auth" asp-action="Login">
-                                Login
-                            </a>
-                        </li>
-                        <li class="nav-item mx-1">
-                            <a class="nav-link btn-register" asp-controller="Auth" asp-action="Register">
-                                Register
-                            </a>
-                        </li>
+                        <a class="btn-login" asp-controller="Auth" asp-action="Login">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                        <a class="btn-register" asp-controller="Auth" asp-action="Register">
+                            <i class="fas fa-user-plus me-2"></i>Register
+                        </a>
                     }
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main>
         @RenderBody()
     </main>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="footer">
         <div class="container">
-            <p>&copy; @DateTime.Now.Year MovieMania. All rights reserved.</p>
+            <div class="row g-4">
+                <!-- About Section -->
+                <div class="col-lg-4 col-md-6">
+                    <h5>
+                        <i class="fas fa-film me-2"></i>MovieMania
+                    </h5>
+                    <p class="text-muted" style="line-height: 1.8;">
+                        Your ultimate destination for unlimited entertainment.
+                        Stream thousands of movies and TV shows in stunning 4K quality.
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a asp-controller="GuestHome" asp-action="Index"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a asp-controller="GuestHome" asp-action="Movies"><i class="fas fa-chevron-right"></i> Movies</a></li>
+                        <li><a asp-controller="GuestHome" asp-action="Shows"><i class="fas fa-chevron-right"></i> TV Shows</a></li>
+                        <li><a asp-controller="GuestHome" asp-action="Anime"><i class="fas fa-chevron-right"></i> Anime</a></li>
+                    </ul>
+                </div>
+
+                <!-- Help & Support -->
+                <div class="col-lg-2 col-md-6">
+                    <h5>Support</h5>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Help Center</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-lg-4 col-md-6">
+                    <h5>Stay Updated</h5>
+                    <p class="text-muted small">Subscribe to get notifications about new releases and exclusive offers.</p>
+                    <div class="newsletter-form">
+                        <input type="email" class="newsletter-input" placeholder="Enter your email" />
+                        <button class="btn-newsletter">
+                            <i class="fas fa-paper-plane me-2"></i>Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="row">
+                    <div class="col-md-6 text-md-start text-center mb-3 mb-md-0">
+                        &copy; @DateTime.Now.Year MovieMania. All rights reserved.
+                    </div>
+                    <div class="col-md-6 text-md-end text-center">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    @* Render Scripts section if defined *@
+    <script>
+        // Configure toastr
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Auto-dismiss alerts
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

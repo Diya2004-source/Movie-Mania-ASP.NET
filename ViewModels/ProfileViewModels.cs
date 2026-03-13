@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MovieMania.Models;
 
 namespace MovieMania.ViewModels
@@ -13,22 +15,22 @@ namespace MovieMania.ViewModels
         public string ProfilePictureUrl { get; set; }
 
         public UserSubscription CurrentSubscription { get; set; }
-        public List<UserSubscription> SubscriptionHistory { get; set; }
-        public List<Payment> RecentPayments { get; set; }
+        public List<UserSubscription> SubscriptionHistory { get; set; } = new List<UserSubscription>();
+        public List<Payment> RecentPayments { get; set; } = new List<Payment>();
 
         public int TotalWishlistItems { get; set; }
         public int TotalMoviesWatched { get; set; }
         public int TotalEpisodesWatched { get; set; }
         public int WatchTimeMinutes { get; set; }
 
-        public List<UserActivity> RecentlyWatched { get; set; }
-        public List<Wishlist> WishlistPreview { get; set; }
+        public List<UserActivity> RecentlyWatched { get; set; } = new List<UserActivity>();
+        public List<Wishlist> WishlistPreview { get; set; } = new List<Wishlist>();
     }
 
     public class UpdateProfileViewModel
     {
         [Required(ErrorMessage = "Name is required")]
-        [StringLength(100, MinimumLength = 2)]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
@@ -43,7 +45,7 @@ namespace MovieMania.ViewModels
         public string CurrentPassword { get; set; }
 
         [Required(ErrorMessage = "New password is required")]
-        [StringLength(100, MinimumLength = 6)]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
         [DataType(DataType.Password)]
         public string NewPassword { get; set; }
 
@@ -57,7 +59,7 @@ namespace MovieMania.ViewModels
         public string ReferralCode { get; set; }
         public int TotalReferrals { get; set; }
         public int RewardPoints { get; set; }
-        public List<Referral> ReferralHistory { get; set; }
+        public List<Referral> ReferralHistory { get; set; } = new List<Referral>();
         public int PendingReferrals { get; set; }
         public int CompletedReferrals { get; set; }
         public decimal TotalEarned { get; set; }

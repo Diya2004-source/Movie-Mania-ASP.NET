@@ -1,0 +1,640 @@
+﻿@model MovieMania.ViewModels.GuestShowDetailsViewModel
+
+@{
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+    ViewData["Title"] = Model.Show.Title;
+}
+
+<div class="show-details-page">
+    <!-- Hero Section -->
+    <section class="show-hero"
+             style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)),
+                    url('@(Model.Show.ThumbnailUrl ?? "/images/default-backdrop.jpg")') center/cover no-repeat fixed;">
+
+        <div class="container">
+            <div class="row align-items-center min-vh-60">
+                <div class="col-lg-3 col-md-4 mb-4 mb-md-0" data-aos="fade-right">
+                    <div class="show-poster-wrapper">
+                        <img src="@(Model.Show.ThumbnailUrl ?? "/images/default-show.jpg")"
+                             alt="@Model.Show.Title"
+                             class="img-fluid rounded show-poster">
+                        @if (Model.Show.Rating.HasValue)
+                        {
+                            <div class="rating-badge">
+                                <i class="fas fa-star text-warning"></i>
+                                <span>@Model.Show.Rating.Value.ToString("F1")</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-8" data-aos="fade-left">
+                    <div class="show-info">
+                        <h1 class="show-title">@Model.Show.Title</h1>
+
+                        <div class="show-meta">
+                            @if (Model.Show.ReleaseYear.HasValue)
+                            {
+                                <span class="meta-item">
+                                    <i class="far fa-calendar-alt"></i> @Model.Show.ReleaseYear
+                                </span>
+                            }
+                            <span class="meta-item">
+                                <i class="fas fa-tag"></i> @Model.Show.Genre
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-layer-group"></i> @Model.Show.TotalSeasons Seasons
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-play-circle"></i> @Model.Show.TotalEpisodes Episodes
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Show.Description))
+                        {
+                            <p class="show-description">@Model.Show.Description</p>
+                        }
+
+                        <div class="show-details-grid">
+                            @if (!string.IsNullOrEmpty(Model.Show.Director))
+                            {
+                                <div class="detail-item">
+                                    <span class="detail-label">Director</span>
+                                    <span class="detail-value">@Model.Show.Director</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Show.Cast))
+                            {
+                                <div class="detail-item">
+                                    <span class="detail-label">Cast</span>
+                                    <span class="detail-value">@Model.Show.Cast</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Show.Language))
+                            {
+                                <div class="detail-item">
+                                    <span class="detail-label">Language</span>
+                                    <span class="detail-value">@Model.Show.Language</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="show-actions">
+                            <button class="btn-wishlist" onclick="addToWishlist(@Model.Show.Id)">
+                                <i class="far fa-heart"></i>
+                                <span>Add to Wishlist</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Episodes Section -->
+    <section class="episodes-section py-5">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-list me-3"></i>Episodes
+                </h2>
+            </div>
+
+            @if (Model.EpisodesBySeason != null && Model.EpisodesBySeason.Any())
+            {
+                <div class="episodes-tabs">
+                    <ul class="nav nav-pills mb-4" id="seasonTabs" role="tablist">
+                        @foreach (var season in Model.EpisodesBySeason.OrderBy(s => s.Key))
+                        {
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link @(season.Key == 1 ? "active" : "")"
+                                        id="season-@season.Key-tab"
+                                        data-bs-toggle="pill"
+                                        data-bs-target="#season-@season.Key"
+                                        type="button"
+                                        role="tab">
+                                    Season @season.Key
+                                </button>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="tab-content" id="seasonTabsContent">
+                        @foreach (var season in Model.EpisodesBySeason.OrderBy(s => s.Key))
+                        {
+                            <div class="tab-pane fade @(season.Key == 1 ? "show active" : "")"
+                                 id="season-@season.Key"
+                                 role="tabpanel">
+
+                                <div class="episodes-grid">
+                                    @foreach (var episode in season.Value.OrderBy(e => e.EpisodeNumber))
+                                    {
+                                        <div class="episode-card">
+                                            <div class="episode-thumbnail">
+                                                <img src="@(episode.ThumbnailUrl ?? "/images/default-episode.jpg")"
+                                                     alt="@episode.Title">
+                                                <div class="episode-overlay">
+                                                    <a href="@episode.VideoUrl" target="_blank" class="btn-play">
+                                                        <i class="fas fa-play"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="episode-info">
+                                                <div class="episode-header">
+                                                    <h6 class="episode-title">@episode.Title</h6>
+                                                    <span class="episode-number">S@(episode.SeasonNumber)E@(episode.EpisodeNumber)</span>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(episode.Description))
+                                                {
+                                                    <p class="episode-description">@episode.Description</p>
+                                                }
+                                                <div class="episode-meta">
+                                                    @if (episode.Duration.HasValue)
+                                                    {
+                                                        <span><i class="far fa-clock"></i> @episode.Duration min</span>
+                                                    }
+                                                    @if (episode.ReleaseDate.HasValue)
+                                                    {
+                                                        <span><i class="far fa-calendar-alt"></i> @episode.ReleaseDate.Value.ToString("dd MMM yyyy")</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="no-episodes">
+                    <i class="fas fa-list fa-4x mb-3"></i>
+                    <h3>No Episodes Yet</h3>
+                    <p>Episodes will be added soon</p>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Related Shows Section -->
+    @if (Model.RelatedShows.Any())
+    {
+        <section class="related-section py-5 bg-dark-gradient">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-tv me-3"></i>You May Also Like
+                    </h2>
+                </div>
+
+                <div class="row g-4">
+                    @foreach (var show in Model.RelatedShows)
+                    {
+                        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                            <div class="show-card">
+                                <div class="show-poster">
+                                    <img src="@(show.ThumbnailUrl ?? "/images/default-show.jpg")"
+                                         alt="@show.Title">
+                                    <div class="show-overlay">
+                                        <a href="@Url.Action("ShowDetails", new { id = show.Id })"
+                                           class="btn-details">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="show-info">
+                                    <h6>@show.Title</h6>
+                                    <small>@show.ReleaseYear</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .show-hero {
+        min-height: 80vh;
+        padding: 100px 0 50px;
+        position: relative;
+    }
+
+    .min-vh-60 {
+        min-height: 60vh;
+    }
+
+    .show-poster-wrapper {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .show-poster {
+        width: 100%;
+        height: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .show-poster-wrapper:hover .show-poster {
+        transform: scale(1.05);
+    }
+
+    .rating-badge {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(5px);
+        padding: 10px 20px;
+        border-radius: 30px;
+        color: #ffd700;
+        font-weight: 600;
+        border: 1px solid rgba(255,215,0,0.3);
+    }
+
+    .show-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #fff, #0dcaf0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .show-meta {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .meta-item {
+        background: rgba(255,255,255,0.05);
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        color: #e5e7eb;
+    }
+
+        .meta-item i {
+            margin-right: 8px;
+            color: #0dcaf0;
+        }
+
+    .show-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #d1d5db;
+        margin-bottom: 30px;
+    }
+
+    /* Episodes Section */
+    .episodes-section {
+        background: #0a0c0f;
+    }
+
+    .episodes-tabs {
+        background: #1a1a1a;
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-pills {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .nav-pills .nav-link {
+            background: #2a2a2a;
+            color: white;
+            border-radius: 30px;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+        }
+
+            .nav-pills .nav-link:hover {
+                background: rgba(13,202,240,0.2);
+            }
+
+            .nav-pills .nav-link.active {
+                background: linear-gradient(135deg, #0dcaf0, #0bb7d6);
+                color: #000;
+                font-weight: 600;
+            }
+
+    .episodes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .episode-card {
+        background: #2a2a2a;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+        .episode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(13,202,240,0.2);
+            border-color: rgba(13,202,240,0.3);
+        }
+
+    .episode-thumbnail {
+        position: relative;
+        aspect-ratio: 16/9;
+        overflow: hidden;
+    }
+
+        .episode-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+    .episode-card:hover .episode-thumbnail img {
+        transform: scale(1.1);
+    }
+
+    .episode-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .episode-card:hover .episode-overlay {
+        opacity: 1;
+    }
+
+    .btn-play {
+        background: #0dcaf0;
+        color: #000;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        transform: scale(0);
+    }
+
+    .episode-card:hover .btn-play {
+        transform: scale(1);
+    }
+
+    .btn-play:hover {
+        background: #0bb7d6;
+        transform: scale(1.1) !important;
+    }
+
+    .episode-info {
+        padding: 15px;
+    }
+
+    .episode-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .episode-title {
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .episode-number {
+        background: rgba(13,202,240,0.2);
+        color: #0dcaf0;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .episode-description {
+        color: #9ca3af;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .episode-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+        .episode-meta i {
+            color: #0dcaf0;
+            margin-right: 4px;
+        }
+
+    .no-episodes {
+        text-align: center;
+        padding: 60px;
+        background: #1a1a1a;
+        border-radius: 20px;
+    }
+
+        .no-episodes i {
+            color: #0dcaf0;
+            opacity: 0.5;
+        }
+
+        .no-episodes h3 {
+            color: white;
+            margin: 20px 0 10px;
+        }
+
+        .no-episodes p {
+            color: #9ca3af;
+        }
+
+    /* Related Shows */
+    .bg-dark-gradient {
+        background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
+    }
+
+    .section-header {
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #0dcaf0, transparent);
+        }
+
+    .show-card {
+        background: #1a1a1a;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+        .show-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(13,202,240,0.2);
+        }
+
+    .show-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+        .show-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+    .show-card:hover .show-poster img {
+        transform: scale(1.1);
+    }
+
+    .show-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .show-card:hover .show-overlay {
+        opacity: 1;
+    }
+
+    .btn-details {
+        background: #0dcaf0;
+        color: #000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        transform: scale(0);
+    }
+
+    .show-card:hover .btn-details {
+        transform: scale(1);
+    }
+
+    .btn-details:hover {
+        background: #0bb7d6;
+        transform: scale(1.1) !important;
+    }
+
+    .show-info {
+        padding: 12px;
+    }
+
+        .show-info h6 {
+            color: white;
+            font-size: 0.9rem;
+            margin: 0 0 5px 0;
+        }
+
+        .show-info small {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .show-title {
+            font-size: 2.5rem;
+        }
+
+        .episodes-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function addToWishlist(showId) {
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                    <text>
+                    $.post('@Url.Action("AddToWishlist", "Wishlist", new { area = "User" })', { showId: showId })
+                        .done(function(response) {
+                            if (response.success) {
+                                toastr.success('Added to wishlist!');
+                            } else {
+                                toastr.info('Already in wishlist');
+                            }
+                        })
+                        .fail(function() {
+                            toastr.error('Error adding to wishlist');
+                        });
+                    </text>
+            }
+            else
+            {
+                    <text>
+                    toastr.warning('Please login to add to wishlist');
+                    setTimeout(function() {
+                        window.location.href = '@Url.Action("Login", "Auth")';
+                    }, 2000);
+                    </text>
+            }
+        }
+    </script>
+}

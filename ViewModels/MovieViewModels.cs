@@ -1,33 +1,29 @@
-﻿// ViewModels/MovieViewModels.cs
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using MovieMania.Models;  // Make sure this using is present
+using MovieMania.Models;
 
 namespace MovieMania.ViewModels
 {
-    public class UserDashboardViewModel
+    // Guest movie details
+    public class GuestMovieDetailsViewModel
     {
-        public List<Movie> FeaturedMovies { get; set; } = new List<Movie>();
-        public List<Movie> RecentMovies { get; set; } = new List<Movie>();
-        public List<Movie> RecommendedMovies { get; set; } = new List<Movie>();
-        public List<Show> TrendingShows { get; set; } = new List<Show>();
-        public List<Wishlist> UserWishlist { get; set; } = new List<Wishlist>();
-        public List<UserActivity> ContinueWatching { get; set; } = new List<UserActivity>();
-        public int TotalWishlistCount { get; set; }
-        public int RecentlyWatchedCount { get; set; }
-        public UserSubscription ActiveSubscription { get; set; }
+        public Movie Movie { get; set; } = new Movie();
+        public List<Movie> RelatedMovies { get; set; } = new List<Movie>();
+        public List<MovieReview> Reviews { get; set; } = new List<MovieReview>();
     }
 
-    public class MovieDetailsViewModel
+    // User movie details
+    public class UserMovieDetailsViewModel
     {
         public Movie Movie { get; set; } = new Movie();
         public bool IsInWishlist { get; set; }
         public decimal? UserRating { get; set; }
         public List<Movie> RelatedMovies { get; set; } = new List<Movie>();
+        public List<int> RelatedMoviesInWishlist { get; set; } = new List<int>();
         public List<MovieReview> Reviews { get; set; } = new List<MovieReview>();
     }
 
+    // Movie rating (FIXES THE ERROR)
     public class MovieRatingViewModel
     {
         [Required]

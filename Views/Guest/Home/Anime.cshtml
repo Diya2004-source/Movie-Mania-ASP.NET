@@ -1,0 +1,476 @@
+﻿@model IEnumerable<MovieMania.Models.Show>
+
+@{
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+    ViewData["Title"] = "Browse Anime";
+}
+
+<div class="anime-page">
+    <!-- Hero Banner -->
+    <section class="page-hero mb-5">
+        <div class="container">
+            <div class="hero-content text-center">
+                <h1 class="hero-title">Browse Anime</h1>
+                <p class="hero-subtitle">Discover the best anime series from Japan and around the world</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section mb-5">
+        <div class="container">
+            <div class="filters-wrapper">
+                <form method="get" class="row g-3 align-items-end">
+                    <!-- Search Bar -->
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label text-muted mb-2">Search Anime</label>
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="form-control" name="search" 
+                                   value="@ViewBag.Search" placeholder="Search by title...">
+                        </div>
+                    </div>
+
+                    <!-- Genre Filter -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label text-muted mb-2">Genre</label>
+                        <div class="filter-select">
+                            <i class="fas fa-tag select-icon"></i>
+                            <select class="form-select" name="genre">
+                                <option value="All">All Genres</option>
+                                @if (ViewBag.Genres != null)
+                                {
+                                    @foreach (var genre in ViewBag.Genres)
+                                    {
+                                        <option value="@genre" selected="@(genre == ViewBag.Genre)">
+                                            @genre
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Apply Button -->
+                    <div class="col-lg-5 col-md-12">
+                        <button type="submit" class="btn-apply w-100">
+                            <i class="fas fa-filter me-2"></i>Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Info -->
+    <section class="results-section mb-4">
+        <div class="container">
+            <div class="results-info">
+                <p class="mb-0">
+                    <i class="fas fa-dragon me-2"></i>
+                    Showing <strong>@Model.Count()</strong> of <strong>@ViewBag.TotalItems</strong> anime
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Anime Grid -->
+    <section class="anime-grid-section mb-5">
+        <div class="container">
+            @if (!Model.Any())
+            {
+                <div class="no-results">
+                    <i class="fas fa-dragon fa-4x mb-3"></i>
+                    <h3>No Anime Found</h3>
+                    <p>Try adjusting your search or filter criteria</p>
+                    <a href="@Url.Action("Anime")" class="btn-clear">
+                        <i class="fas fa-undo me-2"></i>Clear Filters
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var show in Model)
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="fade-up">
+                            <div class="anime-card">
+                                <div class="anime-poster">
+                                    <img src="@(show.ThumbnailUrl ?? "/images/default-anime.jpg")" 
+                                         alt="@show.Title"
+                                         loading="lazy">
+                                    
+                                    @if (show.Rating.HasValue)
+                                    {
+                                        <div class="anime-rating-badge">
+                                            <i class="fas fa-star"></i>
+                                            <span>@show.Rating.Value.ToString("F1")</span>
+                                        </div>
+                                    }
+
+                                    <div class="anime-seasons-badge">
+                                        <i class="fas fa-layer-group"></i>
+                                        <span>@show.TotalSeasons @(show.TotalSeasons == 1 ? "Season" : "Seasons")</span>
+                                    </div>
+
+                                    <div class="anime-overlay">
+                                        <a href="@Url.Action("ShowDetails", new { id = show.Id })" 
+                                           class="btn-details">
+                                            <i class="fas fa-info-circle me-2"></i>Details
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="anime-info">
+                                    <h6 class="anime-title">@show.Title</h6>
+                                    <div class="anime-meta">
+                                        <span class="genre">@show.Genre</span>
+                                        <span class="year">@show.ReleaseYear</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <section class="pagination-section">
+            <div class="container">
+                <nav aria-label="Anime pagination">
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Anime", new { 
+                                    page = ViewBag.CurrentPage - 1, 
+                                    search = ViewBag.Search, 
+                                    genre = ViewBag.Genre
+                                })">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Anime", new { 
+                                    page = i, 
+                                    search = ViewBag.Search, 
+                                    genre = ViewBag.Genre
+                                })">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Anime", new { 
+                                    page = ViewBag.CurrentPage + 1, 
+                                    search = ViewBag.Search, 
+                                    genre = ViewBag.Genre
+                                })">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </section>
+    }
+</div>
+
+<style>
+    /* Page Hero */
+    .page-hero {
+        background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #fff, #ff4d4d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: #9ca3af;
+    }
+
+    /* Filters Section (reuse from Shows.css) */
+    .filters-wrapper {
+        background: #1a1a1a;
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .search-box, .filter-select {
+        position: relative;
+    }
+
+    .search-icon, .select-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ff4d4d;
+        z-index: 2;
+    }
+
+    .form-control, .form-select {
+        background: #2a2a2a;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 12px 15px 12px 45px;
+        color: white;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: #2a2a2a;
+        border-color: #ff4d4d;
+        box-shadow: 0 0 0 3px rgba(255,77,77,0.1);
+        color: white;
+        outline: none;
+    }
+
+    .btn-apply {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-apply:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
+    }
+
+    /* Anime Card */
+    .anime-card {
+        background: #1a1a1a;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        height: 100%;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .anime-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(255,77,77,0.2);
+        border-color: rgba(255,77,77,0.3);
+    }
+
+    .anime-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+    .anime-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .anime-card:hover .anime-poster img {
+        transform: scale(1.1);
+    }
+
+    .anime-rating-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(5px);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: #ffd700;
+        border: 1px solid rgba(255,215,0,0.3);
+        z-index: 2;
+    }
+
+    .anime-seasons-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .anime-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .anime-card:hover .anime-overlay {
+        opacity: 1;
+    }
+
+    .btn-details {
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+
+    .anime-card:hover .btn-details {
+        transform: translateY(0);
+    }
+
+    .btn-details:hover {
+        background: #ff3333;
+        transform: scale(1.05) translateY(-3px) !important;
+    }
+
+    .anime-info {
+        padding: 15px;
+    }
+
+    .anime-title {
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .anime-meta {
+        display: flex;
+        gap: 8px;
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    .anime-meta .genre {
+        color: #ff4d4d;
+    }
+
+    /* Results Info */
+    .results-info {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 15px 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 80px 0;
+        background: #1a1a1a;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .no-results i {
+        color: #ff4d4d;
+        opacity: 0.5;
+    }
+
+    .no-results h3 {
+        color: white;
+        margin: 20px 0 10px;
+    }
+
+    .no-results p {
+        color: #9ca3af;
+        margin-bottom: 20px;
+    }
+
+    .btn-clear {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-clear:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
+        color: white;
+    }
+
+    /* Pagination (reuse from Shows.css) */
+    .pagination {
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        border-color: transparent;
+    }
+
+    .page-link {
+        background: #1a1a1a;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px !important;
+        color: white;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        background: #2a2a2a;
+        border-color: #ff4d4d;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+    }
+</style>
