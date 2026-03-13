@@ -1,21 +1,210 @@
-﻿<!-- Views/Shared/_UserLayout.cshtml -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MOVIE MANIA</title>
+    <title>@ViewData["Title"] - Movie Mania</title>
+
+    <!-- Bootstrap & Fonts -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="~/css/user-style.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Toastr for notifications -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+    <style>
+        :root {
+            --primary: #ff4d4d;
+            --primary-dark: #ff3333;
+            --secondary: #0dcaf0;
+            --dark: #0a0c0f;
+            --darker: #000000;
+            --light: #ffffff;
+            --gray: #9ca3af;
+            --card-bg: #1a1a1a;
+            --card-hover: #252525;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            padding-top: 76px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,77,77,0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+            .navbar.scrolled {
+                padding: 10px 0;
+                background: rgba(0,0,0,0.95);
+            }
+
+        .navbar-brand {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--light) !important;
+            letter-spacing: 1px;
+        }
+
+            .navbar-brand span {
+                background: linear-gradient(135deg, var(--primary), #ff8c5a);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .navbar-brand i {
+                color: var(--primary);
+                margin-right: 8px;
+            }
+
+        .nav-link {
+            color: var(--gray) !important;
+            font-weight: 500;
+            margin: 0 5px;
+            padding: 8px 16px !important;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover {
+                color: var(--light) !important;
+                background: rgba(255,77,77,0.1);
+            }
+
+            .nav-link.active {
+                color: var(--light) !important;
+                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                box-shadow: 0 5px 15px rgba(255,77,77,0.3);
+            }
+
+        /* User Dropdown */
+        .dropdown-menu {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 8px;
+            margin-top: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .dropdown-item {
+            color: var(--gray);
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+            .dropdown-item i {
+                margin-right: 10px;
+                color: var(--primary);
+            }
+
+            .dropdown-item:hover {
+                background: rgba(255,77,77,0.1);
+                color: var(--light);
+                transform: translateX(5px);
+            }
+
+        /* Main Content */
+        main {
+            min-height: calc(100vh - 300px);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, var(--darker) 0%, #000 100%);
+            padding: 60px 0 20px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(255,77,77,0.2);
+        }
+
+            .footer h5 {
+                color: var(--light);
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+            .footer-links li {
+                margin-bottom: 12px;
+            }
+
+            .footer-links a {
+                color: var(--gray);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+                .footer-links a:hover {
+                    color: var(--primary);
+                    transform: translateX(5px);
+                }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+            .social-links a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 50%;
+                color: var(--gray);
+                transition: all 0.3s ease;
+            }
+
+                .social-links a:hover {
+                    background: var(--primary);
+                    color: var(--light);
+                    transform: translateY(-3px);
+                }
+
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: var(--gray);
+        }
+    </style>
 </head>
-<body class="dark-theme">
+<body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="@Url.Action("Index", "Home", new { area = "User" })">
-                <span class="brand-text">MOVIE<span class="text-danger">MANIA</span></span>
+            <a class="navbar-brand" asp-area="User" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-film"></i> Movie<span>Mania</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -25,115 +214,61 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
-                           href="@Url.Action("Index", "Home")">
+                        <a class="nav-link" asp-area="User" asp-controller="Home" asp-action="Index">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Movies" ? "active" : "")"
-                           href="@Url.Action("Movies", "Home")">
+                        <a class="nav-link" asp-area="User" asp-controller="Home" asp-action="Movies">
                             <i class="fas fa-film"></i> Movies
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Shows" ? "active" : "")"
-                           href="@Url.Action("Shows", "Home")">
+                        <a class="nav-link" asp-area="User" asp-controller="Home" asp-action="Shows">
                             <i class="fas fa-tv"></i> TV Shows
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Wishlist" ? "active" : "")"
-                           href="@Url.Action("Index", "Wishlist")">
+                        <a class="nav-link" asp-area="User" asp-controller="Wishlist" asp-action="Index">
                             <i class="fas fa-heart"></i> My List
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Categories", "Home")">
-                            <i class="fas fa-th-large"></i> Categories
                         </a>
                     </li>
                 </ul>
 
-                <div class="navbar-nav ms-auto">
-                    <!-- Search -->
-                    <div class="nav-item dropdown search-dropdown">
-                        <a class="nav-link" href="#" id="searchDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-search"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end search-dropdown-menu">
-                            <form class="px-3 py-2" action="@Url.Action("Movies", "Home")" method="get">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="search"
-                                           placeholder="Search movies, actors, or directors...">
-                                    <button class="btn btn-danger" type="submit">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Notifications -->
-                    <div class="nav-item dropdown">
-                        <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge bg-danger">3</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
-                            <div class="dropdown-header">
-                                <h6 class="mb-0">Notifications</h6>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-gift text-warning"></i>
-                                <div class="notification-content">
-                                    <small><strong>New Episode Available</strong></small>
-                                    <small class="text-muted">The Mandalorian S3E8</small>
-                                </div>
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-tag text-info"></i>
-                                <div class="notification-content">
-                                    <small><strong>Limited Offer!</strong></small>
-                                    <small class="text-muted">50% off on annual plan</small>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- User Menu -->
-                    <div class="nav-item dropdown">
-                        <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i>
-                            <span>@(User.Identity?.Name ?? "User")</span>
+                <div class="d-flex align-items-center">
+                    @{
+                        var userId = Context.Session.GetInt32("UserId");
+                        var userName = Context.Session.GetString("UserName") ?? User.Identity?.Name ?? "User";
+                    }
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+                           role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span>@userName</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="@Url.Action("Index", "Profile")">
+                                <a class="dropdown-item" asp-area="User" asp-controller="Profile" asp-action="Index">
                                     <i class="fas fa-id-card"></i> Profile
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="@Url.Action("Referral", "Profile")">
-                                    <i class="fas fa-gift"></i> Referral Program
+                                <a class="dropdown-item" asp-area="User" asp-controller="Profile" asp-action="Referral">
+                                    <i class="fas fa-gift"></i> Referrals
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="@Url.Action("Subscription", "Profile")">
-                                    <i class="fas fa-crown"></i> Premium
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("Settings", "Profile")">
-                                    <i class="fas fa-cog"></i> Settings
+                                <a class="dropdown-item" asp-area="User" asp-controller="Subscription" asp-action="Plans">
+                                    <i class="fas fa-crown"></i> Subscription
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item text-danger" href="#" onclick="logout()">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </a>
+                                <form asp-controller="Auth" asp-action="Logout" method="post">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>
@@ -143,79 +278,77 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main>
         @RenderBody()
     </main>
 
     <!-- Footer -->
-    <footer class="footer mt-auto py-4">
+    <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <h5 class="brand-text">MOVIE<span class="text-danger">MANIA</span></h5>
-                    <p class="text-muted small">Your ultimate destination for unlimited entertainment. Stream thousands of movies and TV shows in stunning 4K quality.</p>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <h6>Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted">About Us</a></li>
-                        <li><a href="#" class="text-muted">Contact</a></li>
-                        <li><a href="#" class="text-muted">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <h6>Legal</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted">Privacy Policy</a></li>
-                        <li><a href="#" class="text-muted">Terms of Service</a></li>
-                        <li><a href="#" class="text-muted">Help Center</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <h6>Connect With Us</h6>
+                <div class="col-md-4">
+                    <h5><i class="fas fa-film me-2"></i>MovieMania</h5>
+                    <p class="text-muted">Your ultimate destination for unlimited entertainment. Stream thousands of movies and TV shows in stunning 4K quality.</p>
                     <div class="social-links">
-                        <a href="#" class="text-muted me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-muted me-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-muted"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a asp-area="User" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-area="User" asp-controller="Home" asp-action="Movies">Movies</a></li>
+                        <li><a asp-area="User" asp-controller="Home" asp-action="Shows">TV Shows</a></li>
+                        <li><a asp-area="User" asp-controller="Home" asp-action="Categories">Categories</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>My Account</h5>
+                    <ul class="footer-links">
+                        <li><a asp-area="User" asp-controller="Profile" asp-action="Index">Profile</a></li>
+                        <li><a asp-area="User" asp-controller="Wishlist" asp-action="Index">Wishlist</a></li>
+                        <li><a asp-area="User" asp-controller="Subscription" asp-action="Plans">Subscription</a></li>
+                        <li><a asp-area="User" asp-controller="Profile" asp-action="Referral">Referrals</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Support</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
             </div>
-            <hr class="bg-secondary">
-            <div class="text-center">
-                <small class="text-muted">© @DateTime.Now.Year Movie Mania OTT Platform. All rights reserved.</small>
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year MovieMania. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/user-script.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        function logout() {
-            $.post('@Url.Action("Logout", "Auth", new { area = "" })', function() {
-                window.location.href = '@Url.Action("Index", "Home", new { area = "Guest" })';
-            });
-        }
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
 
-        // Update wishlist count
-        function updateWishlistCount() {
-            $.get('@Url.Action("GetWishlistCount", "Wishlist")', function(count) {
-                $('.wishlist-count').text(count);
-            });
-        }
-
-        $(document).ready(function() {
-            updateWishlistCount();
-
-            // Add active class to current nav
-            var currentUrl = window.location.pathname;
-            $('.navbar-nav .nav-link').each(function() {
-                if ($(this).attr('href') === currentUrl) {
-                    $(this).addClass('active');
-                }
-            });
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
         });
     </script>
 

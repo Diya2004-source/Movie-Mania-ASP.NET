@@ -11,7 +11,6 @@
     <Folder Include="Services\" />
     <Folder Include="Views\Admin\AdminAuth\" />
     <Folder Include="Views\User\Payment\" />
-    <Folder Include="Views\User\Wishlist\" />
     <Folder Include="Views\User\Subscription\" />
     <Folder Include="wwwroot\images\users\" />
     <Folder Include="wwwroot\images\offers\" />

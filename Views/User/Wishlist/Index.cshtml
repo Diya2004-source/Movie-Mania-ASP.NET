@@ -1,0 +1,1258 @@
+﻿@model IEnumerable<MovieMania.Models.Wishlist>
+
+@{
+    ViewData["Title"] = "My Wishlist";
+    Layout = "_UserLayout";
+}
+
+<div class="wishlist-page">
+    <!-- Hero Banner -->
+    <section class="page-hero mb-5">
+        <div class="container">
+            <div class="hero-content text-center">
+                <h1 class="hero-title">My Wishlist</h1>
+                <p class="hero-subtitle">Keep track of all the movies and shows you want to watch</p>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-heart text-danger"></i>
+                        <div class="stat-info">
+                            <h3>@ViewBag.Stats.Total</h3>
+                            <p>Total Items</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-film text-primary"></i>
+                        <div class="stat-info">
+                            <h3>@ViewBag.Stats.Movies</h3>
+                            <p>Movies</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tv text-info"></i>
+                        <div class="stat-info">
+                            <h3>@ViewBag.Stats.Shows</h3>
+                            <p>TV Shows</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dragon text-danger"></i>
+                        <div class="stat-info">
+                            <h3>@ViewBag.Stats.Anime</h3>
+                            <p>Anime</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <div class="stat-info">
+                            <h3>@ViewBag.Stats.Watched</h3>
+                            <p>Watched</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock text-warning"></i>
+                        <div class="stat-info">
+                            <h3>@ViewBag.Stats.Unwatched</h3>
+                            <p>To Watch</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section mb-5">
+        <div class="container">
+            <div class="filters-wrapper">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="filter-tabs">
+                            <a href="@Url.Action("Index", new { filter = "all" })" 
+                               class="filter-tab @(ViewBag.CurrentFilter == "all" ? "active" : "")">
+                                <i class="fas fa-list me-2"></i>All Items
+                                <span class="badge">@ViewBag.Stats.Total</span>
+                            </a>
+                            <a href="@Url.Action("Index", new { filter = "movies" })" 
+                               class="filter-tab @(ViewBag.CurrentFilter == "movies" ? "active" : "")">
+                                <i class="fas fa-film me-2"></i>Movies
+                                <span class="badge">@ViewBag.Stats.Movies</span>
+                            </a>
+                            <a href="@Url.Action("Index", new { filter = "shows" })" 
+                               class="filter-tab @(ViewBag.CurrentFilter == "shows" ? "active" : "")">
+                                <i class="fas fa-tv me-2"></i>TV Shows
+                                <span class="badge">@ViewBag.Stats.Shows</span>
+                            </a>
+                            <a href="@Url.Action("Index", new { filter = "anime" })" 
+                               class="filter-tab @(ViewBag.CurrentFilter == "anime" ? "active" : "")">
+                                <i class="fas fa-dragon me-2"></i>Anime
+                                <span class="badge">@ViewBag.Stats.Anime</span>
+                            </a>
+                            <a href="@Url.Action("Index", new { filter = "unwatched" })" 
+                               class="filter-tab @(ViewBag.CurrentFilter == "unwatched" ? "active" : "")">
+                                <i class="fas fa-clock me-2"></i>To Watch
+                                <span class="badge">@ViewBag.Stats.Unwatched</span>
+                            </a>
+                            <a href="@Url.Action("Index", new { filter = "high" })" 
+                               class="filter-tab @(ViewBag.CurrentFilter == "high" ? "active" : "")">
+                                <i class="fas fa-exclamation-circle me-2"></i>High Priority
+                                <span class="badge">@ViewBag.Stats.HighPriority</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="view-options">
+                            <button class="view-option active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-option" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Info -->
+    <section class="results-section mb-4">
+        <div class="container">
+            <div class="results-info">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">
+                            <i class="fas fa-heart me-2 text-danger"></i>
+                            Showing <strong>@Model.Count()</strong> of <strong>@ViewBag.Stats.Total</strong> items
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <button class="btn-clear-all" onclick="clearAllWatched()" style="display: @(ViewBag.Stats.Watched > 0 ? "inline-block" : "none")">
+                            <i class="fas fa-trash me-2"></i>Clear Watched
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wishlist Grid -->
+    <section class="wishlist-grid-section mb-5">
+        <div class="container">
+            @if (!Model.Any())
+            {
+                <div class="empty-wishlist">
+                    <div class="empty-content">
+                        <i class="fas fa-heart-broken fa-4x mb-3"></i>
+                        <h3>Your Wishlist is Empty</h3>
+                        <p>Start adding movies and shows to keep track of what you want to watch!</p>
+                        <div class="suggestions">
+                            <h5>Quick Actions:</h5>
+                            <div class="action-buttons">
+                                <a href="@Url.Action("Movies", "Home")" class="btn-action">
+                                    <i class="fas fa-film me-2"></i>Browse Movies
+                                </a>
+                                <a href="@Url.Action("Shows", "Home")" class="btn-action">
+                                    <i class="fas fa-tv me-2"></i>Browse Shows
+                                </a>
+                                <a href="@Url.Action("Anime", "Home")" class="btn-action">
+                                    <i class="fas fa-dragon me-2"></i>Browse Anime
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="wishlist-grid" id="wishlistGrid">
+                    @foreach (var item in Model)
+                    {
+                        <div class="wishlist-card-wrapper" data-aos="fade-up" data-aos-delay="@(item.Id * 20)">
+                            <div class="wishlist-card @(item.IsWatched ? "watched" : "") @(item.Priority == 1 ? "high-priority" : "")">
+                                @if (item.Priority == 1)
+                                {
+                                    <div class="priority-badge">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>High Priority</span>
+                                    </div>
+                                }
+                                
+                                @if (item.Movie != null)
+                                {
+                                    <!-- Movie Item -->
+                                    <div class="wishlist-poster">
+                                        <img src="@(item.Movie.ThumbnailUrl ?? "/images/default-movie.jpg")" 
+                                             alt="@item.Movie.Title">
+                                        <div class="item-type-badge movie">
+                                            <i class="fas fa-film"></i>
+                                        </div>
+                                        @if (item.IsWatched)
+                                        {
+                                            <div class="watched-badge">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span>Watched</span>
+                                            </div>
+                                        }
+                                        <div class="wishlist-overlay">
+                                            <div class="overlay-content">
+                                                <a href="@Url.Action("MovieDetails", "Home", new { id = item.Movie.Id })" 
+                                                   class="btn-view">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button class="btn-edit" onclick="editItem(@item.Id)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn-remove" onclick="removeFromWishlist(@item.Id)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wishlist-info">
+                                        <h6 class="item-title">@item.Movie.Title</h6>
+                                        <div class="item-meta">
+                                            <span class="genre">@item.Movie.Genre</span>
+                                            <span class="year">@item.Movie.ReleaseYear</span>
+                                        </div>
+                                        @if (item.Movie.Rating.HasValue)
+                                        {
+                                            <div class="item-rating">
+                                                <i class="fas fa-star text-warning"></i>
+                                                <span>@item.Movie.Rating.Value.ToString("F1")</span>
+                                            </div>
+                                        }
+                                        <div class="item-date">
+                                            <i class="far fa-calendar-alt"></i>
+                                            Added: @item.AddedDate.ToString("dd MMM yyyy")
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(item.Notes))
+                                        {
+                                            <div class="item-notes">
+                                                <i class="fas fa-sticky-note"></i>
+                                                @item.Notes
+                                            </div>
+                                        }
+                                        <div class="item-actions">
+                                            @if (!item.IsWatched)
+                                            {
+                                                <button class="btn-watched" onclick="markAsWatched(@item.Id)">
+                                                    <i class="fas fa-check-circle"></i> Mark Watched
+                                                </button>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.Movie.VideoUrl))
+                                            {
+                                                <a href="@item.Movie.VideoUrl" target="_blank" class="btn-watch">
+                                                    <i class="fas fa-play"></i> Watch
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else if (item.Show != null)
+                                {
+                                    <!-- Show or Anime Item -->
+                                    <div class="wishlist-poster">
+                                        <img src="@(item.Show.ThumbnailUrl ?? (item.Show.Genre == "Anime" ? "/images/default-anime.jpg" : "/images/default-show.jpg"))" 
+                                             alt="@item.Show.Title">
+                                        <div class="item-type-badge @(item.Show.Genre == "Anime" ? "anime" : "show")">
+                                            <i class="fas @(item.Show.Genre == "Anime" ? "fa-dragon" : "fa-tv")"></i>
+                                        </div>
+                                        @if (item.IsWatched)
+                                        {
+                                            <div class="watched-badge">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span>Watched</span>
+                                            </div>
+                                        }
+                                        <div class="wishlist-overlay">
+                                            <div class="overlay-content">
+                                                <a href="@Url.Action("ShowDetails", "Home", new { id = item.Show.Id })" 
+                                                   class="btn-view">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button class="btn-edit" onclick="editItem(@item.Id)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn-remove" onclick="removeFromWishlist(@item.Id)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wishlist-info">
+                                        <h6 class="item-title">@item.Show.Title</h6>
+                                        <div class="item-meta">
+                                            <span class="genre @(item.Show.Genre == "Anime" ? "text-danger" : "")">
+                                                @if (item.Show.Genre == "Anime")
+                                                {
+                                                    <i class="fas fa-dragon me-1"></i>
+                                                }
+                                                @item.Show.Genre
+                                            </span>
+                                            <span class="year">@item.Show.ReleaseYear</span>
+                                        </div>
+                                        <div class="show-stats">
+                                            <span class="seasons">
+                                                <i class="fas fa-layer-group"></i> @item.Show.TotalSeasons S
+                                            </span>
+                                            <span class="episodes">
+                                                <i class="fas fa-play-circle"></i> @item.Show.TotalEpisodes Ep
+                                            </span>
+                                        </div>
+                                        @if (item.Show.Rating.HasValue)
+                                        {
+                                            <div class="item-rating">
+                                                <i class="fas fa-star text-warning"></i>
+                                                <span>@item.Show.Rating.Value.ToString("F1")</span>
+                                            </div>
+                                        }
+                                        <div class="item-date">
+                                            <i class="far fa-calendar-alt"></i>
+                                            Added: @item.AddedDate.ToString("dd MMM yyyy")
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(item.Notes))
+                                        {
+                                            <div class="item-notes">
+                                                <i class="fas fa-sticky-note"></i>
+                                                @item.Notes
+                                            </div>
+                                        }
+                                        <div class="item-actions">
+                                            @if (!item.IsWatched)
+                                            {
+                                                <button class="btn-watched" onclick="markAsWatched(@item.Id)">
+                                                    <i class="fas fa-check-circle"></i> Mark Watched
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <section class="pagination-section">
+            <div class="container">
+                <nav aria-label="Wishlist pagination">
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { 
+                                    page = ViewBag.CurrentPage - 1, 
+                                    filter = ViewBag.CurrentFilter 
+                                })">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { 
+                                    page = i, 
+                                    filter = ViewBag.CurrentFilter 
+                                })">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { 
+                                    page = ViewBag.CurrentPage + 1, 
+                                    filter = ViewBag.CurrentFilter 
+                                })">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </section>
+    }
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class-="modal-header border-secondary">
+                <h5 class="modal-title text-white">Edit Wishlist Item</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editId" name="id" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-white">Priority</label>
+                        <select class="form-select bg-dark text-white" id="editPriority" name="priority">
+                            <option value="1">High Priority</option>
+                            <option value="2">Normal Priority</option>
+                            <option value="3">Low Priority</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-white">Notes</label>
+                        <textarea class="form-control bg-dark text-white" id="editNotes" name="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="editNotification" name="notification" />
+                        <label class="form-check-label text-white">Enable Notifications</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    /* Page Hero */
+    .page-hero {
+        background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
+        padding: 60px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><circle cx="50" cy="50" r="40" fill="none" stroke="%23ff4d4d" stroke-width="2"/></svg>') repeat;
+        animation: rotate 60s linear infinite;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #fff, #ff4d4d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: #9ca3af;
+        margin-bottom: 40px;
+        animation: fadeInUp 1s ease;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .stat-card {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px 10px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: #ff4d4d;
+        box-shadow: 0 10px 30px rgba(255,77,77,0.2);
+    }
+
+    .stat-card i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .stat-info h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+    }
+
+    .stat-info p {
+        color: #9ca3af;
+        margin: 5px 0 0;
+        font-size: 0.8rem;
+    }
+
+    /* Filters Section */
+    .filters-wrapper {
+        background: #1a1a1a;
+        border-radius: 20px;
+        padding: 20px 30px;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 10px 20px;
+        border-radius: 30px;
+        background: rgba(255,255,255,0.05);
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .filter-tab:hover {
+        background: rgba(255,77,77,0.1);
+        color: white;
+        border-color: #ff4d4d;
+    }
+
+    .filter-tab.active {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        border-color: transparent;
+    }
+
+    .filter-tab .badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        margin-left: 8px;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+
+    .view-options {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .view-option {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #9ca3af;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .view-option:hover {
+        border-color: #ff4d4d;
+        color: white;
+    }
+
+    .view-option.active {
+        background: #ff4d4d;
+        border-color: #ff4d4d;
+        color: white;
+    }
+
+    /* Results Info */
+    .results-info {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 15px 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .btn-clear-all {
+        background: transparent;
+        border: 1px solid rgba(255,77,77,0.3);
+        color: #ff4d4d;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-clear-all:hover {
+        background: #ff4d4d;
+        color: white;
+        border-color: #ff4d4d;
+    }
+
+    /* Wishlist Grid */
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+    }
+
+    .wishlist-card-wrapper {
+        animation: fadeInUp 0.5s ease;
+    }
+
+    .wishlist-card {
+        background: #1a1a1a;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        height: 100%;
+        border: 1px solid rgba(255,255,255,0.05);
+        position: relative;
+    }
+
+    .wishlist-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(255,77,77,0.2);
+    }
+
+    .wishlist-card.watched {
+        opacity: 0.7;
+        filter: grayscale(0.3);
+    }
+
+    .wishlist-card.watched:hover {
+        opacity: 0.9;
+    }
+
+    .wishlist-card.high-priority {
+        border-left: 4px solid #ff4d4d;
+    }
+
+    .priority-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
+    }
+
+    .wishlist-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+    .wishlist-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .wishlist-card:hover .wishlist-poster img {
+        transform: scale(1.1);
+    }
+
+    .item-type-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        z-index: 2;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .item-type-badge.movie {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+    }
+
+    .item-type-badge.show {
+        background: linear-gradient(135deg, #0dcaf0, #0bb7d6);
+        color: white;
+    }
+
+    .item-type-badge.anime {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+    }
+
+    .watched-badge {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: linear-gradient(135deg, #00c853, #00a844);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 5px 15px rgba(0,200,83,0.3);
+    }
+
+    .wishlist-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .wishlist-card:hover .wishlist-overlay {
+        opacity: 1;
+    }
+
+    .overlay-content {
+        display: flex;
+        gap: 10px;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+
+    .wishlist-card:hover .overlay-content {
+        transform: translateY(0);
+    }
+
+    .btn-view, .btn-edit, .btn-remove {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+
+    .btn-view {
+        background: #ff4d4d;
+        color: white;
+    }
+
+    .btn-edit {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-view:hover, .btn-edit:hover, .btn-remove:hover {
+        transform: scale(1.1);
+    }
+
+    .wishlist-info {
+        padding: 15px;
+    }
+
+    .item-title {
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-meta {
+        display: flex;
+        gap: 8px;
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-bottom: 8px;
+    }
+
+    .item-meta .genre {
+        color: #ff4d4d;
+    }
+
+    .item-meta .genre.text-danger {
+        color: #ff4d4d;
+    }
+
+    .show-stats {
+        display: flex;
+        gap: 10px;
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 8px;
+    }
+
+    .show-stats i {
+        margin-right: 3px;
+        color: #0dcaf0;
+    }
+
+    .item-rating {
+        font-size: 0.8rem;
+        color: #ffd700;
+        margin-bottom: 5px;
+    }
+
+    .item-date {
+        font-size: 0.7rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .item-date i {
+        margin-right: 4px;
+    }
+
+    .item-notes {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        background: rgba(255,255,255,0.05);
+        padding: 5px 8px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        word-wrap: break-word;
+    }
+
+    .item-notes i {
+        margin-right: 4px;
+        color: #ff4d4d;
+    }
+
+    .item-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .btn-watched, .btn-watch {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-watched {
+        background: #00c853;
+        color: white;
+    }
+
+    .btn-watched:hover {
+        background: #00a844;
+        transform: translateY(-2px);
+    }
+
+    .btn-watch {
+        background: #ff4d4d;
+        color: white;
+    }
+
+    .btn-watch:hover {
+        background: #ff3333;
+        transform: translateY(-2px);
+    }
+
+    /* Empty State */
+    .empty-wishlist {
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #1a1a1a;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+        padding: 60px;
+    }
+
+    .empty-content {
+        text-align: center;
+        max-width: 500px;
+    }
+
+    .empty-content i {
+        color: #ff4d4d;
+        opacity: 0.5;
+    }
+
+    .empty-content h3 {
+        color: white;
+        margin: 20px 0 10px;
+    }
+
+    .empty-content p {
+        color: #9ca3af;
+        margin-bottom: 30px;
+    }
+
+    .suggestions {
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 25px;
+    }
+
+    .suggestions h5 {
+        color: #ff4d4d;
+        margin-bottom: 20px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
+        color: white;
+    }
+
+    /* Pagination */
+    .pagination {
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        border-color: transparent;
+        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
+    }
+
+    .page-link {
+        background: #1a1a1a;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px !important;
+        color: white;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        background: #2a2a2a;
+        border-color: #ff4d4d;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: 1px solid rgba(255,77,77,0.3);
+    }
+
+    .form-control, .form-select {
+        background: #2a2a2a;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: #2a2a2a;
+        border-color: #ff4d4d;
+        box-shadow: 0 0 0 3px rgba(255,77,77,0.2);
+        color: white;
+    }
+
+    .form-check-input {
+        background-color: #2a2a2a;
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    .form-check-input:checked {
+        background-color: #ff4d4d;
+        border-color: #ff4d4d;
+    }
+
+    /* Animations */
+    @@keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @@media (max-width: 1400px) {
+        .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .wishlist-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 1200px) {
+        .wishlist-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .wishlist-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .filter-tabs {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .stat-card {
+            padding: 15px 5px;
+        }
+        .stat-card i {
+            font-size: 1.5rem;
+        }
+        .stat-info h3 {
+            font-size: 1.2rem;
+        }
+        .stat-info p {
+            font-size: 0.7rem;
+        }
+        .wishlist-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .filters-wrapper {
+            padding: 20px;
+        }
+        .view-options {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .wishlist-grid {
+            grid-template-columns: 1fr;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .filter-tab {
+            width: 100%;
+            justify-content: center;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // View toggle (grid/list)
+        $('.view-option').click(function() {
+            $('.view-option').removeClass('active');
+            $(this).addClass('active');
+            
+            if ($(this).data('view') === 'list') {
+                $('.wishlist-grid').css('grid-template-columns', 'repeat(1, 1fr)');
+                $('.wishlist-card').css('display', 'flex');
+                $('.wishlist-poster').css('width', '150px');
+            } else {
+                $('.wishlist-grid').css('grid-template-columns', '');
+                $('.wishlist-card').css('display', '');
+                $('.wishlist-poster').css('width', '');
+            }
+        });
+
+        // Edit item
+        function editItem(id) {
+            $.get('@Url.Action("GetWishlistItem", "Wishlist")/' + id)
+                .done(function(item) {
+                    $('#editId').val(item.id);
+                    $('#editPriority').val(item.priority);
+                    $('#editNotes').val(item.notes);
+                    $('#editNotification').prop('checked', item.notificationEnabled);
+                    $('#editModal').modal('show');
+                });
+        }
+
+        // Save edit
+        function saveEdit() {
+            var data = {
+                Id: $('#editId').val(),
+                Priority: parseInt($('#editPriority').val()),
+                Notes: $('#editNotes').val(),
+                NotificationEnabled: $('#editNotification').is(':checked')
+            };
+
+            $.post('@Url.Action("Update", "Wishlist")', data)
+                .done(function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#editModal').modal('hide');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                })
+                .fail(function() {
+                    toastr.error('Error updating item');
+                });
+        }
+
+        // Remove from wishlist
+        function removeFromWishlist(id) {
+            if (confirm('Remove this item from your wishlist?')) {
+                $.post('@Url.Action("Remove", "Wishlist")', { id: id })
+                    .done(function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    });
+            }
+        }
+
+        // Mark as watched
+        function markAsWatched(id) {
+            var rating = prompt('Rate this item (1-10):', '8');
+            if (rating !== null) {
+                var numRating = parseFloat(rating);
+                if (numRating >= 0 && numRating <= 10) {
+                    $.post('@Url.Action("MarkAsWatched", "Wishlist")', { id: id, rating: numRating })
+                        .done(function(response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        });
+                } else {
+                    toastr.warning('Please enter a rating between 0 and 10');
+                }
+            }
+        }
+
+        // Clear all watched
+        function clearAllWatched() {
+            if (confirm('Remove all watched items from your wishlist?')) {
+                $.post('@Url.Action("ClearWatched", "Wishlist")')
+                    .done(function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    });
+            }
+        }
+
+        // Toggle priority
+        function togglePriority(id) {
+            $.post('@Url.Action("TogglePriority", "Wishlist")', { id: id })
+                .done(function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                });
+        }
+    </script>
+}

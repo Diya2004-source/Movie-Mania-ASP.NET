@@ -1,27 +1,43 @@
-﻿@model IEnumerable<MovieMania.Models.Movie>
+﻿@model IEnumerable<MovieMania.Models.Show>
 
 @{
-    ViewData["Title"] = "Browse Movies";
+    ViewData["Title"] = "Browse TV Shows";
     Layout = "_UserLayout";
 }
 
-<div class="movies-page">
-    <!-- Hero Banner -->
+<div class="shows-page">
+    <!-- Hero Banner with Category Tabs -->
     <section class="page-hero mb-5">
         <div class="container">
             <div class="hero-content text-center">
-                <h1 class="hero-title">Discover Movies</h1>
-                <p class="hero-subtitle">Explore our collection of thousands of movies</p>
+                <h1 class="hero-title">Discover Amazing Shows</h1>
+                <p class="hero-subtitle">Explore thousands of TV series, anime, and more</p>
                 <div class="hero-stats">
                     <span class="stat-badge">
-                        <i class="fas fa-film"></i> @Model.Count()+ Movies
+                        <i class="fas fa-tv"></i> @Model.Count()+ Shows
                     </span>
                     <span class="stat-badge">
                         <i class="fas fa-star text-warning"></i> Top Rated
                     </span>
                     <span class="stat-badge">
-                        <i class="fas fa-clock"></i> New Releases Daily
+                        <i class="fas fa-calendar-week"></i> Weekly Updates
                     </span>
+                </div>
+                
+                <!-- Category Tabs -->
+                <div class="category-tabs mt-4">
+                    <a href="@Url.Action("Shows", "Home")" class="tab-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Shows" && string.IsNullOrEmpty(ViewBag.Type) ? "active" : "")">
+                        <i class="fas fa-tv me-2"></i>All Shows
+                    </a>
+                    <a href="@Url.Action("Shows", "Home")?type=anime" class="tab-link @(ViewBag.Type == "anime" ? "active" : "")">
+                        <i class="fas fa-dragon me-2"></i>Anime
+                    </a>
+                    <a href="@Url.Action("Shows", "Home")?type=trending" class="tab-link @(ViewBag.Type == "trending" ? "active" : "")">
+                        <i class="fas fa-fire me-2"></i>Trending
+                    </a>
+                    <a href="@Url.Action("Shows", "Home")?type=latest" class="tab-link @(ViewBag.Type == "latest" ? "active" : "")">
+                        <i class="fas fa-clock me-2"></i>Latest
+                    </a>
                 </div>
             </div>
         </div>
@@ -32,20 +48,23 @@
         <div class="container">
             <div class="filters-wrapper">
                 <form method="get" class="row g-3 align-items-end" id="filterForm">
+                    <!-- Hidden field for type -->
+                    <input type="hidden" name="type" value="@ViewBag.Type" />
+                    
                     <!-- Search Bar -->
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label text-muted mb-2">
-                            <i class="fas fa-search me-2"></i>Search Movies
+                            <i class="fas fa-search me-2"></i>Search Shows
                         </label>
                         <div class="search-box">
                             <i class="fas fa-search search-icon"></i>
                             <input type="text" class="form-control" name="search" 
                                    value="@ViewBag.Search" 
-                                   placeholder="Search by title, cast, director..."
+                                   placeholder="Search by title, genre..."
                                    id="searchInput">
                             @if (!string.IsNullOrEmpty(ViewBag.Search))
                             {
-                                <a href="@Url.Action("Movies")" class="clear-search">
+                                <a href="@Url.Action("Shows", new { type = ViewBag.Type })" class="clear-search">
                                     <i class="fas fa-times"></i>
                                 </a>
                             }
@@ -87,6 +106,7 @@
                                 <option value="year" selected="@(ViewBag.SortBy == "year")">Release Year</option>
                                 <option value="title" selected="@(ViewBag.SortBy == "title")">Title A-Z</option>
                                 <option value="views" selected="@(ViewBag.SortBy == "views")">Most Viewed</option>
+                                <option value="seasons" selected="@(ViewBag.SortBy == "seasons")">Most Seasons</option>
                             </select>
                         </div>
                     </div>
@@ -109,7 +129,7 @@
                             <span class="filter-tag">
                                 <i class="fas fa-search me-1"></i>
                                 "@ViewBag.Search"
-                                <a href="@Url.Action("Movies", new { genre = ViewBag.Genre, sortBy = ViewBag.SortBy })" class="remove-filter">
+                                <a href="@Url.Action("Shows", new { type = ViewBag.Type, genre = ViewBag.Genre, sortBy = ViewBag.SortBy })" class="remove-filter">
                                     <i class="fas fa-times"></i>
                                 </a>
                             </span>
@@ -119,12 +139,12 @@
                             <span class="filter-tag">
                                 <i class="fas fa-tag me-1"></i>
                                 @ViewBag.Genre
-                                <a href="@Url.Action("Movies", new { search = ViewBag.Search, sortBy = ViewBag.SortBy })" class="remove-filter">
+                                <a href="@Url.Action("Shows", new { type = ViewBag.Type, search = ViewBag.Search, sortBy = ViewBag.SortBy })" class="remove-filter">
                                     <i class="fas fa-times"></i>
                                 </a>
                             </span>
                         }
-                        <a href="@Url.Action("Movies")" class="clear-all">
+                        <a href="@Url.Action("Shows", new { type = ViewBag.Type })" class="clear-all">
                             <i class="fas fa-undo-alt me-1"></i>Clear All
                         </a>
                     </div>
@@ -140,8 +160,8 @@
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <p class="mb-0">
-                            <i class="fas fa-film me-2 text-primary"></i>
-                            Showing <strong>@Model.Count()</strong> of <strong>@ViewBag.TotalItems</strong> movies
+                            <i class="fas fa-tv me-2 text-info"></i>
+                            Showing <strong>@Model.Count()</strong> of <strong>@ViewBag.TotalItems</strong> shows
                         </p>
                     </div>
                     <div class="col-md-6 text-md-end">
@@ -159,26 +179,26 @@
         </div>
     </section>
 
-    <!-- Movies Grid -->
-    <section class="movies-grid-section mb-5">
+    <!-- Shows Grid -->
+    <section class="shows-grid-section mb-5">
         <div class="container">
             @if (!Model.Any())
             {
                 <div class="no-results">
                     <div class="no-results-content">
-                        <i class="fas fa-film fa-4x mb-3"></i>
-                        <h3>No Movies Found</h3>
-                        <p>We couldn't find any movies matching your criteria.</p>
+                        <i class="fas fa-tv fa-4x mb-3"></i>
+                        <h3>No Shows Found</h3>
+                        <p>We couldn't find any shows matching your criteria.</p>
                         <div class="suggestions">
                             <h5>Suggestions:</h5>
                             <ul>
                                 <li>Check your spelling</li>
                                 <li>Try more general keywords</li>
-                                <li>Try different genre</li>
-                                <li>Browse all movies</li>
+                                <li>Try a different genre</li>
+                                <li>Browse all shows</li>
                             </ul>
                         </div>
-                        <a href="@Url.Action("Movies")" class="btn-clear">
+                        <a href="@Url.Action("Shows")" class="btn-clear">
                             <i class="fas fa-undo me-2"></i>Clear Filters
                         </a>
                     </div>
@@ -186,82 +206,88 @@
             }
             else
             {
-                <div class="movies-grid" id="moviesGrid">
-                    @foreach (var movie in Model)
+                <div class="shows-grid" id="showsGrid">
+                    @foreach (var show in Model)
                     {
-                        <div class="movie-card-wrapper" data-aos="fade-up" data-aos-delay="@(movie.Id * 20)">
-                            <div class="movie-card">
-                                <div class="movie-poster">
-                                    <img src="@(movie.ThumbnailUrl ?? "/images/default-movie.jpg")" 
-                                         alt="@movie.Title"
+                        <div class="show-card-wrapper" data-aos="fade-up" data-aos-delay="@(show.Id * 20)">
+                            <div class="show-card @(show.Genre == "Anime" ? "anime-card" : "")">
+                                <div class="show-poster">
+                                    <img src="@(show.ThumbnailUrl ?? (show.Genre == "Anime" ? "/images/default-anime.jpg" : "/images/default-show.jpg"))" 
+                                         alt="@show.Title"
                                          loading="lazy">
                                     
-                                    @if (movie.Rating.HasValue)
+                                    @if (show.Rating.HasValue)
                                     {
-                                        <div class="movie-rating">
+                                        <div class="show-rating">
                                             <i class="fas fa-star"></i>
-                                            <span>@movie.Rating.Value.ToString("F1")</span>
+                                            <span>@show.Rating.Value.ToString("F1")</span>
                                         </div>
                                     }
 
-                                    @if (movie.IsFeatured)
+                                    @if (show.IsFeatured)
                                     {
-                                        <div class="movie-featured">
+                                        <div class="show-featured">
                                             <i class="fas fa-crown"></i>
                                         </div>
                                     }
 
-                                    @if (!string.IsNullOrEmpty(movie.VideoUrl))
-                                    {
-                                        <div class="movie-badge watch-badge">
-                                            <i class="fas fa-play"></i> Available
-                                        </div>
-                                    }
+                                    <div class="show-badge">
+                                        @if (show.Genre == "Anime")
+                                        {
+                                            <span class="badge-anime">
+                                                <i class="fas fa-dragon"></i> Anime
+                                            </span>
+                                        }
+                                        <span class="badge-seasons">
+                                            <i class="fas fa-layer-group"></i> @show.TotalSeasons S
+                                        </span>
+                                        <span class="badge-episodes">
+                                            <i class="fas fa-play-circle"></i> @show.TotalEpisodes Ep
+                                        </span>
+                                    </div>
 
-                                    <div class="movie-overlay">
+                                    <div class="show-overlay">
                                         <div class="overlay-content">
-                                            <a href="@Url.Action("MovieDetails", new { id = movie.Id })" 
+                                            <a href="@Url.Action("ShowDetails", new { id = show.Id })" 
                                                class="btn-details">
                                                 <i class="fas fa-info-circle"></i>
                                                 <span>Details</span>
                                             </a>
-                                            <button class="btn-wishlist" onclick="toggleWishlist(@movie.Id, 'movie')" 
-                                                    data-movie-id="@movie.Id">
+                                            <button class="btn-wishlist" onclick="toggleWishlist(@show.Id, 'show')" 
+                                                    data-show-id="@show.Id">
                                                 <i class="fas fa-heart"></i>
                                                 <span>Wishlist</span>
                                             </button>
-                                            @if (!string.IsNullOrEmpty(movie.TrailerUrl))
-                                            {
-                                                <a href="@movie.TrailerUrl" target="_blank" class="btn-trailer">
-                                                    <i class="fab fa-youtube"></i>
-                                                </a>
-                                            }
                                         </div>
                                     </div>
                                 </div>
-                                <div class="movie-info">
-                                    <h6 class="movie-title">@movie.Title</h6>
-                                    <div class="movie-meta">
-                                        <span class="genre">@movie.Genre</span>
-                                        <span class="year">@movie.ReleaseYear</span>
+                                <div class="show-info">
+                                    <h6 class="show-title">@show.Title</h6>
+                                    <div class="show-meta">
+                                        <span class="genre @(show.Genre == "Anime" ? "text-danger" : "")">
+                                            @if (show.Genre == "Anime")
+                                            {
+                                                <i class="fas fa-dragon me-1"></i>
+                                            }
+                                            @show.Genre
+                                        </span>
+                                        <span class="year">@show.ReleaseYear</span>
                                     </div>
-                                    @if (!string.IsNullOrEmpty(movie.Director))
+                                    <div class="show-stats">
+                                        <span class="seasons">
+                                            <i class="fas fa-layer-group"></i> @show.TotalSeasons @(show.TotalSeasons == 1 ? "Season" : "Seasons")
+                                        </span>
+                                        <span class="views">
+                                            <i class="fas fa-eye"></i> @show.ViewsCount
+                                        </span>
+                                    </div>
+                                    @if (show.TotalEpisodes > 0)
                                     {
-                                        <div class="movie-director">
-                                            <i class="fas fa-user-tie"></i> @movie.Director
+                                        <div class="episode-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>@show.TotalEpisodes Episodes</span>
                                         </div>
                                     }
-                                    <div class="movie-stats">
-                                        <span class="views">
-                                            <i class="fas fa-eye"></i> @movie.ViewsCount
-                                        </span>
-                                        @if (movie.Duration.HasValue)
-                                        {
-                                            <span class="duration">
-                                                <i class="far fa-clock"></i> @movie.Duration min
-                                            </span>
-                                        }
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -276,16 +302,17 @@
     {
         <section class="pagination-section">
             <div class="container">
-                <nav aria-label="Movies pagination">
+                <nav aria-label="Shows pagination">
                     <ul class="pagination">
                         @if (ViewBag.CurrentPage > 1)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Movies", new { 
+                                <a class="page-link" href="@Url.Action("Shows", new { 
                                     page = ViewBag.CurrentPage - 1, 
                                     search = ViewBag.Search, 
                                     genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy
+                                    sortBy = ViewBag.SortBy,
+                                    type = ViewBag.Type
                                 })">
                                     <i class="fas fa-chevron-left"></i>
                                 </a>
@@ -295,11 +322,12 @@
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
                             <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Movies", new { 
+                                <a class="page-link" href="@Url.Action("Shows", new { 
                                     page = i, 
                                     search = ViewBag.Search, 
                                     genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy
+                                    sortBy = ViewBag.SortBy,
+                                    type = ViewBag.Type
                                 })">@i</a>
                             </li>
                         }
@@ -307,11 +335,12 @@
                         @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Movies", new { 
+                                <a class="page-link" href="@Url.Action("Shows", new { 
                                     page = ViewBag.CurrentPage + 1, 
                                     search = ViewBag.Search, 
                                     genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy
+                                    sortBy = ViewBag.SortBy,
+                                    type = ViewBag.Type
                                 })">
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
@@ -389,6 +418,43 @@
     .stat-badge i {
         margin-right: 8px;
         color: #ff4d4d;
+    }
+
+    /* Category Tabs */
+    .category-tabs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .tab-link {
+        padding: 12px 30px;
+        border-radius: 30px;
+        background: rgba(255,255,255,0.05);
+        color: #9ca3af;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .tab-link:hover {
+        background: rgba(255,77,77,0.1);
+        color: white;
+        border-color: #ff4d4d;
+        transform: translateY(-2px);
+    }
+
+    .tab-link.active {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
+    }
+
+    .tab-link i {
+        margin-right: 8px;
     }
 
     /* Filters Section */
@@ -584,18 +650,18 @@
         color: white;
     }
 
-    /* Movies Grid */
-    .movies-grid {
+    /* Shows Grid */
+    .shows-grid {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
         gap: 20px;
     }
 
-    .movie-card-wrapper {
+    .show-card-wrapper {
         animation: fadeInUp 0.5s ease;
     }
 
-    .movie-card {
+    .show-card {
         background: #1a1a1a;
         border-radius: 16px;
         overflow: hidden;
@@ -605,30 +671,35 @@
         position: relative;
     }
 
-    .movie-card:hover {
+    .show-card:hover {
         transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(13,202,240,0.3);
+        border-color: rgba(13,202,240,0.3);
+    }
+
+    .anime-card:hover {
         box-shadow: 0 20px 40px rgba(255,77,77,0.3);
         border-color: rgba(255,77,77,0.3);
     }
 
-    .movie-poster {
+    .show-poster {
         position: relative;
         aspect-ratio: 2/3;
         overflow: hidden;
     }
 
-    .movie-poster img {
+    .show-poster img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.6s ease;
     }
 
-    .movie-card:hover .movie-poster img {
+    .show-card:hover .show-poster img {
         transform: scale(1.1);
     }
 
-    .movie-rating {
+    .show-rating {
         position: absolute;
         top: 10px;
         right: 10px;
@@ -642,7 +713,7 @@
         z-index: 2;
     }
 
-    .movie-featured {
+    .show-featured {
         position: absolute;
         top: 10px;
         left: 10px;
@@ -659,21 +730,50 @@
         box-shadow: 0 5px 15px rgba(255,215,0,0.3);
     }
 
-    .watch-badge {
+    .show-badge {
         position: absolute;
         bottom: 10px;
         left: 10px;
-        background: linear-gradient(135deg, #00c853, #00a844);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        right: 10px;
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
         z-index: 2;
-        box-shadow: 0 5px 15px rgba(0,200,83,0.3);
     }
 
-    .movie-overlay {
+    .badge-anime {
+        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
+    }
+
+    .badge-seasons {
+        background: rgba(13,202,240,0.9);
+        backdrop-filter: blur(5px);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(13,202,240,0.3);
+    }
+
+    .badge-episodes {
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(5px);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .show-overlay {
         position: absolute;
         top: 0;
         left: 0;
@@ -687,7 +787,7 @@
         transition: opacity 0.3s ease;
     }
 
-    .movie-card:hover .movie-overlay {
+    .show-card:hover .show-overlay {
         opacity: 1;
     }
 
@@ -699,11 +799,11 @@
         transition: transform 0.3s ease;
     }
 
-    .movie-card:hover .overlay-content {
+    .show-card:hover .overlay-content {
         transform: translateY(0);
     }
 
-    .btn-details, .btn-wishlist, .btn-trailer {
+    .btn-details, .btn-wishlist {
         padding: 8px 16px;
         border-radius: 25px;
         font-size: 0.8rem;
@@ -715,12 +815,12 @@
         transition: all 0.3s ease;
         border: none;
         cursor: pointer;
+        flex: 1;
     }
 
     .btn-details {
         background: #ff4d4d;
         color: white;
-        flex: 1;
     }
 
     .btn-details:hover {
@@ -732,7 +832,6 @@
         background: rgba(255,255,255,0.2);
         color: white;
         border: 1px solid rgba(255,255,255,0.3);
-        flex: 1;
     }
 
     .btn-wishlist:hover {
@@ -741,24 +840,11 @@
         transform: scale(1.05);
     }
 
-    .btn-trailer {
-        background: rgba(255,0,0,0.2);
-        color: white;
-        border: 1px solid rgba(255,0,0,0.3);
-        padding: 8px 12px;
-    }
-
-    .btn-trailer:hover {
-        background: #ff0000;
-        border-color: #ff0000;
-        transform: scale(1.05);
-    }
-
-    .movie-info {
+    .show-info {
         padding: 15px;
     }
 
-    .movie-title {
+    .show-title {
         color: white;
         font-size: 0.95rem;
         font-weight: 600;
@@ -768,7 +854,7 @@
         text-overflow: ellipsis;
     }
 
-    .movie-meta {
+    .show-meta {
         display: flex;
         gap: 8px;
         font-size: 0.8rem;
@@ -776,33 +862,44 @@
         margin-bottom: 8px;
     }
 
-    .movie-meta .genre {
+    .show-meta .genre {
+        color: #0dcaf0;
+    }
+
+    .show-meta .genre.text-danger {
         color: #ff4d4d;
     }
 
-    .movie-director {
-        font-size: 0.75rem;
-        color: #6c757d;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-bottom: 8px;
-    }
-
-    .movie-director i {
-        color: #ff4d4d;
-        margin-right: 4px;
-    }
-
-    .movie-stats {
+    .show-stats {
         display: flex;
         gap: 12px;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         color: #6c757d;
+        margin-bottom: 5px;
     }
 
-    .movie-stats i {
+    .show-stats i {
         margin-right: 4px;
+        color: #0dcaf0;
+    }
+
+    .anime-card .show-stats i {
+        color: #ff4d4d;
+    }
+
+    .episode-info {
+        font-size: 0.7rem;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .episode-info i {
+        color: #0dcaf0;
+    }
+
+    .anime-card .episode-info i {
         color: #ff4d4d;
     }
 
@@ -941,28 +1038,35 @@
 
     /* Responsive */
     @@media (max-width: 1400px) {
-        .movies-grid {
+        .shows-grid {
             grid-template-columns: repeat(5, 1fr);
         }
     }
 
     @@media (max-width: 1200px) {
-        .movies-grid {
+        .shows-grid {
             grid-template-columns: repeat(4, 1fr);
         }
     }
 
     @@media (max-width: 992px) {
-        .movies-grid {
+        .shows-grid {
             grid-template-columns: repeat(3, 1fr);
         }
         .hero-title {
             font-size: 3rem;
         }
+        .category-tabs {
+            gap: 5px;
+        }
+        .tab-link {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
     }
 
     @@media (max-width: 768px) {
-        .movies-grid {
+        .shows-grid {
             grid-template-columns: repeat(2, 1fr);
         }
         .hero-title {
@@ -980,10 +1084,14 @@
             width: 100%;
             text-align: center;
         }
+        .show-badge {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 
     @@media (max-width: 576px) {
-        .movies-grid {
+        .shows-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
@@ -994,9 +1102,22 @@
             padding: 8px 15px;
             font-size: 0.85rem;
         }
+        .tab-link {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
         .btn-details, .btn-wishlist {
             padding: 6px 10px;
             font-size: 0.7rem;
+        }
+        .show-badge {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+        .badge-anime, .badge-seasons, .badge-episodes {
+            padding: 3px 6px;
+            font-size: 0.6rem;
         }
     }
 </style>
@@ -1016,13 +1137,13 @@
             $(this).addClass('active');
             
             if ($(this).data('view') === 'list') {
-                $('.movies-grid').css('grid-template-columns', 'repeat(1, 1fr)');
-                $('.movie-card').css('display', 'flex');
-                $('.movie-poster').css('width', '150px');
+                $('.shows-grid').css('grid-template-columns', 'repeat(1, 1fr)');
+                $('.show-card').css('display', 'flex');
+                $('.show-poster').css('width', '150px');
             } else {
-                $('.movies-grid').css('grid-template-columns', '');
-                $('.movie-card').css('display', '');
-                $('.movie-poster').css('width', '');
+                $('.shows-grid').css('grid-template-columns', '');
+                $('.show-card').css('display', '');
+                $('.show-poster').css('width', '');
             }
         });
 
@@ -1050,7 +1171,7 @@
                         if (response.success) {
                             toastr.success(response.message);
                             // Update button appearance
-                            $(`[data-movie-id="${itemId}"]`).toggleClass('in-wishlist');
+                            $(`[data-show-id="${itemId}"]`).toggleClass('in-wishlist');
                         } else {
                             toastr.info(response.message);
                         }

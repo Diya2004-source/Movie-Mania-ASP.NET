@@ -8,6 +8,7 @@ using System.Security.Claims;
 namespace MovieMania.Controllers.User
 {
     [Authorize(Roles = "user")]
+    [Area("User")]
     public class WishlistController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,12 +21,11 @@ namespace MovieMania.Controllers.User
         // GET: User/Wishlist
         public async Task<IActionResult> Index(string filter = "all", int page = 1)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Auth", new { area = "" });
             }
-            var userId = int.Parse(userIdClaim);
 
             int pageSize = 20;
 
@@ -34,37 +34,45 @@ namespace MovieMania.Controllers.User
                 .Include(w => w.Show)
                 .Where(w => w.UserId == userId && w.IsActive);
 
+            // Apply filters
             query = filter switch
             {
                 "movies" => query.Where(w => w.ItemType == "Movie"),
                 "shows" => query.Where(w => w.ItemType == "Show"),
+                "anime" => query.Where(w => w.ItemType == "Show" && w.Show.Genre == "Anime"),
                 "watched" => query.Where(w => w.IsWatched),
                 "unwatched" => query.Where(w => !w.IsWatched),
                 "high" => query.Where(w => w.Priority == 1 && !w.IsWatched),
                 _ => query
             };
 
+            // Sorting
             query = query.OrderByDescending(w => w.Priority)
                          .ThenByDescending(w => w.AddedDate);
 
+            // Pagination
             var totalItems = await query.CountAsync();
             var wishlist = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            ViewBag.CurrentFilter = filter;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            ViewBag.Stats = new
+            // Get statistics
+            var stats = new
             {
                 Total = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.IsActive),
                 Movies = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.ItemType == "Movie" && w.IsActive),
-                Shows = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.ItemType == "Show" && w.IsActive),
+                Shows = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.ItemType == "Show" && w.IsActive && w.Show.Genre != "Anime"),
+                Anime = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.ItemType == "Show" && w.IsActive && w.Show.Genre == "Anime"),
                 Watched = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.IsWatched),
+                Unwatched = await _context.Wishlists.CountAsync(w => w.UserId == userId && !w.IsWatched),
                 HighPriority = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.Priority == 1 && !w.IsWatched)
             };
+
+            ViewBag.CurrentFilter = filter;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.Stats = stats;
 
             return View(wishlist);
         }
@@ -73,12 +81,11 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Add(int? movieId, int? showId, int priority = 1, string notes = "")
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                return Json(new { success = false, message = "User not authenticated" });
+                return Json(new { success = false, message = "Please login first" });
             }
-            var userId = int.Parse(userIdClaim);
 
             if (!movieId.HasValue && !showId.HasValue)
             {
@@ -104,12 +111,24 @@ namespace MovieMania.Controllers.User
                 return Json(new { success = false, message = "Already in wishlist" });
             }
 
+            var itemType = movieId.HasValue ? "Movie" : "Show";
+
+            // If it's a show, check if it's anime
+            if (showId.HasValue)
+            {
+                var show = await _context.Shows.FindAsync(showId);
+                if (show != null && show.Genre == "Anime")
+                {
+                    itemType = "Anime";
+                }
+            }
+
             var wishlist = new Wishlist
             {
-                UserId = userId,
+                UserId = userId.Value,
                 MovieId = movieId,
                 ShowId = showId,
-                ItemType = movieId.HasValue ? "Movie" : "Show",
+                ItemType = itemType,
                 AddedDate = DateTime.Now,
                 Notes = notes,
                 Priority = priority,
@@ -132,12 +151,11 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] WishlistUpdateViewModel model)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                return Json(new { success = false, message = "User not authenticated" });
+                return Json(new { success = false, message = "Please login first" });
             }
-            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .FirstOrDefaultAsync(w => w.Id == model.Id && w.UserId == userId);
@@ -166,12 +184,11 @@ namespace MovieMania.Controllers.User
         [HttpPost]
         public async Task<IActionResult> MarkAsWatched(int id, decimal? rating = null)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                return Json(new { success = false, message = "User not authenticated" });
+                return Json(new { success = false, message = "Please login first" });
             }
-            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
@@ -189,7 +206,7 @@ namespace MovieMania.Controllers.User
             {
                 var activity = new UserActivity
                 {
-                    UserId = userId,
+                    UserId = userId.Value,
                     MovieId = wishlist.MovieId,
                     ActivityType = "Watch",
                     ActivityDate = DateTime.Now,
@@ -210,58 +227,15 @@ namespace MovieMania.Controllers.User
             return Json(new { success = true, message = "Marked as watched! 🎉" });
         }
 
-        // POST: User/Wishlist/UpdateProgress
-        [HttpPost]
-        public async Task<IActionResult> UpdateProgress(int id, int watchedSeasons, int watchedEpisodes)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Json(new { success = false, message = "User not authenticated" });
-            }
-            var userId = int.Parse(userIdClaim);
-
-            var wishlist = await _context.Wishlists
-                .Include(w => w.Show)
-                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId && w.ItemType == "Show");
-
-            if (wishlist == null)
-            {
-                return Json(new { success = false, message = "Item not found" });
-            }
-
-            wishlist.WatchedSeasons = watchedSeasons;
-            wishlist.WatchedEpisodes = watchedEpisodes;
-
-            if (wishlist.Show != null &&
-                watchedSeasons >= wishlist.Show.TotalSeasons &&
-                watchedEpisodes >= wishlist.Show.TotalEpisodes)
-            {
-                wishlist.IsWatched = true;
-                wishlist.WatchedDate = DateTime.Now;
-            }
-
-            wishlist.UpdatedDate = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            return Json(new
-            {
-                success = true,
-                message = "Progress updated",
-                isCompleted = wishlist.IsWatched
-            });
-        }
-
         // POST: User/Wishlist/Remove
         [HttpPost]
         public async Task<IActionResult> Remove(int id)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                return Json(new { success = false, message = "User not authenticated" });
+                return Json(new { success = false, message = "Please login first" });
             }
-            var userId = int.Parse(userIdClaim);
 
             var wishlist = await _context.Wishlists
                 .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
@@ -283,15 +257,44 @@ namespace MovieMania.Controllers.User
             });
         }
 
+        // POST: User/Wishlist/TogglePriority
+        [HttpPost]
+        public async Task<IActionResult> TogglePriority(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Please login first" });
+            }
+
+            var wishlist = await _context.Wishlists
+                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
+
+            if (wishlist == null)
+            {
+                return Json(new { success = false, message = "Item not found" });
+            }
+
+            wishlist.Priority = wishlist.Priority == 1 ? 2 : 1;
+            wishlist.UpdatedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                priority = wishlist.Priority,
+                message = wishlist.Priority == 1 ? "Marked as high priority" : "Marked as normal priority"
+            });
+        }
+
         // GET: User/Wishlist/GetWishlistCount
         public async Task<IActionResult> GetWishlistCount()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
                 return Json(0);
             }
-            var userId = int.Parse(userIdClaim);
 
             var count = await _context.Wishlists
                 .CountAsync(w => w.UserId == userId && w.IsActive);

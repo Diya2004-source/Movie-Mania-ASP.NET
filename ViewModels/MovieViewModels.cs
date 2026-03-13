@@ -4,22 +4,11 @@ using MovieMania.Models;
 
 namespace MovieMania.ViewModels
 {
-    // Guest movie details
+    // Guest movie details - NO UserMovieDetailsViewModel here
     public class GuestMovieDetailsViewModel
     {
         public Movie Movie { get; set; } = new Movie();
         public List<Movie> RelatedMovies { get; set; } = new List<Movie>();
-        public List<MovieReview> Reviews { get; set; } = new List<MovieReview>();
-    }
-
-    // User movie details
-    public class UserMovieDetailsViewModel
-    {
-        public Movie Movie { get; set; } = new Movie();
-        public bool IsInWishlist { get; set; }
-        public decimal? UserRating { get; set; }
-        public List<Movie> RelatedMovies { get; set; } = new List<Movie>();
-        public List<int> RelatedMoviesInWishlist { get; set; } = new List<int>();
         public List<MovieReview> Reviews { get; set; } = new List<MovieReview>();
     }
 

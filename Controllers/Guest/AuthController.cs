@@ -31,6 +31,10 @@ namespace MovieMania.Controllers.Guest
                 string registrationJson = JsonSerializer.Serialize(model);
                 TempData["RegistrationData"] = registrationJson;
                 HttpContext.Session.SetString("RegData", registrationJson);
+
+                string reference = "PAY" + DateTime.Now.Ticks.ToString().Substring(0, 8);
+                HttpContext.Session.SetString("PaymentRef", reference);
+
                 return RedirectToAction("PaymentQRCode");
             }
             return View("~/Views/Guest/Auth/Register.cshtml", model);
@@ -54,7 +58,9 @@ namespace MovieMania.Controllers.Guest
                 return RedirectToAction("Register");
             }
 
-            string reference = "PAY" + DateTime.Now.Ticks.ToString().Substring(0, 8);
+            string reference = HttpContext.Session.GetString("PaymentRef") ??
+                              "PAY" + DateTime.Now.Ticks.ToString().Substring(0, 8);
+
             HttpContext.Session.SetString("PaymentRef", reference);
 
             ViewBag.Name = model.Name;
@@ -67,9 +73,9 @@ namespace MovieMania.Controllers.Guest
         [HttpPost]
         public async Task<IActionResult> VerifyPayment()
         {
-            await Task.Delay(2000); // Simulate payment processing
+            await Task.Delay(2000);
 
-            string? regJson = TempData["RegistrationData"]?.ToString() ?? HttpContext.Session.GetString("RegData");
+            string? regJson = HttpContext.Session.GetString("RegData");
             string? paymentRef = HttpContext.Session.GetString("PaymentRef");
 
             if (!string.IsNullOrEmpty(regJson) && !string.IsNullOrEmpty(paymentRef))
@@ -78,13 +84,11 @@ namespace MovieMania.Controllers.Guest
 
                 if (model != null)
                 {
-                    // Check if user already exists
                     var existingUser = await _context.Users
                         .FirstOrDefaultAsync(u => u.Email == model.Email);
 
                     if (existingUser == null)
                     {
-                        // Create new user directly (without CompleteRegistration page)
                         var user = new AppUser
                         {
                             Name = model.Name,
@@ -102,7 +106,6 @@ namespace MovieMania.Controllers.Guest
                         _context.Users.Add(user);
                         await _context.SaveChangesAsync();
 
-                        // Clear session data
                         HttpContext.Session.Remove("RegData");
                         HttpContext.Session.Remove("PaymentRef");
 
@@ -138,11 +141,6 @@ namespace MovieMania.Controllers.Guest
 
                 if (user != null && VerifyPassword(model.Password, user.Password))
                 {
-                    if (!string.IsNullOrEmpty(model.ReferralCode))
-                    {
-                        await ProcessReferralCode(model.ReferralCode, user.Id);
-                    }
-
                     HttpContext.Session.SetInt32("UserId", user.Id);
                     HttpContext.Session.SetString("UserName", user.Name);
                     HttpContext.Session.SetString("UserEmail", user.Email);
@@ -151,15 +149,15 @@ namespace MovieMania.Controllers.Guest
                     user.LastLoginAt = DateTime.Now;
                     await _context.SaveChangesAsync();
 
-                    // ✅ FIX: Always redirect to User dashboard explicitly
-                    // This ensures users go to the correct page after login
-                    return RedirectToAction("Index", "Home", new { area = "User" });
+                    // ✅ DIRECT REDIRECT to User Dashboard
+                    return Redirect("/User/Home/Index");
                 }
-
-                ModelState.AddModelError("", "Invalid email or password");
+                else
+                {
+                    ModelState.AddModelError("", "Invalid email or password");
+                }
             }
 
-            ViewBag.ReturnUrl = returnUrl;
             return View("~/Views/Guest/Auth/Login.cshtml", model);
         }
 
@@ -167,8 +165,10 @@ namespace MovieMania.Controllers.Guest
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home", new { area = "Guest" });
+            return Redirect("/");
         }
+
+        // ==================== HELPER METHODS ====================
 
         private async Task ProcessReferralCode(string referralCode, int newUserId)
         {

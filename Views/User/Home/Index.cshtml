@@ -61,7 +61,7 @@
 </section>
 
 <!-- Continue Watching Section -->
-@if (Model.ContinueWatching.Any())
+@if (Model.ContinueWatching != null && Model.ContinueWatching.Any())
 {
     <section class="continue-section mb-5">
         <div class="container">
@@ -69,10 +69,13 @@
                 <h2 class="section-title">
                     <i class="fas fa-play-circle text-success me-3"></i>Continue Watching
                 </h2>
+                <a href="@Url.Action("Movies", "Home")" class="view-all">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
 
             <div class="row g-4">
-                @foreach (var item in Model.ContinueWatching)
+                @foreach (var item in Model.ContinueWatching.Take(6))
                 {
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6" data-aos="fade-up">
                         <div class="continue-card">
@@ -93,7 +96,7 @@
                                         <circle class="progress-bg" cx="25" cy="25" r="22" />
                                         <circle class="progress-bar" cx="25" cy="25" r="22"
                                                 style="stroke-dasharray: 138.2;
-                                                               stroke-dashoffset: @(138.2 - (138.2 * item.ProgressPercentage / 100))" />
+                                                                       stroke-dashoffset: @(138.2 - (138.2 * item.ProgressPercentage / 100))" />
                                     </svg>
                                     <span class="progress-text">@item.ProgressPercentage%</span>
                                 </div>
@@ -117,24 +120,24 @@
     </section>
 }
 
-<!-- Recommended Movies Section -->
-@if (Model.RecommendedMovies.Any())
-{
-    <section class="recommended-section mb-5">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-star text-warning me-3"></i>Recommended For You
-                </h2>
-                <a href="@Url.Action("Movies", "Home")" class="view-all">
-                    View All <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
+<!-- All Movies Section -->
+<section class="all-movies-section mb-5">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-film text-primary me-3"></i>All Movies
+            </h2>
+            <a href="@Url.Action("Movies", "Home")" class="view-all">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
 
-            <div class="row g-4">
-                @foreach (var movie in Model.RecommendedMovies.Take(6))
+        <div class="row g-4">
+            @if (Model.AllMovies != null && Model.AllMovies.Any())
+            {
+                @foreach (var movie in Model.AllMovies.Take(12))
                 {
-                    <div class="col-lg-2 col-md-3 col-sm-4 col-6" data-aos="zoom-in">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6" data-aos="fade-up">
                         <div class="movie-card">
                             <div class="movie-poster">
                                 <img src="@(movie.ThumbnailUrl ?? "/images/default-movie.jpg")"
@@ -144,6 +147,12 @@
                                     <i class="fas fa-star"></i>
                                     <span>@(movie.Rating?.ToString("F1") ?? "N/A")</span>
                                 </div>
+                                @if (!string.IsNullOrEmpty(movie.VideoUrl))
+                                {
+                                    <div class="watch-now-badge">
+                                        <span class="badge bg-danger">Watch Now</span>
+                                    </div>
+                                }
                                 <div class="movie-overlay">
                                     <a href="@Url.Action("MovieDetails", new { id = movie.Id })"
                                        class="btn-details">
@@ -164,75 +173,40 @@
                         </div>
                     </div>
                 }
-            </div>
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">No movies available</p>
+                </div>
+            }
         </div>
-    </section>
-}
+    </div>
+</section>
 
-<!-- Trending Movies Section -->
-@if (Model.TrendingMovies.Any())
-{
-    <section class="trending-section mb-5 bg-dark-gradient">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-fire text-danger me-3"></i>Trending Now
-                </h2>
-                <a href="@Url.Action("Movies", "Home", new { sortBy = "trending" })" class="view-all">
-                    View All <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="row g-4">
-                @foreach (var movie in Model.TrendingMovies)
-                {
-                    <div class="col-lg-3 col-md-4 col-sm-6" data-aos="flip-up">
-                        <div class="trending-card">
-                            <div class="trending-poster">
-                                <img src="@(movie.ThumbnailUrl ?? "/images/default-movie.jpg")"
-                                     alt="@movie.Title">
-                                <span class="trending-rank">#@movie.Id</span>
-                                <div class="trending-overlay">
-                                    <a href="@Url.Action("MovieDetails", new { id = movie.Id })"
-                                       class="btn-trending">
-                                        <i class="fas fa-play"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="trending-info">
-                                <h6>@movie.Title</h6>
-                                <p>@movie.ViewsCount views</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
+<!-- All TV Shows Section -->
+<section class="all-shows-section mb-5 bg-dark-gradient py-4">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-tv text-info me-3"></i>TV Shows
+            </h2>
+            <a href="@Url.Action("Shows", "Home")" class="view-all">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
-    </section>
-}
 
-<!-- Trending Shows Section -->
-@if (Model.TrendingShows.Any())
-{
-    <section class="shows-section mb-5">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-tv text-info me-3"></i>Trending Shows
-                </h2>
-                <a href="@Url.Action("Shows", "Home")" class="view-all">
-                    View All <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="row g-4">
-                @foreach (var show in Model.TrendingShows)
+        <div class="row g-4">
+            @if (Model.AllShows != null && Model.AllShows.Any())
+            {
+                @foreach (var show in Model.AllShows.Take(12))
                 {
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6" data-aos="fade-up">
                         <div class="show-card">
                             <div class="show-poster">
                                 <img src="@(show.ThumbnailUrl ?? "/images/default-show.jpg")"
-                                     alt="@show.Title">
+                                     alt="@show.Title"
+                                     loading="lazy">
                                 <div class="show-badge">
                                     <span class="badge-season">@show.TotalSeasons S</span>
                                 </div>
@@ -254,13 +228,74 @@
                         </div>
                     </div>
                 }
-            </div>
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">No TV shows available</p>
+                </div>
+            }
         </div>
-    </section>
-}
+    </div>
+</section>
+
+<!-- Anime Section -->
+<section class="anime-section mb-5">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-dragon text-danger me-3"></i>Anime
+            </h2>
+            <a href="@Url.Action("Anime", "Home")" class="view-all">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            @if (Model.AnimeShows != null && Model.AnimeShows.Any())
+            {
+                @foreach (var anime in Model.AnimeShows.Take(12))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6" data-aos="fade-up">
+                        <div class="show-card">
+                            <div class="show-poster">
+                                <img src="@(anime.ThumbnailUrl ?? "/images/default-anime.jpg")"
+                                     alt="@anime.Title"
+                                     loading="lazy">
+                                <div class="show-badge">
+                                    <span class="badge-season">@anime.TotalSeasons S</span>
+                                </div>
+                                <div class="show-overlay">
+                                    <a href="@Url.Action("ShowDetails", new { id = anime.Id })"
+                                       class="btn-details">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="show-info">
+                                <h6 class="show-title">@anime.Title</h6>
+                                <div class="show-meta">
+                                    <span>@anime.Genre</span>
+                                    <span class="dot">•</span>
+                                    <span>@anime.ReleaseYear</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">No anime available</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
 
 <!-- Wishlist Preview -->
-@if (Model.UserWishlist.Any())
+@if (Model.UserWishlist != null && Model.UserWishlist.Any())
 {
     <section class="wishlist-section mb-5">
         <div class="container">
@@ -274,7 +309,7 @@
             </div>
 
             <div class="row g-4">
-                @foreach (var item in Model.UserWishlist)
+                @foreach (var item in Model.UserWishlist.Take(8))
                 {
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6" data-aos="fade-up">
                         @if (item.Movie != null)
@@ -316,7 +351,6 @@
     </section>
 }
 
-<!-- Enhanced CSS -->
 <style>
     /* Welcome Hero */
     .welcome-hero {
@@ -373,6 +407,7 @@
         background: linear-gradient(135deg, #ff4d4d, #ff8c5a);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .welcome-text {
@@ -639,6 +674,23 @@
         z-index: 2;
     }
 
+    .watch-now-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+    }
+
+        .watch-now-badge .badge {
+            background: linear-gradient(135deg, #ff4d4d, #ff3333);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255,77,77,0.3);
+        }
+
     .movie-overlay {
         position: absolute;
         top: 0;
@@ -734,13 +786,27 @@
     .bg-dark-gradient {
         background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
         padding: 40px 0;
+        position: relative;
+        overflow: hidden;
     }
+
+        .bg-dark-gradient::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,77,77,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
 
     .trending-card {
         background: #1a1a1a;
         border-radius: 16px;
         overflow: hidden;
         transition: all 0.3s ease;
+        height: 100%;
     }
 
         .trending-card:hover {
@@ -776,6 +842,7 @@
         font-size: 0.9rem;
         font-weight: 600;
         z-index: 2;
+        box-shadow: 0 5px 15px rgba(255,215,0,0.3);
     }
 
     .trending-overlay {
@@ -826,6 +893,8 @@
         .trending-info h6 {
             color: white;
             margin: 0 0 5px 0;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .trending-info p {
@@ -879,6 +948,7 @@
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
+        box-shadow: 0 5px 15px rgba(13,202,240,0.3);
     }
 
     .show-overlay {
@@ -899,6 +969,29 @@
         opacity: 1;
     }
 
+    .btn-details-show {
+        background: #0dcaf0;
+        color: #000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transform: scale(0);
+        transition: all 0.3s ease;
+    }
+
+    .show-card:hover .btn-details-show {
+        transform: scale(1);
+    }
+
+    .btn-details-show:hover {
+        background: #0bb7d6;
+        transform: scale(1.1) !important;
+    }
+
     .show-info {
         padding: 15px;
     }
@@ -908,6 +1001,9 @@
         font-size: 0.9rem;
         font-weight: 600;
         margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .show-meta {
@@ -926,6 +1022,7 @@
         overflow: hidden;
         transition: all 0.3s ease;
         height: 100%;
+        position: relative;
     }
 
         .wishlist-card:hover {
@@ -967,6 +1064,7 @@
         opacity: 0;
         transition: all 0.3s ease;
         z-index: 2;
+        border: 1px solid rgba(255,255,255,0.2);
     }
 
     .wishlist-card:hover .btn-remove {
@@ -986,6 +1084,9 @@
             color: white;
             font-size: 0.9rem;
             margin: 0 0 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .wishlist-info small {
@@ -993,6 +1094,7 @@
             font-size: 0.8rem;
         }
 
+    /* Animations - ESCAPED WITH @@ */
     @@keyframes rotate {
         from {
             transform: rotate(0deg);
@@ -1003,8 +1105,70 @@
         }
     }
 
-    /* Responsive */
-    @@media (max-width: 768px) {
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+
+    .animate-pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Loading State */
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255,77,77,0.3);
+        border-radius: 50%;
+        border-top-color: #ff4d4d;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 0;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ff4d4d;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+
+    /* Responsive Design - ESCAPED WITH @@ */
+    @@media (max-width: 1200px) {
+        .welcome-title {
+            font-size: 3rem;
+        }
+    }
+
+    @@media (max-width: 992px) {
         .welcome-title {
             font-size: 2.5rem;
         }
@@ -1023,49 +1187,117 @@
         }
 
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .welcome-hero {
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+        }
+
+        .welcome-text {
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            margin-top: 30px;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .view-all {
+            align-self: flex-start;
+        }
+
+        .movie-card, .show-card, .wishlist-card {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .bg-dark-gradient::before {
+            display: none;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .col-6 {
+            padding: 0 5px;
+        }
+
+        .movie-info, .show-info, .wishlist-info {
+            padding: 10px;
+        }
+
+        .movie-title, .show-title {
+            font-size: 0.8rem;
+        }
+
+        .movie-meta, .show-meta {
+            font-size: 0.7rem;
+        }
+
+        .btn-details, .btn-wishlist, .btn-details-show {
+            width: 30px;
+            height: 30px;
+            font-size: 0.8rem;
+        }
+
+        .trending-rank {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+        }
+
+        .badge-season {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+        }
+    }
+
+    /* Hover Effects */
+    .movie-card, .show-card, .wishlist-card, .trending-card {
+        cursor: pointer;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #ff4d4d;
+        border-radius: 4px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff3333;
+        }
+
+    /* Print Styles */
+    @@media print {
+        .welcome-hero,
+        .continue-section,
+        .trending-section,
+        .wishlist-section,
+        .btn-details,
+        .btn-wishlist,
+        .btn-remove,
+        .view-all {
+            display: none !important;
         }
     }
 </style>
-
-@section Scripts {
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
-
-        function toggleWishlist(itemId, type) {
-            $.post('@Url.Action("ToggleWishlist", "Wishlist", new { area = "User" })',
-                { itemId: itemId, itemType: type })
-                .done(function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        toastr.error(response.message);
-                    }
-                })
-                .fail(function() {
-                    toastr.error('Error updating wishlist');
-                });
-        }
-
-        function removeFromWishlist(wishlistId) {
-            if (confirm('Remove from wishlist?')) {
-                $.post('@Url.Action("Remove", "Wishlist", new { area = "User" })',
-                    { id: wishlistId })
-                    .done(function(response) {
-                        if (response.success) {
-                            toastr.success('Removed from wishlist');
-                            setTimeout(() => location.reload(), 1500);
-                        } else {
-                            toastr.error('Error removing item');
-                        }
-                    });
-            }
-        }
-    </script>
-}
