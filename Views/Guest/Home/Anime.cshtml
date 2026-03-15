@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MovieMania.Models.Show>
+﻿@model IEnumerable<MovieMania.Models.Movie>
 
 @{
     Layout = "~/Views/Shared/_GuestLayout.cshtml";
@@ -11,7 +11,7 @@
         <div class="container">
             <div class="hero-content text-center">
                 <h1 class="hero-title">Browse Anime</h1>
-                <p class="hero-subtitle">Discover the best anime series from Japan and around the world</p>
+                <p class="hero-subtitle">Discover the best anime series and movies from Japan</p>
             </div>
         </div>
     </section>
@@ -27,7 +27,7 @@
                         <div class="search-box">
                             <i class="fas fa-search search-icon"></i>
                             <input type="text" class="form-control" name="search" 
-                                   value="@ViewBag.Search" placeholder="Search by title...">
+                                   value="@ViewBag.Search" placeholder="Search by title, genre...">
                         </div>
                     </div>
 
@@ -51,13 +51,52 @@
                         </div>
                     </div>
 
+                    <!-- Sort Filter -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label text-muted mb-2">Sort By</label>
+                        <div class="filter-select">
+                            <i class="fas fa-sort select-icon"></i>
+                            <select class="form-select" name="sortBy">
+                                <option value="latest" selected="@(ViewBag.CurrentSort == "latest")">Latest</option>
+                                <option value="rating" selected="@(ViewBag.CurrentSort == "rating")">Top Rated</option>
+                                <option value="views" selected="@(ViewBag.CurrentSort == "views")">Most Viewed</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Apply Button -->
-                    <div class="col-lg-5 col-md-12">
+                    <div class="col-lg-3 col-md-6">
                         <button type="submit" class="btn-apply w-100">
                             <i class="fas fa-filter me-2"></i>Apply Filters
                         </button>
                     </div>
                 </form>
+
+                <!-- Active Filters -->
+                @if (!string.IsNullOrEmpty(ViewBag.Search) || (!string.IsNullOrEmpty(ViewBag.Genre) && ViewBag.Genre != "All"))
+                {
+                    <div class="active-filters mt-4">
+                        <span class="filters-label">Active Filters:</span>
+                        @if (!string.IsNullOrEmpty(ViewBag.Search))
+                        {
+                            <span class="filter-tag">
+                                Search: "@ViewBag.Search"
+                                <a href="@Url.Action("Index", new { genre = ViewBag.Genre, sortBy = ViewBag.CurrentSort })" class="remove-filter">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </span>
+                        }
+                        @if (!string.IsNullOrEmpty(ViewBag.Genre) && ViewBag.Genre != "All")
+                        {
+                            <span class="filter-tag">
+                                Genre: @ViewBag.Genre
+                                <a href="@Url.Action("Index", new { search = ViewBag.Search, sortBy = ViewBag.CurrentSort })" class="remove-filter">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </span>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </section>
@@ -83,7 +122,7 @@
                     <i class="fas fa-dragon fa-4x mb-3"></i>
                     <h3>No Anime Found</h3>
                     <p>Try adjusting your search or filter criteria</p>
-                    <a href="@Url.Action("Anime")" class="btn-clear">
+                    <a href="@Url.Action("Index")" class="btn-clear">
                         <i class="fas fa-undo me-2"></i>Clear Filters
                     </a>
                 </div>
@@ -91,41 +130,55 @@
             else
             {
                 <div class="row g-4">
-                    @foreach (var show in Model)
+                    @foreach (var anime in Model)
                     {
-                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="fade-up">
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="@(anime.Id * 20)">
                             <div class="anime-card">
                                 <div class="anime-poster">
-                                    <img src="@(show.ThumbnailUrl ?? "/images/default-anime.jpg")" 
-                                         alt="@show.Title"
+                                    <img src="@(anime.ThumbnailUrl ?? "/images/default-movie.jpg")" 
+                                         alt="@anime.Title"
                                          loading="lazy">
                                     
-                                    @if (show.Rating.HasValue)
+                                    @if (anime.Rating.HasValue)
                                     {
                                         <div class="anime-rating-badge">
                                             <i class="fas fa-star"></i>
-                                            <span>@show.Rating.Value.ToString("F1")</span>
+                                            <span>@anime.Rating.Value.ToString("F1")</span>
                                         </div>
                                     }
 
-                                    <div class="anime-seasons-badge">
-                                        <i class="fas fa-layer-group"></i>
-                                        <span>@show.TotalSeasons @(show.TotalSeasons == 1 ? "Season" : "Seasons")</span>
-                                    </div>
+                                    @if (anime.ReleaseYear.HasValue)
+                                    {
+                                        <div class="anime-year-badge">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>@anime.ReleaseYear</span>
+                                        </div>
+                                    }
 
                                     <div class="anime-overlay">
-                                        <a href="@Url.Action("ShowDetails", new { id = show.Id })" 
-                                           class="btn-details">
-                                            <i class="fas fa-info-circle me-2"></i>Details
-                                        </a>
+                                        <div class="overlay-content">
+                                            <a href="@Url.Action("Details", new { id = anime.Id })" 
+                                               class="btn-details">
+                                                <i class="fas fa-info-circle me-2"></i>Details
+                                            </a>
+                                            <button class="btn-wishlist" onclick="addToWishlist(@anime.Id)">
+                                                <i class="far fa-heart"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="anime-info">
-                                    <h6 class="anime-title">@show.Title</h6>
+                                    <h6 class="anime-title">@anime.Title</h6>
                                     <div class="anime-meta">
-                                        <span class="genre">@show.Genre</span>
-                                        <span class="year">@show.ReleaseYear</span>
+                                        <span class="genre">@anime.Genre</span>
                                     </div>
+                                    @if (anime.Duration.HasValue)
+                                    {
+                                        <div class="anime-duration">
+                                            <i class="fas fa-clock"></i>
+                                            <span>@anime.Duration min</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -145,10 +198,11 @@
                         @if (ViewBag.CurrentPage > 1)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Anime", new { 
+                                <a class="page-link" href="@Url.Action("Index", new { 
                                     page = ViewBag.CurrentPage - 1, 
                                     search = ViewBag.Search, 
-                                    genre = ViewBag.Genre
+                                    genre = ViewBag.Genre,
+                                    sortBy = ViewBag.CurrentSort
                                 })">
                                     <i class="fas fa-chevron-left"></i>
                                 </a>
@@ -158,10 +212,11 @@
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
                             <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Anime", new { 
+                                <a class="page-link" href="@Url.Action("Index", new { 
                                     page = i, 
                                     search = ViewBag.Search, 
-                                    genre = ViewBag.Genre
+                                    genre = ViewBag.Genre,
+                                    sortBy = ViewBag.CurrentSort
                                 })">@i</a>
                             </li>
                         }
@@ -169,10 +224,11 @@
                         @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Anime", new { 
+                                <a class="page-link" href="@Url.Action("Index", new { 
                                     page = ViewBag.CurrentPage + 1, 
                                     search = ViewBag.Search, 
-                                    genre = ViewBag.Genre
+                                    genre = ViewBag.Genre,
+                                    sortBy = ViewBag.CurrentSort
                                 })">
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
@@ -185,6 +241,7 @@
     }
 </div>
 
+<!-- Custom CSS -->
 <style>
     /* Page Hero */
     .page-hero {
@@ -194,10 +251,21 @@
         overflow: hidden;
     }
 
+    .page-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><circle cx="50" cy="50" r="40" fill="none" stroke="%23dc3545" stroke-width="2"/></svg>') repeat;
+        animation: rotate 60s linear infinite;
+    }
+
     .hero-title {
         font-size: 3.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #fff, #ff4d4d);
+        background: linear-gradient(135deg, #fff, #dc3545);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 15px;
@@ -208,7 +276,7 @@
         color: #9ca3af;
     }
 
-    /* Filters Section (reuse from Shows.css) */
+    /* Filters Section */
     .filters-wrapper {
         background: #1a1a1a;
         border-radius: 20px;
@@ -226,7 +294,7 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: #ff4d4d;
+        color: #dc3545;
         z-index: 2;
     }
 
@@ -242,14 +310,14 @@
 
     .form-control:focus, .form-select:focus {
         background: #2a2a2a;
-        border-color: #ff4d4d;
-        box-shadow: 0 0 0 3px rgba(255,77,77,0.1);
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
         color: white;
         outline: none;
     }
 
     .btn-apply {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        background: linear-gradient(135deg, #dc3545, #c82333);
         border: none;
         border-radius: 12px;
         padding: 12px 20px;
@@ -261,7 +329,7 @@
 
     .btn-apply:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
+        box-shadow: 0 10px 25px rgba(220,53,69,0.3);
     }
 
     /* Anime Card */
@@ -276,8 +344,8 @@
 
     .anime-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(255,77,77,0.2);
-        border-color: rgba(255,77,77,0.3);
+        box-shadow: 0 20px 40px rgba(220,53,69,0.2);
+        border-color: rgba(220,53,69,0.3);
     }
 
     .anime-poster {
@@ -311,17 +379,25 @@
         z-index: 2;
     }
 
-    .anime-seasons-badge {
+    .anime-rating-badge i {
+        margin-right: 4px;
+    }
+
+    .anime-year-badge {
         position: absolute;
         top: 10px;
         left: 10px;
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        background: linear-gradient(135deg, #dc3545, #c82333);
         color: white;
         padding: 5px 12px;
         border-radius: 20px;
         font-size: 0.75rem;
         font-weight: 600;
         z-index: 2;
+    }
+
+    .anime-year-badge i {
+        margin-right: 4px;
     }
 
     .anime-overlay {
@@ -333,7 +409,6 @@
         background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
         display: flex;
         align-items: flex-end;
-        justify-content: center;
         padding: 20px;
         opacity: 0;
         transition: opacity 0.3s ease;
@@ -343,26 +418,53 @@
         opacity: 1;
     }
 
-    .btn-details {
-        background: #ff4d4d;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 30px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-decoration: none;
+    .overlay-content {
+        display: flex;
+        gap: 10px;
+        width: 100%;
         transform: translateY(20px);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease;
     }
 
-    .anime-card:hover .btn-details {
+    .anime-card:hover .overlay-content {
         transform: translateY(0);
     }
 
+    .btn-details {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        flex: 1;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+
     .btn-details:hover {
-        background: #ff3333;
-        transform: scale(1.05) translateY(-3px) !important;
+        background: #c82333;
+        transform: scale(1.05);
+        color: white;
+    }
+
+    .btn-wishlist {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 8px 12px;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-wishlist:hover {
+        background: #dc3545;
+        border-color: #dc3545;
+        transform: scale(1.05);
     }
 
     .anime-info {
@@ -384,10 +486,21 @@
         gap: 8px;
         font-size: 0.8rem;
         color: #9ca3af;
+        margin-bottom: 8px;
     }
 
     .anime-meta .genre {
-        color: #ff4d4d;
+        color: #dc3545;
+    }
+
+    .anime-duration {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .anime-duration i {
+        color: #dc3545;
+        margin-right: 4px;
     }
 
     /* Results Info */
@@ -408,7 +521,7 @@
     }
 
     .no-results i {
-        color: #ff4d4d;
+        color: #dc3545;
         opacity: 0.5;
     }
 
@@ -423,7 +536,7 @@
     }
 
     .btn-clear {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        background: linear-gradient(135deg, #dc3545, #c82333);
         color: white;
         border: none;
         padding: 12px 30px;
@@ -436,18 +549,18 @@
 
     .btn-clear:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
+        box-shadow: 0 10px 25px rgba(220,53,69,0.3);
         color: white;
     }
 
-    /* Pagination (reuse from Shows.css) */
+    /* Pagination */
     .pagination {
         gap: 5px;
         justify-content: center;
     }
 
     .page-item.active .page-link {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
+        background: linear-gradient(135deg, #dc3545, #c82333);
         border-color: transparent;
     }
 
@@ -462,7 +575,7 @@
 
     .page-link:hover {
         background: #2a2a2a;
-        border-color: #ff4d4d;
+        border-color: #dc3545;
         color: white;
         transform: translateY(-2px);
     }
@@ -472,5 +585,50 @@
         .hero-title {
             font-size: 2.5rem;
         }
+        
+        .filters-wrapper {
+            padding: 20px;
+        }
     }
 </style>
+
+@section Scripts {
+    <script>
+        function addToWishlist(animeId) {
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <text>
+                fetch('@Url.Action("Add", "Wishlist", new { area = "User" })', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ movieId: animeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success('Added to wishlist!');
+                    } else {
+                        toastr.info(data.message || 'Already in wishlist');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('Error adding to wishlist');
+                });
+                </text>
+            }
+            else
+            {
+                <text>
+                toastr.warning('Please login to add to wishlist');
+                setTimeout(function() {
+                    window.location.href = '@Url.Action("Login", "Auth")';
+                }, 2000);
+                </text>
+            }
+        }
+    </script>
+}

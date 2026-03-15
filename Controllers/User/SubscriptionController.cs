@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
-using MovieMania.ViewModels;
 using System.Security.Claims;
 
 namespace MovieMania.Controllers.User
@@ -17,88 +16,92 @@ namespace MovieMania.Controllers.User
             _context = context;
         }
 
-        // GET: User/Subscription/Plans
-        public async Task<IActionResult> Plans()
+        public async Task<IActionResult> Index()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Unauthorized();
-            }
-            var userId = int.Parse(userIdClaim);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return RedirectToAction("Login", "Auth");
 
-            var plans = await _context.SubscriptionPlans
-                .Where(sp => sp.IsActive)
-                .OrderBy(sp => sp.Price)
+            var userId = int.Parse(userIdClaim.Value);
+
+            // Get current active subscription
+            var currentSubscription = await _context.UserSubscriptions
+                .Include(s => s.SubscriptionPlan)
+                .Where(s => s.UserId == userId && s.IsActive)
+                .OrderByDescending(s => s.StartDate)
+                .FirstOrDefaultAsync();
+
+            // Get subscription history
+            var subscriptionHistory = await _context.UserSubscriptions
+                .Include(s => s.SubscriptionPlan)
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.StartDate)
+                .Skip(currentSubscription != null ? 1 : 0)
+                .Take(5)
                 .ToListAsync();
 
-            var currentSubscription = await _context.UserSubscriptions
-                .Include(us => us.SubscriptionPlan)
-                .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Active");
+            // Get available plans
+            var availablePlans = await _context.SubscriptionPlans
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.DisplayOrder)
+                .ToListAsync();
 
             ViewBag.CurrentSubscription = currentSubscription;
+            ViewBag.SubscriptionHistory = subscriptionHistory;
 
-            return View(plans);
+            return View("~/Views/User/Subscription/Index.cshtml", availablePlans);
         }
 
-        // POST: User/Subscription/Cancel
         [HttpPost]
         public async Task<IActionResult> Cancel()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Json(new { success = false, message = "User not authenticated" });
-            }
-            var userId = int.Parse(userIdClaim);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Json(new { success = false, message = "User not found" });
+
+            var userId = int.Parse(userIdClaim.Value);
 
             var subscription = await _context.UserSubscriptions
-                .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Active");
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive);
 
             if (subscription == null)
-            {
                 return Json(new { success = false, message = "No active subscription found" });
-            }
 
-            subscription.Status = "Cancelled";
-            subscription.EndDate = DateTime.Now;
-            subscription.CancelledAt = DateTime.Now;
+            subscription.IsActive = false;
+            // Remove UpdatedAt if it doesn't exist in your model
+            // subscription.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
-            return Json(new
-            {
-                success = true,
-                message = "Subscription cancelled successfully",
-                endDate = subscription.EndDate.ToString("MMM dd, yyyy")
-            });
+            return Json(new { success = true, message = "Subscription cancelled successfully" });
         }
 
-        // POST: User/Subscription/Reactivate
-        [HttpPost]
-        public async Task<IActionResult> Reactivate()
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Json(new { success = false, message = "User not authenticated" });
-            }
-            var userId = int.Parse(userIdClaim);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return RedirectToAction("Login", "Auth");
+
+            var userId = int.Parse(userIdClaim.Value);
 
             var subscription = await _context.UserSubscriptions
-                .FirstOrDefaultAsync(us => us.UserId == userId && us.Status == "Cancelled");
+                .Include(s => s.SubscriptionPlan)
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
             if (subscription == null)
-            {
-                return Json(new { success = false, message = "No cancelled subscription found" });
-            }
+                return NotFound();
 
-            subscription.Status = "Active";
-            subscription.ReactivatedAt = DateTime.Now;
+            // Get payments related to this subscription
+            var payments = await _context.Payments
+                .Where(p => p.UserId == userId && p.SubscriptionPlanId == subscription.PlanId)
+                .OrderByDescending(p => p.PaymentDate)
+                .ToListAsync();
 
-            await _context.SaveChangesAsync();
+            ViewBag.Payments = payments;
 
-            return Json(new { success = true, message = "Subscription reactivated successfully" });
+            return View("~/Views/User/Subscription/Details.cshtml", subscription);
         }
     }
 }

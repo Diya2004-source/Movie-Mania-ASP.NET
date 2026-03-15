@@ -1,168 +1,149 @@
 ﻿@model MovieMania.Models.SubscriptionPlan
-
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Edit Subscription Plan";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-5">
-    <div class="card card-dark p-4 shadow-lg">
-        <h2 class="mb-4 text-center text-light">
-            <i class="fas fa-edit me-2 text-warning"></i>Edit Subscription Plan
-        </h2>
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-light">
+                <i class="fas fa-edit me-2 text-warning"></i>Edit Subscription Plan
+            </h1>
+        </div>
+    </div>
 
-        <form asp-action="Edit" method="post">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CreatedAt" />
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg bg-dark">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedAt" />
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Name" class="form-label text-light"></label>
-                    <input asp-for="Name" class="form-control custom-input" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label asp-for="Name" class="form-label text-light fw-bold"></label>
+                                <input asp-for="Name" class="form-control bg-secondary text-light border-0" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DisplayOrder" class="form-label text-light fw-bold">Display Order</label>
+                                <input asp-for="DisplayOrder" class="form-control bg-secondary text-light border-0" type="number" min="0" />
+                                <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label text-light fw-bold"></label>
+                            <textarea asp-for="Description" class="form-control bg-secondary text-light border-0" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="Price" class="form-label text-light fw-bold">Price (₹)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-primary text-white border-0">₹</span>
+                                    <input asp-for="Price" class="form-control bg-secondary text-light border-0" type="number" step="0.01" min="0" />
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DurationInDays" class="form-label text-light fw-bold">Duration (Days)</label>
+                                <input asp-for="DurationInDays" class="form-control bg-secondary text-light border-0" type="number" min="1" />
+                                <span asp-validation-for="DurationInDays" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="MaxScreens" class="form-label text-light fw-bold">Max Screens</label>
+                                <input asp-for="MaxScreens" class="form-control bg-secondary text-light border-0" type="number" min="1" max="10" />
+                                <span asp-validation-for="MaxScreens" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="VideoQuality" class="form-label text-light fw-bold">Video Quality</label>
+                                <select asp-for="VideoQuality" class="form-select bg-secondary text-light border-0">
+                                    <option value="HD">HD (720p)</option>
+                                    <option value="Full HD">Full HD (1080p)</option>
+                                    <option value="4K">4K (2160p)</option>
+                                    <option value="8K">8K (4320p)</option>
+                                </select>
+                                <span asp-validation-for="VideoQuality" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input asp-for="IsActive" class="form-check-input" />
+                                    <label asp-for="IsActive" class="form-check-label text-light fw-bold"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Features" class="form-label text-light fw-bold">Features</label>
+                            <textarea asp-for="Features" class="form-control bg-secondary text-light border-0" rows="4"></textarea>
+                            <span asp-validation-for="Features" class="text-danger"></span>
+                            <small class="text-muted">Enter each feature on a new line</small>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning px-4">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-light ms-2 px-4">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+            </div>
+        </div>
 
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Price" class="form-label text-light"></label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-secondary text-white border-0">$</span>
-                        <input asp-for="Price" class="form-control custom-input" type="number" step="0.01" />
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg bg-dark mb-3">
+                <div class="card-body p-4">
+                    <h5 class="text-warning mb-3">
+                        <i class="fas fa-clock me-2"></i>Plan Information
+                    </h5>
+                    <ul class="list-unstyled text-light">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-plus text-primary me-2"></i>
+                            <strong>Created:</strong> @Model.CreatedAt.ToString("dd MMM yyyy HH:mm")
+                        </li>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-check text-success me-2"></i>
+                                <strong>Updated:</strong> @Model.UpdatedAt.Value.ToString("dd MMM yyyy HH:mm")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg bg-dark">
+                <div class="card-body p-4">
+                    <h5 class="text-warning mb-3">
+                        <i class="fas fa-crown me-2"></i>Current Plan Preview
+                    </h5>
+                    <div class="bg-secondary p-3 rounded text-center">
+                        <h6 class="text-light">@Model.Name</h6>
+                        <p class="text-success fw-bold fs-4">₹ @Model.Price.ToString("N0")</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <span class="badge bg-primary">@Model.MaxScreens Screens</span>
+                            <span class="badge bg-info">@Model.VideoQuality</span>
+                        </div>
                     </div>
-                    <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label asp-for="DurationInDays" class="form-label text-light"></label>
-                    <div class="input-group">
-                        <input asp-for="DurationInDays" class="form-control custom-input" type="number" />
-                        <span class="input-group-text bg-secondary text-white border-0">days</span>
-                    </div>
-                    <span asp-validation-for="DurationInDays" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label asp-for="MaxScreens" class="form-label text-light"></label>
-                    <input asp-for="MaxScreens" class="form-control custom-input" type="number" />
-                    <span asp-validation-for="MaxScreens" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label asp-for="DisplayOrder" class="form-label text-light"></label>
-                    <input asp-for="DisplayOrder" class="form-control custom-input" type="number" />
-                    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="VideoQuality" class="form-label text-light"></label>
-                    <select asp-for="VideoQuality" class="form-control custom-input">
-                        <option value="SD">SD (480p)</option>
-                        <option value="HD">HD (720p)</option>
-                        <option value="Full HD">Full HD (1080p)</option>
-                        <option value="4K">4K Ultra HD</option>
-                    </select>
-                    <span asp-validation-for="VideoQuality" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label text-light"></label>
-                <textarea asp-for="Description" class="form-control custom-input" rows="3"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Features" class="form-label text-light"></label>
-                <textarea asp-for="Features" class="form-control custom-input" rows="4"></textarea>
-                <span asp-validation-for="Features" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input asp-for="IsActive" class="form-check-input" />
-                <label asp-for="IsActive" class="form-check-label text-light">Active</label>
-            </div>
-
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-warning btn-custom px-5">
-                    <i class="fas fa-save me-2"></i>Update Plan
-                </button>
-                <a asp-action="Index" class="btn btn-outline-light btn-custom px-4 ms-2">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </a>
-            </div>
-
-        </form>
+        </div>
     </div>
 </div>
-
-<style>
-    body {
-        background: #0f0f0f;
-    }
-
-    .card-dark {
-        background: #1c1c1c;
-        border: none;
-        border-radius: 15px;
-        max-width: 900px;
-        margin: auto;
-    }
-
-    .custom-input {
-        background: #2a2a2a;
-        border: 1px solid #444;
-        color: white;
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-        .custom-input:focus {
-            background: #2a2a2a;
-            color: white;
-            border-color: #ffc107;
-            box-shadow: 0 0 8px rgba(255,193,7,0.4);
-        }
-
-    .input-group-text {
-        background: #2a2a2a;
-        border: 1px solid #444;
-        border-left: none;
-    }
-
-    .btn-custom {
-        padding: 10px 20px;
-        border-radius: 8px;
-        transition: all 0.3s;
-    }
-
-    .btn-warning {
-        background: #ffc107;
-        border: none;
-        color: #000;
-    }
-
-        .btn-warning:hover {
-            background: #ffca2c;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255,193,7,0.3);
-        }
-
-    .btn-outline-light:hover {
-        background: white;
-        color: black;
-        transform: translateY(-2px);
-    }
-
-    .form-check-input:checked {
-        background-color: #ffc107;
-        border-color: #ffc107;
-    }
-</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using MovieMania.Models;
+using System.Security.Claims;
 using MovieMania.ViewModels;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
 namespace MovieMania.Controllers.Guest
 {
@@ -17,221 +17,256 @@ namespace MovieMania.Controllers.Guest
             _context = context;
         }
 
+        // GET: /Auth/Login
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Login(string? returnUrl = null)
         {
-            return View("~/Views/Guest/Auth/Register.cshtml");
-        }
-
-        [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
+            // If already logged in as regular user, go to user dashboard
+            if (User.Identity?.IsAuthenticated == true)
             {
-                string registrationJson = JsonSerializer.Serialize(model);
-                TempData["RegistrationData"] = registrationJson;
-                HttpContext.Session.SetString("RegData", registrationJson);
-
-                string reference = "PAY" + DateTime.Now.Ticks.ToString().Substring(0, 8);
-                HttpContext.Session.SetString("PaymentRef", reference);
-
-                return RedirectToAction("PaymentQRCode");
-            }
-            return View("~/Views/Guest/Auth/Register.cshtml", model);
-        }
-
-        [HttpGet]
-        public IActionResult PaymentQRCode()
-        {
-            string? regJson = TempData["RegistrationData"]?.ToString() ?? HttpContext.Session.GetString("RegData");
-
-            if (string.IsNullOrEmpty(regJson))
-            {
-                TempData["Error"] = "Session expired. Please register again.";
-                return RedirectToAction("Register");
-            }
-
-            var model = JsonSerializer.Deserialize<RegisterViewModel>(regJson);
-            if (model == null)
-            {
-                TempData["Error"] = "Invalid registration data.";
-                return RedirectToAction("Register");
-            }
-
-            string reference = HttpContext.Session.GetString("PaymentRef") ??
-                              "PAY" + DateTime.Now.Ticks.ToString().Substring(0, 8);
-
-            HttpContext.Session.SetString("PaymentRef", reference);
-
-            ViewBag.Name = model.Name;
-            ViewBag.Email = model.Email;
-            ViewBag.Reference = reference;
-
-            return View("~/Views/Guest/Auth/PaymentQRCode.cshtml");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> VerifyPayment()
-        {
-            await Task.Delay(2000);
-
-            string? regJson = HttpContext.Session.GetString("RegData");
-            string? paymentRef = HttpContext.Session.GetString("PaymentRef");
-
-            if (!string.IsNullOrEmpty(regJson) && !string.IsNullOrEmpty(paymentRef))
-            {
-                var model = JsonSerializer.Deserialize<RegisterViewModel>(regJson);
-
-                if (model != null)
+                if (User.IsInRole("admin"))
                 {
-                    var existingUser = await _context.Users
-                        .FirstOrDefaultAsync(u => u.Email == model.Email);
-
-                    if (existingUser == null)
-                    {
-                        var user = new AppUser
-                        {
-                            Name = model.Name,
-                            Email = model.Email,
-                            Password = HashPassword(model.Password),
-                            Role = "user",
-                            IsActive = true,
-                            CreatedAt = DateTime.Now,
-                            ProfilePictureUrl = null,
-                            ReferralCode = GenerateReferralCode(),
-                            TotalReferrals = 0,
-                            RewardPoints = 0
-                        };
-
-                        _context.Users.Add(user);
-                        await _context.SaveChangesAsync();
-
-                        HttpContext.Session.Remove("RegData");
-                        HttpContext.Session.Remove("PaymentRef");
-
-                        TempData["Success"] = "Payment successful! Your account has been created. Please login.";
-                        return RedirectToAction("Login");
-                    }
-                    else
-                    {
-                        TempData["Error"] = "User already exists. Please login.";
-                        return RedirectToAction("Login");
-                    }
-                }
-            }
-
-            TempData["Error"] = "Payment verification failed. Please try again.";
-            return RedirectToAction("PaymentQRCode");
-        }
-
-        [HttpGet]
-        public IActionResult Login(string returnUrl = null)
-        {
-            ViewBag.ReturnUrl = returnUrl;
-            return View("~/Views/Guest/Auth/Login.cshtml");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.IsActive);
-
-                if (user != null && VerifyPassword(model.Password, user.Password))
-                {
-                    HttpContext.Session.SetInt32("UserId", user.Id);
-                    HttpContext.Session.SetString("UserName", user.Name);
-                    HttpContext.Session.SetString("UserEmail", user.Email);
-                    HttpContext.Session.SetString("UserRole", user.Role);
-
-                    user.LastLoginAt = DateTime.Now;
-                    await _context.SaveChangesAsync();
-
-                    // ✅ DIRECT REDIRECT to User Dashboard
-                    return Redirect("/User/Home/Index");
+                    // If admin is logged in, log them out first
+                    HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).Wait();
+                    TempData["Info"] = "Please use admin login page";
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Invalid email or password");
+                    return RedirectToAction("Index", "Home", new { area = "User" });
                 }
             }
 
-            return View("~/Views/Guest/Auth/Login.cshtml", model);
+            ViewData["ReturnUrl"] = returnUrl ?? string.Empty;
+            return View("~/Views/Guest/Auth/Login.cshtml");
         }
 
+        // POST: /Auth/Login
         [HttpPost]
-        public IActionResult Logout()
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
-            HttpContext.Session.Clear();
-            return Redirect("/");
+            if (!ModelState.IsValid)
+                return View("~/Views/Guest/Auth/Login.cshtml", model);
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            if (user == null || user.Password != model.Password || !user.IsActive)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                TempData["Error"] = "Invalid email or password.";
+                return View("~/Views/Guest/Auth/Login.cshtml", model);
+            }
+
+            // IMPORTANT: Prevent admin login from guest login page
+            if (user.Role == "admin")
+            {
+                ModelState.AddModelError(string.Empty, "Please use the admin login page");
+                TempData["Error"] = "Admin accounts cannot login here. Please use the admin login page.";
+                return View("~/Views/Guest/Auth/Login.cshtml", model);
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Name ?? string.Empty),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                new Claim(ClaimTypes.Role, user.Role ?? "user")
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)),
+                new AuthenticationProperties { IsPersistent = model.RememberMe });
+
+            user.LastLoginAt = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Welcome back, {user.Name}!";
+
+            // Check if there's a pending payment
+            if (TempData["PendingPlanId"] != null)
+            {
+                int planId = Convert.ToInt32(TempData["PendingPlanId"]);
+                TempData.Remove("PendingPlanId");
+                return RedirectToAction("Process", "Payment", new { area = "User", planId = planId });
+            }
+
+            // For regular users, always go to User dashboard
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl) && !returnUrl.StartsWith("/Admin"))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("Index", "Home", new { area = "User" });
         }
 
-        // ==================== HELPER METHODS ====================
-
-        private async Task ProcessReferralCode(string referralCode, int newUserId)
+        // GET: /Auth/Register
+        [HttpGet]
+        public IActionResult Register(string? planId = null, string? referralCode = null)
         {
-            try
-            {
-                var referrer = await _context.Users
-                    .FirstOrDefaultAsync(u => u.ReferralCode == referralCode && u.IsActive);
-
-                if (referrer != null)
-                {
-                    var newUser = await _context.Users.FindAsync(newUserId);
-
-                    var existingReferral = await _context.Referrals
-                        .FirstOrDefaultAsync(r => r.ReferralCode == referralCode &&
-                                                  r.ReferredUserId == newUserId);
-
-                    if (existingReferral == null && newUser != null)
-                    {
-                        var referral = new Referral
-                        {
-                            ReferrerId = referrer.Id,
-                            ReferredUserId = newUserId,
-                            ReferredUserEmail = newUser.Email,
-                            ReferralCode = referralCode,
-                            Status = "Completed",
-                            RewardAmount = 5.00m,
-                            CompletedAt = DateTime.Now,
-                            CreatedAt = DateTime.Now
-                        };
-
-                        _context.Referrals.Add(referral);
-
-                        referrer.TotalReferrals += 1;
-                        referrer.RewardPoints += 50;
-
-                        await _context.SaveChangesAsync();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing referral: {ex.Message}");
-            }
+            ViewBag.PlanId = planId;
+            ViewBag.ReferralCode = referralCode;
+            return View("~/Views/Guest/Auth/Register.cshtml");
         }
 
-        private string HashPassword(string password)
+        // POST: /Auth/Register
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model, string? planId = null)
         {
-            using (var sha256 = SHA256.Create())
+            if (!ModelState.IsValid)
             {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
+                ViewBag.PlanId = planId;
+                return View("~/Views/Guest/Auth/Register.cshtml", model);
             }
-        }
 
-        private bool VerifyPassword(string password, string hash)
-        {
-            var hashedInput = HashPassword(password);
-            return hashedInput == hash;
+            if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "Email already exists");
+                TempData["Error"] = "Email already registered.";
+                ViewBag.PlanId = planId;
+                return View("~/Views/Guest/Auth/Register.cshtml", model);
+            }
+
+            var user = new AppUser
+            {
+                Name = model.Name ?? string.Empty,
+                Email = model.Email ?? string.Empty,
+                Password = model.Password ?? string.Empty,
+                Role = "user", // Always set to "user" for new registrations
+                IsActive = true,
+                CreatedAt = DateTime.Now,
+                ReferralCode = GenerateReferralCode()
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            // After successful registration, ALWAYS redirect to login page
+            if (!string.IsNullOrEmpty(planId) && int.TryParse(planId, out int parsedPlanId))
+            {
+                TempData["PendingPlanId"] = parsedPlanId;
+                TempData["Success"] = "Registration successful! Please login to complete your payment.";
+            }
+            else
+            {
+                TempData["Success"] = "Registration successful! Please login.";
+            }
+
+            return RedirectToAction(nameof(Login));
         }
 
         private string GenerateReferralCode()
         {
-            return "REF" + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+            return "MOVIE" + new Random().Next(1000, 9999);
+        }
+
+        // GET: /Auth/Logout
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData["Success"] = "You have been logged out successfully.";
+            return RedirectToAction("Index", "GuestHome");
+        }
+
+        // POST: /Auth/Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogoutPost()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData["Success"] = "You have been logged out successfully.";
+            return RedirectToAction("Index", "GuestHome");
+        }
+
+        // GET: /Auth/AccessDenied
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View("~/Views/Guest/Auth/AccessDenied.cshtml");
+        }
+
+        // GET: /Auth/ForgotPassword
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View("~/Views/Guest/Auth/ForgotPassword.cshtml");
+        }
+
+        // POST: /Auth/ForgotPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/Guest/Auth/ForgotPassword.cshtml", model);
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            if (user != null)
+            {
+                // Here you would send password reset email
+                TempData["Success"] = "Password reset link has been sent to your email.";
+            }
+            else
+            {
+                TempData["Success"] = "If your email is registered, you will receive a password reset link.";
+            }
+
+            return RedirectToAction(nameof(Login));
+        }
+
+        // GET: /Auth/ResetPassword
+        [HttpGet]
+        public IActionResult ResetPassword(string? token = null, string? email = null)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Invalid password reset token.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Email = email,
+                Code = token
+            };
+
+            return View("~/Views/Guest/Auth/ResetPassword.cshtml", model);
+        }
+
+        // POST: /Auth/ResetPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/Guest/Auth/ResetPassword.cshtml", model);
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Invalid password reset attempt.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            user.Password = model.Password ?? string.Empty;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Password has been reset successfully. Please login with your new password.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        // GET: /Auth/CheckEmailAvailability
+        [HttpGet]
+        public async Task<IActionResult> CheckEmailAvailability(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return Json(new { available = false, message = "Email is required" });
+
+            var exists = await _context.Users.AnyAsync(u => u.Email == email);
+            return Json(new { available = !exists, message = exists ? "Email already registered" : "Email available" });
         }
     }
 }

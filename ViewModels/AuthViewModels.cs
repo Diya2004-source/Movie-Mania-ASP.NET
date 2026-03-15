@@ -2,67 +2,74 @@
 
 namespace MovieMania.ViewModels
 {
-    public class RegisterViewModel
-    {
-        [Required(ErrorMessage = "Name is required")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters")]
-        [Display(Name = "Full Name")]
-        public string Name { get; set; }
-
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-
-        [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm Password")]
-        [Compare("Password", ErrorMessage = "Passwords do not match")]
-        public string ConfirmPassword { get; set; }
-    }
-
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
-        [Display(Name = "Remember me")]
         public bool RememberMe { get; set; }
-
-        // OPTIONAL REFERRAL CODE FIELD
-        [Display(Name = "Referral Code (Optional)")]
-        public string ReferralCode { get; set; }
+        public string? ReferralCode { get; set; }
     }
 
-    public class PaymentQRCodeViewModel
+    public class RegisterViewModel
     {
-        public string QRCodeText { get; set; }
-        public decimal Amount { get; set; }
-        public string Reference { get; set; }
-        public DateTime ExpiryTime { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
+        [Required]
+        [StringLength(100, MinimumLength = 2)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
+
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+
+        public string? ReferralCode { get; set; }
     }
 
-    public class PaymentQRCodeData
+    public class ForgotPasswordViewModel
     {
-        public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public string Reference { get; set; }
-        public string Email { get; set; }
-        public string Name { get; set; }
-        public DateTime ExpiryTime { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordViewModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
+
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+
+        public string Code { get; set; } = string.Empty;
+    }
+
+    public class TwoFactorViewModel
+    {
+        public string? QRCodeText { get; set; }
+        public string? ManualKey { get; set; }
+        public string? Reference { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Currency { get; set; }
     }
 }

@@ -14,46 +14,24 @@ namespace MovieMania.Models
         public int UserId { get; set; }
 
         [Required]
-        public int SubscriptionPlanId { get; set; }
+        public int PlanId { get; set; }
 
-        [Display(Name = "Start Date")]
-        [DataType(DataType.DateTime)]
         public DateTime StartDate { get; set; }
-
-        [Display(Name = "End Date")]
-        [DataType(DataType.DateTime)]
         public DateTime EndDate { get; set; }
+        public bool IsActive { get; set; }
 
-        [Required]
-        [StringLength(20)]
-        [Display(Name = "Status")]
-        public string Status { get; set; } = "Active"; // Active, Cancelled, Expired
+        [StringLength(50)]
+        public string? PaymentStatus { get; set; }  // Add this - make it nullable with ?
 
-        [StringLength(20)]
-        [Display(Name = "Payment Status")]
-        public string PaymentStatus { get; set; } = "Pending"; // Pending, Paid, Failed
+        public DateTime CreatedAt { get; set; }
 
-        [StringLength(100)]
-        [Display(Name = "Payment Reference")]
-        public string PaymentReference { get; set; }
+        public DateTime? UpdatedAt { get; set; }  // Add this - nullable
 
-        [Display(Name = "Cancelled At")]
-        [DataType(DataType.DateTime)]
-        public DateTime? CancelledAt { get; set; }
-
-        [Display(Name = "Reactivated At")]
-        [DataType(DataType.DateTime)]
-        public DateTime? ReactivatedAt { get; set; }
-
-        [Display(Name = "Created At")]
-        [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        // Navigation Properties
+        // Navigation properties
         [ForeignKey("UserId")]
-        public virtual AppUser User { get; set; }
+        public virtual AppUser? User { get; set; }  // Make nullable
 
-        [ForeignKey("SubscriptionPlanId")]
-        public virtual SubscriptionPlan SubscriptionPlan { get; set; }
+        [ForeignKey("PlanId")]
+        public virtual SubscriptionPlan? SubscriptionPlan { get; set; }  // Make nullable
     }
 }

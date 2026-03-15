@@ -17,21 +17,26 @@ namespace MovieMania.Models
         public int UserId { get; set; }
 
         [Required]
-        [Range(0, 10, ErrorMessage = "Rating must be between 0 and 10")]
-        public decimal Rating { get; set; }
+        [Range(1, 10)]
+        public int Rating { get; set; }
 
-        [StringLength(1000, ErrorMessage = "Review cannot exceed 1000 characters")]
-        public string ReviewText { get; set; }
+        [Required]
+        [StringLength(1000)]
+        public string ReviewText { get; set; } = string.Empty;
 
-        public DateTime ReviewDate { get; set; } = DateTime.Now;
-        public bool IsApproved { get; set; } = false;
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [DataType(DataType.DateTime)]
+        public DateTime? UpdatedAt { get; set; }
+
         public int HelpfulCount { get; set; } = 0;
 
-        // Navigation Properties - Using AppUser
+        // Navigation properties
         [ForeignKey("MovieId")]
-        public virtual Movie Movie { get; set; }
+        public virtual Movie? Movie { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual AppUser User { get; set; }  // Fixed: AppUser instead of User
+        public virtual AppUser? User { get; set; }
     }
 }

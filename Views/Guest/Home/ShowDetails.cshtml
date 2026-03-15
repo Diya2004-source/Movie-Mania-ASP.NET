@@ -18,11 +18,11 @@
                         <img src="@(Model.Show.ThumbnailUrl ?? "/images/default-show.jpg")"
                              alt="@Model.Show.Title"
                              class="img-fluid rounded show-poster">
-                        @if (Model.Show.Rating.HasValue)
+                        @if (Model.AverageRating > 0)
                         {
                             <div class="rating-badge">
                                 <i class="fas fa-star text-warning"></i>
-                                <span>@Model.Show.Rating.Value.ToString("F1")</span>
+                                <span>@Model.AverageRating.ToString("F1")</span>
                             </div>
                         }
                     </div>
@@ -38,14 +38,17 @@
                                     <i class="far fa-calendar-alt"></i> @Model.Show.ReleaseYear
                                 </span>
                             }
+                            @if (!string.IsNullOrEmpty(Model.Show.Genre))
+                            {
+                                <span class="meta-item">
+                                    <i class="fas fa-tag"></i> @Model.Show.Genre
+                                </span>
+                            }
                             <span class="meta-item">
-                                <i class="fas fa-tag"></i> @Model.Show.Genre
+                                <i class="fas fa-layer-group"></i> @Model.TotalSeasons Season@(Model.TotalSeasons > 1 ? "s" : "")
                             </span>
                             <span class="meta-item">
-                                <i class="fas fa-layer-group"></i> @Model.Show.TotalSeasons Seasons
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-play-circle"></i> @Model.Show.TotalEpisodes Episodes
+                                <i class="fas fa-play-circle"></i> @Model.Episodes.Count Episode@(Model.Episodes.Count > 1 ? "s" : "")
                             </span>
                         </div>
 
@@ -53,30 +56,6 @@
                         {
                             <p class="show-description">@Model.Show.Description</p>
                         }
-
-                        <div class="show-details-grid">
-                            @if (!string.IsNullOrEmpty(Model.Show.Director))
-                            {
-                                <div class="detail-item">
-                                    <span class="detail-label">Director</span>
-                                    <span class="detail-value">@Model.Show.Director</span>
-                                </div>
-                            }
-                            @if (!string.IsNullOrEmpty(Model.Show.Cast))
-                            {
-                                <div class="detail-item">
-                                    <span class="detail-label">Cast</span>
-                                    <span class="detail-value">@Model.Show.Cast</span>
-                                </div>
-                            }
-                            @if (!string.IsNullOrEmpty(Model.Show.Language))
-                            {
-                                <div class="detail-item">
-                                    <span class="detail-label">Language</span>
-                                    <span class="detail-value">@Model.Show.Language</span>
-                                </div>
-                            }
-                        </div>
 
                         <div class="show-actions">
                             <button class="btn-wishlist" onclick="addToWishlist(@Model.Show.Id)">
@@ -133,9 +112,18 @@
                                                 <img src="@(episode.ThumbnailUrl ?? "/images/default-episode.jpg")"
                                                      alt="@episode.Title">
                                                 <div class="episode-overlay">
-                                                    <a href="@episode.VideoUrl" target="_blank" class="btn-play">
-                                                        <i class="fas fa-play"></i>
-                                                    </a>
+                                                    @if (!string.IsNullOrEmpty(episode.VideoUrl))
+                                                    {
+                                                        <a href="@episode.VideoUrl" target="_blank" class="btn-play">
+                                                            <i class="fas fa-play"></i>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="btn-play disabled">
+                                                            <i class="fas fa-lock"></i>
+                                                        </span>
+                                                    }
                                                 </div>
                                             </div>
                                             <div class="episode-info">
@@ -171,20 +159,58 @@
                 <div class="no-episodes">
                     <i class="fas fa-list fa-4x mb-3"></i>
                     <h3>No Episodes Yet</h3>
-                    <p>Episodes will be added soon</p>
+                    <p>Episodes will be added soon. Stay tuned!</p>
                 </div>
             }
         </div>
     </section>
 
-    <!-- Related Shows Section -->
-    @if (Model.RelatedShows.Any())
+    <!-- Similar Shows Section (Same Genre) -->
+    @if (Model.SimilarShows != null && Model.SimilarShows.Any())
+    {
+        <section class="similar-section py-5 bg-dark-gradient">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-film me-3"></i>Similar Shows
+                    </h2>
+                </div>
+
+                <div class="row g-4">
+                    @foreach (var show in Model.SimilarShows)
+                    {
+                        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                            <div class="show-card">
+                                <div class="show-poster">
+                                    <img src="@(show.ThumbnailUrl ?? "/images/default-show.jpg")"
+                                         alt="@show.Title">
+                                    <div class="show-overlay">
+                                        <a href="@Url.Action("Details", new { id = show.Id })"
+                                           class="btn-details">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="show-info">
+                                    <h6>@show.Title</h6>
+                                    <small>@(show.ReleaseYear?.ToString() ?? "N/A")</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- Related Shows Section (Popular) -->
+    @if (Model.RelatedShows != null && Model.RelatedShows.Any())
     {
         <section class="related-section py-5 bg-dark-gradient">
             <div class="container">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-tv me-3"></i>You May Also Like
+                        <i class="fas fa-fire me-3"></i>You May Also Like
                     </h2>
                 </div>
 
@@ -197,7 +223,7 @@
                                     <img src="@(show.ThumbnailUrl ?? "/images/default-show.jpg")"
                                          alt="@show.Title">
                                     <div class="show-overlay">
-                                        <a href="@Url.Action("ShowDetails", new { id = show.Id })"
+                                        <a href="@Url.Action("Details", new { id = show.Id })"
                                            class="btn-details">
                                             <i class="fas fa-info-circle"></i>
                                         </a>
@@ -205,7 +231,7 @@
                                 </div>
                                 <div class="show-info">
                                     <h6>@show.Title</h6>
-                                    <small>@show.ReleaseYear</small>
+                                    <small>@(show.ReleaseYear?.ToString() ?? "N/A")</small>
                                 </div>
                             </div>
                         </div>
@@ -294,9 +320,33 @@
         margin-bottom: 30px;
     }
 
+    .btn-wishlist {
+        background: transparent;
+        border: 2px solid #0dcaf0;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-wishlist:hover {
+            background: #0dcaf0;
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(13,202,240,0.3);
+        }
+
+        .btn-wishlist i {
+            margin-right: 8px;
+        }
+
     /* Episodes Section */
     .episodes-section {
         background: #0a0c0f;
+        padding: 60px 0;
     }
 
     .episodes-tabs {
@@ -407,6 +457,11 @@
         transform: scale(1.1) !important;
     }
 
+    .btn-play.disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+
     .episode-info {
         padding: 15px;
     }
@@ -423,6 +478,10 @@
         font-size: 1rem;
         font-weight: 600;
         margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
     }
 
     .episode-number {
@@ -478,9 +537,11 @@
             color: #9ca3af;
         }
 
-    /* Related Shows */
+    /* Similar and Related Shows */
     .bg-dark-gradient {
         background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
+        position: relative;
+        overflow: hidden;
     }
 
     .section-header {
@@ -515,6 +576,7 @@
         overflow: hidden;
         transition: all 0.3s ease;
         height: 100%;
+        cursor: pointer;
     }
 
         .show-card:hover {
@@ -578,6 +640,7 @@
     .btn-details:hover {
         background: #0bb7d6;
         transform: scale(1.1) !important;
+        color: #000;
     }
 
     .show-info {
@@ -588,6 +651,9 @@
             color: white;
             font-size: 0.9rem;
             margin: 0 0 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .show-info small {
@@ -596,13 +662,37 @@
         }
 
     /* Responsive */
+    @@media (max-width: 992px) {
+        .show-title {
+            font-size: 2.8rem;
+        }
+    }
+
     @@media (max-width: 768px) {
         .show-title {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
         }
 
         .episodes-grid {
             grid-template-columns: 1fr;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .show-title {
+            font-size: 1.8rem;
+        }
+
+        .show-meta {
+            justify-content: center;
+        }
+
+        .btn-wishlist {
+            width: 100%;
         }
     }
 </style>
@@ -613,28 +703,41 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                     <text>
-                    $.post('@Url.Action("AddToWishlist", "Wishlist", new { area = "User" })', { showId: showId })
-                        .done(function(response) {
-                            if (response.success) {
-                                toastr.success('Added to wishlist!');
-                            } else {
-                                toastr.info('Already in wishlist');
-                            }
-                        })
-                        .fail(function() {
-                            toastr.error('Error adding to wishlist');
-                        });
+                    fetch('@Url.Action("AddToWishlist", "Wishlist", new { area = "User" })', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: JSON.stringify({ showId: showId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Added to wishlist!', 'success');
+                        } else {
+                            showNotification(data.message || 'Already in wishlist', 'info');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('Error adding to wishlist', 'error');
+                    });
                     </text>
             }
             else
             {
                     <text>
-                    toastr.warning('Please login to add to wishlist');
+                    showNotification('Please login to add to wishlist', 'warning');
                     setTimeout(function() {
                         window.location.href = '@Url.Action("Login", "Auth")';
                     }, 2000);
                     </text>
             }
+        }
+
+        function showNotification(message, type) {
+            // Simple alert for now - you can replace with toastr or custom notification
+            alert(message);
         }
     </script>
 }

@@ -11,62 +11,59 @@ namespace MovieMania.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Name is required")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters")]
-        [Display(Name = "Full Name")]
+        [Required]
+        [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
-        [StringLength(150)]
-        [Display(Name = "Email Address")]
+        [Required]
+        [EmailAddress]
+        [StringLength(100)]
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(255)]
-        [DataType(DataType.Password)]
+        [StringLength(100)]
         public string Password { get; set; } = string.Empty;
 
-        [StringLength(50)]
-        [Display(Name = "Role")]
-        public string Role { get; set; } = "user";
+        [StringLength(20)]
+        public string? Role { get; set; } = "user";
 
-        [Display(Name = "Member Since")]
+        [StringLength(500)]
+        public string? ProfilePicture { get; set; }  // This is the correct property name (not ProfilePictureUrl)
+
+        // Computed property for view compatibility
+        [NotMapped]
+        public string? ProfilePictureUrl
+        {
+            get { return ProfilePicture; }
+            set { ProfilePicture = value; }
+        }
+
+        public bool IsActive { get; set; } = true;
+
+        // Referral and Rewards System
+        public int TotalReferrals { get; set; } = 0;  // Add this
+        public int RewardPoints { get; set; } = 0;    // Add this
+        public string? ReferralCode { get; set; }     // Add this
+
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        [Display(Name = "Last Login")]
         [DataType(DataType.DateTime)]
         public DateTime? LastLoginAt { get; set; }
 
-        [Display(Name = "Referral Code")]
-        [StringLength(20)]
-        public string? ReferralCode { get; set; }  // Made nullable
+        [DataType(DataType.DateTime)]
+        public DateTime? UpdatedAt { get; set; }
 
-        [Display(Name = "Total Referrals")]
-        public int TotalReferrals { get; set; } = 0;
-
-        [Display(Name = "Reward Points")]
-        public int RewardPoints { get; set; } = 0;
-
-        [Display(Name = "Is Active")]
-        public bool IsActive { get; set; } = true;
-
-        [Display(Name = "Profile Picture")]
-        [StringLength(500)]
-        [Url(ErrorMessage = "Invalid URL format")]
-        public string? ProfilePictureUrl { get; set; }  // Made nullable
-
-        // Navigation Properties
-        public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
-        public virtual ICollection<UserSubscription> Subscriptions { get; set; } = new List<UserSubscription>();
-        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        public virtual ICollection<Referral> ReferralsMade { get; set; } = new List<Referral>();
-        public virtual ICollection<Referral> ReferralsReceived { get; set; } = new List<Referral>();
-        public virtual ICollection<MovieReview> MovieReviews { get; set; } = new List<MovieReview>();
-        public virtual ICollection<ShowReview> ShowReviews { get; set; } = new List<ShowReview>();
-        public virtual ICollection<EpisodeComment> EpisodeComments { get; set; } = new List<EpisodeComment>();
-        public virtual ICollection<UserActivity> Activities { get; set; } = new List<UserActivity>();
-        public virtual ICollection<WishlistShow> WishlistShows { get; set; } = new List<WishlistShow>();
+        // Navigation properties
+        public virtual ICollection<Wishlist>? Wishlists { get; set; }
+        public virtual ICollection<UserSubscription>? Subscriptions { get; set; }
+        public virtual ICollection<Payment>? Payments { get; set; }
+        public virtual ICollection<Referral>? ReferralsMade { get; set; }
+        public virtual ICollection<Referral>? ReferralsReceived { get; set; }
+        public virtual ICollection<MovieReview>? MovieReviews { get; set; }
+        public virtual ICollection<ShowReview>? ShowReviews { get; set; }
+        public virtual ICollection<EpisodeComment>? EpisodeComments { get; set; }
+        public virtual ICollection<WishlistShow>? WishlistShows { get; set; }
+        public virtual ICollection<UserActivity>? Activities { get; set; }
     }
 }

@@ -1,322 +1,191 @@
 @model IEnumerable<MovieMania.Models.SubscriptionPlan>
-
 @{
     ViewData["Title"] = "Subscription Plans";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="card card-dark p-4 shadow-lg">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-light">
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0 text-light">
                 <i class="fas fa-crown me-2 text-warning"></i>Subscription Plans
-            </h2>
-            <div>
-                <span class="badge bg-info me-2 p-2">Total Plans: @Model.Count()</span>
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Add New Plan
-                </a>
-            </div>
+            </h1>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Create New Plan
+            </a>
         </div>
+    </div>
 
-        @if (TempData["Success"] != null)
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var plan in Model)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>@Html.Raw(TempData["Success"])
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>@Html.Raw(TempData["Error"])
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        <div class="table-responsive">
-            <table class="table table-dark table-hover table-striped mb-0">
-                <thead class="table-secondary text-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Duration</th>
-                        <th>Quality</th>
-                        <th>Screens</th>
-                        <th>Status</th>
-                        <th>Order</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var plan in Model.OrderBy(p => p.DisplayOrder))
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-lg @(plan.IsActive ? "bg-dark" : "bg-secondary") text-light" style="border-radius: 15px;">
+                    @if (!plan.IsActive)
                     {
-                        <tr class="plan-row">
-                            <td class="fw-bold text-white">@plan.Name</td>
-                            <td class="text-success fw-bold">$@plan.Price.ToString("N2")</td>
-                            <td class="text-white">@plan.DurationInDays days</td>
-                            <td>
-                                @if (plan.VideoQuality == "4K")
-                                {
-                                    <span class="badge bg-danger px-3 py-2">4K Ultra HD</span>
-                                }
-                                else if (plan.VideoQuality == "Full HD")
-                                {
-                                    <span class="badge bg-info text-dark px-3 py-2">Full HD (1080p)</span>
-                                }
-                                else if (plan.VideoQuality == "HD")
-                                {
-                                    <span class="badge bg-primary px-3 py-2">HD (720p)</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary px-3 py-2">@plan.VideoQuality</span>
-                                }
-                            </td>
-                            <td class="text-center text-white">@plan.MaxScreens</td>
-                            <td>
-                                @if (plan.IsActive)
-                                {
-                                    <span class="badge bg-success px-3 py-2">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary px-3 py-2">Inactive</span>
-                                }
-                            </td>
-                            <td class="text-center text-white">@plan.DisplayOrder</td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <a asp-action="Details" asp-route-id="@plan.Id"
-                                       class="btn btn-info btn-sm text-white" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@plan.Id"
-                                       class="btn btn-warning btn-sm" title="Edit Plan">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@plan.Id"
-                                       class="btn btn-danger btn-sm" title="Delete Plan">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                    <button type="button"
-                                            class="btn btn-info btn-sm toggle-status"
-                                            data-id="@plan.Id"
-                                            data-active="@plan.IsActive"
-                                            title="@(plan.IsActive ? "Deactivate" : "Activate")">
-                                        <i class="fas fa-@(plan.IsActive ? "toggle-on" : "toggle-off")"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-secondary px-3 py-2">Inactive</span>
+                        </div>
                     }
-                </tbody>
-            </table>
-        </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title mb-0 text-warning fw-bold">@plan.Name</h4>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-light p-0" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a asp-action="Details" asp-route-id="@plan.Id" class="dropdown-item">
+                                            <i class="fas fa-info-circle me-2 text-info"></i>Details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Edit" asp-route-id="@plan.Id" class="dropdown-item">
+                                            <i class="fas fa-edit me-2 text-warning"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a asp-action="Delete" asp-route-id="@plan.Id" class="dropdown-item text-danger">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 
-        @if (!Model.Any())
-        {
-            <div class="text-center text-muted py-5">
-                <i class="fas fa-crown fa-4x mb-3"></i>
-                <h5 class="text-light">No subscription plans found</h5>
-                <p class="text-muted">Click "Add New Plan" to create your first subscription plan.</p>
-                <a asp-action="Create" class="btn btn-primary mt-3">
-                    <i class="fas fa-plus me-2"></i>Add New Plan
-                </a>
+                        <div class="text-center mb-4">
+                            <h1 class="display-3 fw-bold text-success mb-0">
+                                ? @plan.Price.ToString("N0")
+                            </h1>
+                            <span class="text-muted">/ @plan.DurationInDays days</span>
+                        </div>
+
+                        <div class="mb-4">
+                            @if (!string.IsNullOrEmpty(plan.Description))
+                            {
+                                <p class="text-light-50 mb-3">@plan.Description</p>
+                            }
+
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="fas fa-tv text-primary me-2 fs-5"></i>
+                                    <strong>Video Quality:</strong>
+                                    @if (plan.VideoQuality == "4K")
+                                    {
+                                        <span class="badge bg-danger ms-2">4K Ultra HD</span>
+                                    }
+                                    else if (plan.VideoQuality == "Full HD")
+                                    {
+                                        <span class="badge bg-info ms-2">1080p</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary ms-2">@plan.VideoQuality</span>
+                                    }
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-mobile-alt text-primary me-2 fs-5"></i>
+                                    <strong>Max Screens:</strong>
+                                    <span class="badge bg-primary ms-2">@plan.MaxScreens</span>
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-calendar text-primary me-2 fs-5"></i>
+                                    <strong>Created:</strong> @plan.CreatedAt.ToString("dd MMM yyyy")
+                                </li>
+                            </ul>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(plan.Features))
+                        {
+                            <div class="mb-3 p-3" style="background: #2a2a2a; border-radius: 10px;">
+                                <small class="text-warning d-block mb-2">
+                                    <i class="fas fa-star me-1"></i>Features:
+                                </small>
+                                <p class="small text-light mb-0">@plan.Features</p>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">
+                                <i class="fas fa-hashtag me-1"></i>Order: @plan.DisplayOrder
+                            </span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input status-toggle"
+                                       type="checkbox"
+                                       data-id="@plan.Id"
+                                       @(plan.IsActive ? "checked" : "")>
+                                <label class="form-check-label small text-light">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
     </div>
 </div>
 
-<style>
-    body {
-        background: #0f0f0f;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .card-dark {
-        background: #1c1c1c;
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Table Styling */
-    .table {
-        border-collapse: separate;
-        border-spacing: 0 5px;
-        width: 100%;
-    }
-
-        .table thead th {
-            background: #2a2a2a;
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            padding: 15px 12px;
-            white-space: nowrap;
-        }
-
-        .table tbody tr {
-            background: #1e1e1e;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-            .table tbody tr:hover {
-                background: #252525;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(255, 77, 77, 0.2);
-            }
-
-                .table tbody tr:hover td,
-                .table tbody tr:hover td span,
-                .table tbody tr:hover td .text-white,
-                .table tbody tr:hover td .fw-bold {
-                    color: #ffffff !important;
-                }
-
-                .table tbody tr:hover .text-muted {
-                    color: #aaa !important;
-                }
-
-        .table td {
-            padding: 15px 12px;
-            vertical-align: middle;
-            border: none;
-            color: #fff;
-        }
-
-    /* Badge Styling */
-    .badge {
-        font-size: 0.85rem;
-        font-weight: 500;
-        border-radius: 20px;
-    }
-
-        .badge.bg-success {
-            background: #00c853 !important;
-        }
-
-        .badge.bg-danger {
-            background: #ff4d4d !important;
-        }
-
-        .badge.bg-info {
-            background: #0dcaf0 !important;
-            color: #000 !important;
-        }
-
-        .badge.bg-primary {
-            background: #4A80F0 !important;
-        }
-
-        .badge.bg-secondary {
-            background: #6c757d !important;
-        }
-
-    /* Button Group Styling */
-    .btn-group {
-        gap: 5px;
-    }
-
-    .btn-sm {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px !important;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        border: none;
-        margin: 0 2px;
-    }
-
-        .btn-sm:hover {
-            transform: scale(1.1);
-        }
-
-    .btn-info {
-        background: #0dcaf0;
-    }
-
-        .btn-info:hover {
-            background: #0bb7d6;
-        }
-
-    .btn-warning {
-        background: #ffc107;
-    }
-
-        .btn-warning:hover {
-            background: #ffb300;
-        }
-
-    .btn-danger {
-        background: #ff4d4d;
-    }
-
-        .btn-danger:hover {
-            background: #ff3333;
-        }
-
-    /* Alert Styling */
-    .alert {
-        border: none;
-        border-radius: 10px;
-        padding: 15px 20px;
-        margin-bottom: 20px;
-    }
-
-    .alert-success {
-        background: rgba(0, 200, 83, 0.15);
-        color: #00c853;
-        border-left: 4px solid #00c853;
-    }
-
-    .alert-danger {
-        background: rgba(255, 77, 77, 0.15);
-        color: #ff4d4d;
-        border-left: 4px solid #ff4d4d;
-    }
-
-    .btn-close {
-        filter: invert(1);
-    }
-</style>
+<form id="deleteForm" method="post" style="display: none;">
+    <input type="hidden" name="id" id="deleteId" />
+</form>
 
 @section Scripts {
     <script>
-        // Toggle status with AJAX
-        $('.toggle-status').click(function() {
-            var button = $(this);
-            var id = button.data('id');
-            var isActive = button.data('active');
-
-            $.post('@Url.Action("ToggleStatus", "AdminSubscriptions")/' + id)
-                .done(function(response) {
-                    if (response.success) {
-                        // Update button icon and data
-                        button.find('i').attr('class', 'fas fa-' + (response.isActive ? 'toggle-on' : 'toggle-off'));
-                        button.data('active', response.isActive);
-                        button.attr('title', response.isActive ? 'Deactivate' : 'Activate');
-
-                        // Update status badge
-                        var statusCell = button.closest('tr').find('td:eq(5)');
-                        if (response.isActive) {
-                            statusCell.html('<span class="badge bg-success px-3 py-2">Active</span>');
-                        } else {
-                            statusCell.html('<span class="badge bg-secondary px-3 py-2">Inactive</span>');
+        // Toggle status
+        document.querySelectorAll('.status-toggle').forEach(toggle => {
+            toggle.addEventListener('change', async function() {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch(`/AdminSubscriptions/ToggleStatus/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
                         }
+                    });
 
-                        // Show success message
-                        toastr.success(response.message);
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                    } else {
+                        this.checked = !this.checked;
+                        showNotification(data.message, 'error');
                     }
-                })
-                .fail(function() {
-                    toastr.error('Error toggling plan status');
-                });
+                } catch (error) {
+                    this.checked = !this.checked;
+                    showNotification('Error updating status', 'error');
+                }
+            });
         });
+
+        function showNotification(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
     </script>
 }

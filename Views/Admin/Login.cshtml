@@ -1,118 +1,396 @@
 ﻿@{
-    Layout = null;   // Login page without admin sidebar layout
+    Layout = null;
+    var returnUrl = ViewBag.ReturnUrl as string;
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Admin Login - Movie Mania</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - MovieMania</title>
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #0A0C0F;
-            height: 100vh;
+            background: linear-gradient(135deg, #0A0C0F 0%, #1a1f2b 100%);
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+            body::before {
+                content: '';
+                position: absolute;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(74, 128, 240, 0.1) 0%, transparent 50%);
+                animation: rotate 20s linear infinite;
+            }
+
+        @@keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
         }
 
         .login-card {
-            background-color: #1E1E1E;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
             padding: 40px;
-            border-radius: 15px;
-            width: 400px;
-            box-shadow: 0 0 25px rgba(0,0,0,0.5);
-            color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(74, 128, 240, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .login-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .login-header i {
+                font-size: 50px;
+                color: #4A80F0;
+                margin-bottom: 15px;
+                animation: pulse 2s infinite;
+            }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .login-header h2 {
+            color: #4A80F0;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            background: #2A2A2A;
+            border: 1px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .input-group:focus-within {
+                border-color: #4A80F0;
+                box-shadow: 0 0 0 3px rgba(74, 128, 240, 0.2);
+            }
+
+        .input-group-text {
+            background: #2A2A2A;
+            border: none;
+            color: #4A80F0;
+            padding: 12px 15px;
         }
 
         .form-control {
-            background-color: #2A2A2A;
+            background: #2A2A2A;
             border: none;
             color: white;
+            padding: 12px 15px;
+            font-size: 14px;
         }
 
             .form-control:focus {
-                background-color: #2A2A2A;
+                background: #2A2A2A;
                 color: white;
-                box-shadow: 0 0 0 2px #4A80F0;
+                box-shadow: none;
+                outline: none;
             }
 
-        .btn-primary {
-            background-color: #4A80F0;
+            .form-control::placeholder {
+                color: #666;
+            }
+
+        .btn-login {
+            background: linear-gradient(135deg, #4A80F0, #3768d8);
             border: none;
+            color: white;
+            padding: 14px;
+            width: 100%;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-            .btn-primary:hover {
-                background-color: #3768d8;
+            .btn-login:hover {
+                background: linear-gradient(135deg, #3768d8, #4A80F0);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(74, 128, 240, 0.4);
             }
 
-        .logo-text {
-            font-size: 26px;
-            font-weight: bold;
-            color: #4A80F0;
+            .btn-login:active {
+                transform: translateY(0);
+            }
+
+            .btn-login i {
+                margin-right: 8px;
+            }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideIn 0.5s ease;
         }
 
-        .error-text {
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid #ff4d4d;
             color: #ff4d4d;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 0, 0.1);
+            border: 1px solid #00c800;
+            color: #00c800;
+        }
+
+        .alert i {
+            margin-right: 8px;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            color: #888;
             font-size: 14px;
+        }
+
+            .checkbox input {
+                margin-right: 8px;
+                accent-color: #4A80F0;
+            }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .login-footer a {
+                color: #4A80F0;
+                text-decoration: none;
+                font-size: 13px;
+                transition: color 0.3s ease;
+            }
+
+                .login-footer a:hover {
+                    color: #3768d8;
+                    text-decoration: underline;
+                }
+
+            .login-footer i {
+                margin-right: 5px;
+            }
+
+        .password-toggle {
+            cursor: pointer;
+            padding: 12px 15px;
+            background: #2A2A2A;
+            border: none;
+            color: #4A80F0;
+            transition: color 0.3s ease;
+        }
+
+            .password-toggle:hover {
+                color: #3768d8;
+            }
+
+        @@media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
-
-    <div class="login-card">
-
-        <div class="text-center mb-4">
-            <div class="logo-text">Movie Mania</div>
-            <small class="text-secondary">Admin Panel Login</small>
-        </div>
-
-        <form asp-controller="Admin" asp-action="Login" method="post">
-
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-dark text-white border-0">
-                        <i class="bi bi-envelope"></i>
-                    </span>
-                    <input type="email" name="Email" class="form-control" placeholder="Enter admin email" required />
-                </div>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-film"></i>
+                <h2>MovieMania Admin</h2>
+                <p>Sign in to access admin panel</p>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-dark text-white border-0">
-                        <i class="bi bi-lock"></i>
-                    </span>
-                    <input type="password" name="Password" class="form-control" placeholder="Enter password" required />
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    @TempData["Success"]
                 </div>
-            </div>
+            }
 
             @if (ViewBag.Error != null)
             {
-                <div class="error-text mb-3">
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
                     @ViewBag.Error
                 </div>
             }
 
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-box-arrow-in-right"></i> Login
+            <form method="post" asp-action="Login" asp-controller="Admin">
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email"
+                               name="email"
+                               class="form-control"
+                               placeholder="Email address"
+                               value="admin@moviemania.com"
+                               required
+                               autofocus />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               id="password"
+                               placeholder="Password"
+                               value="Admin@123"
+                               required />
+                        <span class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" name="rememberMe" value="true" checked />
+                        <span>Remember me</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
                 </button>
-            </div>
 
-        </form>
-
+                <div class="login-footer">
+                    <p>
+                        <i class="fas fa-shield-alt"></i>
+                        <a href="/">← Back to Website</a>
+                    </p>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword() {
+            var password = document.getElementById("password");
+            var icon = document.getElementById("toggleIcon");
 
+            if (password.type === "password") {
+                password.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                password.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        // Add loading state to form
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var button = document.querySelector('.btn-login');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+            button.disabled = true;
+        });
+
+        // Pre-fill demo credentials (remove in production)
+        window.onload = function() {
+            // Just for demo - you can remove this
+            console.log('Demo credentials: admin@moviemania.com / Admin@123');
+        };
+    </script>
 </body>
 </html>

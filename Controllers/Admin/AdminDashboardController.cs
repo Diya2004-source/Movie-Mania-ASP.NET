@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
 
 namespace MovieMania.Controllers.Admin
 {
+    [Authorize(Roles = "admin")]
     public class AdminDashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,16 +17,13 @@ namespace MovieMania.Controllers.Admin
 
         public async Task<IActionResult> Index()
         {
-            // Use async methods for better performance
+            // Your existing code
             ViewBag.TotalMovies = await _context.Movies.CountAsync();
             ViewBag.TotalUsers = await _context.Users.CountAsync();
-
             ViewBag.ActiveSubscriptions = await _context.UserSubscriptions
                 .CountAsync(s => s.EndDate >= DateTime.Now);
-
             ViewBag.TotalRevenue = await _context.Payments
                 .SumAsync(p => (decimal?)p.Amount) ?? 0;
-
             ViewBag.RecentMovies = await _context.Movies
                 .OrderByDescending(m => m.CreatedAt)
                 .Take(5)

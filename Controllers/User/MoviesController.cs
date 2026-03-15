@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
 using MovieMania.ViewModels;
 using System.Security.Claims;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
 
 namespace MovieMania.Controllers.User
 {
@@ -17,152 +21,208 @@ namespace MovieMania.Controllers.User
             _context = context;
         }
 
-        // POST: User/Movies/Rate
-        [HttpPost]
-        public async Task<IActionResult> RateMovie([FromBody] MovieRatingViewModel model)
+        public async Task<IActionResult> Index(string? genre, string? sortBy, int page = 1)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Json(new { success = false, message = "User not authenticated" });
-            }
-            var userId = int.Parse(userIdClaim);
+            var query = _context.Movies.Where(m => m.IsActive);
 
-            var review = await _context.MovieReviews
-                .FirstOrDefaultAsync(r => r.MovieId == model.MovieId && r.UserId == userId);
-
-            if (review == null)
+            // Apply genre filter
+            if (!string.IsNullOrEmpty(genre) && genre != "All")
             {
-                review = new MovieReview
-                {
-                    MovieId = model.MovieId,
-                    UserId = userId,
-                    Rating = model.Rating,
-                    ReviewText = model.Review,
-                    ReviewDate = DateTime.Now,
-                    IsApproved = false
-                };
-                _context.MovieReviews.Add(review);
-            }
-            else
-            {
-                review.Rating = model.Rating;
-                review.ReviewText = model.Review;
-                review.ReviewDate = DateTime.Now;
-                review.IsApproved = false;
+                query = query.Where(m => m.Genre != null && m.Genre == genre);
             }
 
-            await _context.SaveChangesAsync();
+            int totalCount = await query.CountAsync();
 
-            var movie = await _context.Movies.FindAsync(model.MovieId);
-            if (movie != null)
+            // Apply sorting
+            query = sortBy switch
             {
-                movie.Rating = await _context.MovieReviews
-                    .Where(r => r.MovieId == model.MovieId && r.IsApproved)
-                    .AverageAsync(r => (decimal?)r.Rating) ?? 0;
-                await _context.SaveChangesAsync();
-            }
-
-            return Json(new
-            {
-                success = true,
-                message = "Thank you for rating! Your review will be visible after approval."
-            });
-        }
-
-        // POST: User/Movies/MarkAsWatched
-        [HttpPost]
-        public async Task<IActionResult> MarkAsWatched(int movieId)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Json(new { success = false, message = "User not authenticated" });
-            }
-            var userId = int.Parse(userIdClaim);
-
-            var activity = new UserActivity
-            {
-                UserId = userId,
-                MovieId = movieId,
-                ActivityType = "Watch",
-                ActivityDate = DateTime.Now,
-                IsCompleted = true,
-                ProgressPercentage = 100
+                "rating" => query.OrderByDescending(m => m.Rating),
+                "latest" => query.OrderByDescending(m => m.CreatedAt),
+                "views" => query.OrderByDescending(m => m.ViewsCount),
+                _ => query.OrderByDescending(m => m.CreatedAt)
             };
 
-            _context.UserActivities.Add(activity);
-
-            var movie = await _context.Movies.FindAsync(movieId);
-            if (movie != null)
-            {
-                movie.ViewsCount++;
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true, message = "Marked as watched!" });
-        }
-
-        // GET: User/Movies/GetComments/5
-        public async Task<IActionResult> GetComments(int movieId)
-        {
-            var comments = await _context.MovieReviews
-                .Include(r => r.User)
-                .Where(r => r.MovieId == movieId && r.IsApproved)
-                .OrderByDescending(r => r.ReviewDate)
-                .Select(r => new
+            var movies = await query
+                .Skip((page - 1) * 12)
+                .Take(12)
+                .Select(m => new MovieViewModel
                 {
-                    r.Id,
-                    r.Rating,
-                    r.ReviewText,
-                    r.ReviewDate,
-                    UserName = r.User != null ? r.User.Name : "Anonymous",
-                    r.HelpfulCount
+                    Id = m.Id,
+                    Title = m.Title ?? "Untitled",
+                    ThumbnailUrl = m.ThumbnailUrl ?? "/images/default-movie.jpg",
+                    Genre = m.Genre ?? "Unknown",
+                    ReleaseYear = m.ReleaseYear,
+                    Rating = m.Rating.HasValue ? (double?)m.Rating.Value : null,
+                    ViewsCount = m.ViewsCount
                 })
                 .ToListAsync();
 
-            return Json(comments);
+            var genres = await _context.Movies
+                .Where(m => m.IsActive && m.Genre != null)
+                .Select(m => m.Genre!)
+                .Distinct()
+                .ToListAsync();
+
+            ViewBag.Movies = movies;
+            ViewBag.Genres = genres;
+            ViewBag.CurrentGenre = genre ?? "All";
+            ViewBag.CurrentSort = sortBy ?? "latest";
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / 12);
+
+            return View("~/Views/User/Movies/Index.cshtml");
         }
 
-        // POST: User/Movies/MarkHelpful
-        [HttpPost]
-        public async Task<IActionResult> MarkHelpful(int reviewId)
+        public async Task<IActionResult> Watch(int id)
         {
-            var review = await _context.MovieReviews.FindAsync(reviewId);
-            if (review != null)
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+            // Check if user has active subscription
+            var hasSubscription = await _context.UserSubscriptions
+                .AnyAsync(s => s.UserId == userId && s.EndDate >= DateTime.Now && s.IsActive);
+
+            if (!hasSubscription)
             {
-                review.HelpfulCount++;
-                await _context.SaveChangesAsync();
-                return Json(new { success = true, count = review.HelpfulCount });
+                TempData["Error"] = "Please subscribe to watch movies";
+                return RedirectToAction("Plans", "Subscription");
             }
-            return Json(new { success = false });
+
+            var movie = await _context.Movies
+                .FirstOrDefaultAsync(m => m.Id == id && m.IsActive);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            // Increment view count
+            movie.ViewsCount++;
+            await _context.SaveChangesAsync();
+
+            return View("~/Views/User/Movies/Watch.cshtml", movie);
         }
 
-        // GET: User/Movies/GetSimilar/5
-        public async Task<IActionResult> GetSimilar(int movieId)
+        public async Task<IActionResult> Details(int id)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+            var movie = await _context.Movies
+                .FirstOrDefaultAsync(m => m.Id == id && m.IsActive);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            // Get reviews
+            var reviews = await _context.MovieReviews
+                .Include(r => r.User)
+                .Where(r => r.MovieId == id)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            // Calculate average rating
+            double averageRating = 0;
+            if (reviews.Any())
+            {
+                averageRating = reviews.Average(r => (double)r.Rating);
+            }
+
+            // Get similar movies
+            var similarMovies = await _context.Movies
+                .Where(m => m.IsActive && m.Genre == movie.Genre && m.Id != id)
+                .OrderByDescending(m => m.Rating)
+                .Take(6)
+                .ToListAsync();
+
+            // Check if user has active subscription
+            var hasSubscription = await _context.UserSubscriptions
+                .AnyAsync(s => s.UserId == userId && s.EndDate >= DateTime.Now && s.IsActive);
+
+            // Create rating distribution
+            var ratingDistribution = new int[10];
+            foreach (var review in reviews)
+            {
+                if (review.Rating >= 1 && review.Rating <= 10)
+                {
+                    ratingDistribution[review.Rating - 1]++;
+                }
+            }
+
+            var viewModel = new GuestMovieDetailsViewModel
+            {
+                Movie = movie,
+                Reviews = reviews,
+                SimilarMovies = similarMovies,
+                RelatedMovies = similarMovies, // Use similar movies as related
+                IsInWishlist = false, // You can implement wishlist check here
+                AverageRating = averageRating,
+                TotalReviews = reviews.Count,
+                CanWatch = hasSubscription,
+                RatingInfo = new MovieRatingViewModel
+                {
+                    MovieId = movie.Id,
+                    MovieTitle = movie.Title ?? "Untitled",
+                    AverageRating = averageRating,
+                    TotalRatings = reviews.Count,
+                    UserRating = 0,
+                    RatingDistribution = ratingDistribution,
+                    Reviews = reviews.Select(r => new MovieReviewViewModel
+                    {
+                        Id = r.Id,
+                        MovieId = r.MovieId,
+                        UserId = r.UserId,
+                        UserName = r.User?.Name ?? "Anonymous",
+                        UserProfilePicture = r.User?.ProfilePicture,
+                        Rating = r.Rating,
+                        ReviewText = r.ReviewText,
+                        CreatedAt = r.CreatedAt,
+                        HelpfulCount = r.HelpfulCount
+                    }).ToList()
+                }
+            };
+
+            return View("~/Views/User/Movies/Details.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddReview(int movieId, int rating, string reviewText)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
             var movie = await _context.Movies.FindAsync(movieId);
             if (movie == null)
             {
-                return Json(new { success = false });
+                return Json(new { success = false, message = "Movie not found" });
             }
 
-            var similar = await _context.Movies
-                .Where(m => m.Genre == movie.Genre && m.Id != movieId && m.IsActive)
-                .OrderByDescending(m => m.Rating)
-                .Take(6)
-                .Select(m => new
-                {
-                    m.Id,
-                    m.Title,
-                    m.ThumbnailUrl,
-                    m.ReleaseYear,
-                    m.Rating
-                })
-                .ToListAsync();
+            // Check if user already reviewed
+            var existingReview = await _context.MovieReviews
+                .FirstOrDefaultAsync(r => r.MovieId == movieId && r.UserId == userId);
 
-            return Json(similar);
+            if (existingReview != null)
+            {
+                existingReview.Rating = rating;
+                existingReview.ReviewText = reviewText;
+                existingReview.UpdatedAt = DateTime.Now;
+            }
+            else
+            {
+                var review = new MovieReview
+                {
+                    MovieId = movieId,
+                    UserId = userId,
+                    Rating = rating,
+                    ReviewText = reviewText,
+                    CreatedAt = DateTime.Now,
+                    HelpfulCount = 0
+                };
+                _context.MovieReviews.Add(review);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Review added successfully" });
         }
     }
 }

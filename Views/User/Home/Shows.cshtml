@@ -1,686 +1,213 @@
 ﻿@model IEnumerable<MovieMania.Models.Show>
 
 @{
-    ViewData["Title"] = "Browse TV Shows";
-    Layout = "_UserLayout";
+    ViewData["Title"] = "TV Shows";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
-<div class="shows-page">
-    <!-- Hero Banner with Category Tabs -->
-    <section class="page-hero mb-5">
-        <div class="container">
-            <div class="hero-content text-center">
-                <h1 class="hero-title">Discover Amazing Shows</h1>
-                <p class="hero-subtitle">Explore thousands of TV series, anime, and more</p>
-                <div class="hero-stats">
-                    <span class="stat-badge">
-                        <i class="fas fa-tv"></i> @Model.Count()+ Shows
-                    </span>
-                    <span class="stat-badge">
-                        <i class="fas fa-star text-warning"></i> Top Rated
-                    </span>
-                    <span class="stat-badge">
-                        <i class="fas fa-calendar-week"></i> Weekly Updates
-                    </span>
-                </div>
-                
-                <!-- Category Tabs -->
-                <div class="category-tabs mt-4">
-                    <a href="@Url.Action("Shows", "Home")" class="tab-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Shows" && string.IsNullOrEmpty(ViewBag.Type) ? "active" : "")">
-                        <i class="fas fa-tv me-2"></i>All Shows
-                    </a>
-                    <a href="@Url.Action("Shows", "Home")?type=anime" class="tab-link @(ViewBag.Type == "anime" ? "active" : "")">
-                        <i class="fas fa-dragon me-2"></i>Anime
-                    </a>
-                    <a href="@Url.Action("Shows", "Home")?type=trending" class="tab-link @(ViewBag.Type == "trending" ? "active" : "")">
-                        <i class="fas fa-fire me-2"></i>Trending
-                    </a>
-                    <a href="@Url.Action("Shows", "Home")?type=latest" class="tab-link @(ViewBag.Type == "latest" ? "active" : "")">
-                        <i class="fas fa-clock me-2"></i>Latest
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="browse-header">
+    <div class="container-fluid px-4">
+        <h1 class="page-title">TV Shows</h1>
+        <p class="page-subtitle">Explore thousands of TV series, anime, and more</p>
 
-    <!-- Filters Section -->
-    <section class="filters-section mb-5">
-        <div class="container">
-            <div class="filters-wrapper">
-                <form method="get" class="row g-3 align-items-end" id="filterForm">
-                    <!-- Hidden field for type -->
-                    <input type="hidden" name="type" value="@ViewBag.Type" />
-                    
-                    <!-- Search Bar -->
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label text-muted mb-2">
-                            <i class="fas fa-search me-2"></i>Search Shows
-                        </label>
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="form-control" name="search" 
-                                   value="@ViewBag.Search" 
-                                   placeholder="Search by title, genre..."
-                                   id="searchInput">
-                            @if (!string.IsNullOrEmpty(ViewBag.Search))
+        <div class="filter-bar">
+            <form method="get" class="filter-form">
+                <div class="filter-group">
+                    <label>Genre</label>
+                    <select name="genre" class="filter-select">
+                        <option value="All">All Genres</option>
+                        @if (ViewBag.Genres != null)
+                        {
+                            var genres = ViewBag.Genres as List<string>;
+                            if (genres != null)
                             {
-                                <a href="@Url.Action("Shows", new { type = ViewBag.Type })" class="clear-search">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Genre Filter -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label text-muted mb-2">
-                            <i class="fas fa-tag me-2"></i>Genre
-                        </label>
-                        <div class="filter-select">
-                            <i class="fas fa-chevron-down select-arrow"></i>
-                            <select class="form-select" name="genre" id="genreSelect">
-                                <option value="All">All Genres</option>
-                                @if (ViewBag.Genres != null)
+                                foreach (var genre in genres)
                                 {
-                                    @foreach (var genre in ViewBag.Genres)
-                                    {
-                                        <option value="@genre" selected="@(genre == ViewBag.Genre)">
-                                            @genre
-                                        </option>
-                                    }
+                                    <option value="@genre" selected="@(genre == ViewBag.CurrentGenre)">@genre</option>
                                 }
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Sort By -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label text-muted mb-2">
-                            <i class="fas fa-sort me-2"></i>Sort By
-                        </label>
-                        <div class="filter-select">
-                            <i class="fas fa-chevron-down select-arrow"></i>
-                            <select class="form-select" name="sortBy" id="sortSelect">
-                                <option value="latest" selected="@(ViewBag.SortBy == "latest")">Latest First</option>
-                                <option value="rating" selected="@(ViewBag.SortBy == "rating")">Top Rated</option>
-                                <option value="year" selected="@(ViewBag.SortBy == "year")">Release Year</option>
-                                <option value="title" selected="@(ViewBag.SortBy == "title")">Title A-Z</option>
-                                <option value="views" selected="@(ViewBag.SortBy == "views")">Most Viewed</option>
-                                <option value="seasons" selected="@(ViewBag.SortBy == "seasons")">Most Seasons</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Apply Button -->
-                    <div class="col-lg-2 col-md-6">
-                        <button type="submit" class="btn-apply w-100">
-                            <i class="fas fa-filter me-2"></i>Apply
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Active Filters -->
-                @if (!string.IsNullOrEmpty(ViewBag.Search) || (!string.IsNullOrEmpty(ViewBag.Genre) && ViewBag.Genre != "All"))
-                {
-                    <div class="active-filters mt-4">
-                        <span class="filters-label">Active Filters:</span>
-                        @if (!string.IsNullOrEmpty(ViewBag.Search))
-                        {
-                            <span class="filter-tag">
-                                <i class="fas fa-search me-1"></i>
-                                "@ViewBag.Search"
-                                <a href="@Url.Action("Shows", new { type = ViewBag.Type, genre = ViewBag.Genre, sortBy = ViewBag.SortBy })" class="remove-filter">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            </span>
+                            }
                         }
-                        @if (!string.IsNullOrEmpty(ViewBag.Genre) && ViewBag.Genre != "All")
-                        {
-                            <span class="filter-tag">
-                                <i class="fas fa-tag me-1"></i>
-                                @ViewBag.Genre
-                                <a href="@Url.Action("Shows", new { type = ViewBag.Type, search = ViewBag.Search, sortBy = ViewBag.SortBy })" class="remove-filter">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            </span>
-                        }
-                        <a href="@Url.Action("Shows", new { type = ViewBag.Type })" class="clear-all">
-                            <i class="fas fa-undo-alt me-1"></i>Clear All
-                        </a>
-                    </div>
-                }
-            </div>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select name="sortBy" class="filter-select">
+                        <option value="latest" selected="@(ViewBag.CurrentSort == "latest")">Latest First</option>
+                        <option value="rating" selected="@(ViewBag.CurrentSort == "rating")">Top Rated</option>
+                        <option value="views" selected="@(ViewBag.CurrentSort == "views")">Most Viewed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="filter-btn">Apply Filters</button>
+            </form>
         </div>
-    </section>
 
-    <!-- Results Info -->
-    <section class="results-section mb-4">
-        <div class="container">
-            <div class="results-info">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <p class="mb-0">
-                            <i class="fas fa-tv me-2 text-info"></i>
-                            Showing <strong>@Model.Count()</strong> of <strong>@ViewBag.TotalItems</strong> shows
+        <div class="results-count">
+            Showing @Model.Count() of @ViewBag.TotalItems shows
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+    <div class="shows-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var show in Model)
+            {
+                <div class="show-card" onclick="location.href='/User/Home/ShowDetails/@show.Id'">
+                    <div class="show-poster">
+                        <img src="@(show.ThumbnailUrl ?? "/images/default-show.jpg")" alt="@show.Title">
+                        <div class="show-badge">
+                            <span class="badge">@(show.Genre ?? "Hotstar Specials")</span>
+                        </div>
+                        @if (show.Rating > 0)
+                        {
+                            <div class="show-rating">
+                                <i class="fas fa-star"></i>
+                                <span>@string.Format("{0:F1}", show.Rating)</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="show-info">
+                        <h4 class="show-title">@show.Title</h4>
+                        <p class="show-meta">
+                            <span class="show-genre">@(show.Genre ?? "Action")</span>
+                            <span class="show-year">@(show.ReleaseYear?.ToString() ?? "2026")</span>
+                        </p>
+                        <p class="show-episodes">
+                            <i class="fas fa-play-circle"></i>
+                            @if (show.Episodes != null)
+                            {
+                                @(show.Episodes.Count + " Episodes")
+                            }
+                            else
+                            {
+                                <span>New Series</span>
+                            }
                         </p>
                     </div>
-                    <div class="col-md-6 text-md-end">
-                        <div class="view-options">
-                            <button class="view-option active" data-view="grid">
-                                <i class="fas fa-th"></i>
-                            </button>
-                            <button class="view-option" data-view="list">
-                                <i class="fas fa-list"></i>
-                            </button>
-                        </div>
-                    </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-tv"></i>
+                <h3>No shows found</h3>
+                <p>Try adjusting your filters</p>
             </div>
-        </div>
-    </section>
-
-    <!-- Shows Grid -->
-    <section class="shows-grid-section mb-5">
-        <div class="container">
-            @if (!Model.Any())
-            {
-                <div class="no-results">
-                    <div class="no-results-content">
-                        <i class="fas fa-tv fa-4x mb-3"></i>
-                        <h3>No Shows Found</h3>
-                        <p>We couldn't find any shows matching your criteria.</p>
-                        <div class="suggestions">
-                            <h5>Suggestions:</h5>
-                            <ul>
-                                <li>Check your spelling</li>
-                                <li>Try more general keywords</li>
-                                <li>Try a different genre</li>
-                                <li>Browse all shows</li>
-                            </ul>
-                        </div>
-                        <a href="@Url.Action("Shows")" class="btn-clear">
-                            <i class="fas fa-undo me-2"></i>Clear Filters
-                        </a>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="shows-grid" id="showsGrid">
-                    @foreach (var show in Model)
-                    {
-                        <div class="show-card-wrapper" data-aos="fade-up" data-aos-delay="@(show.Id * 20)">
-                            <div class="show-card @(show.Genre == "Anime" ? "anime-card" : "")">
-                                <div class="show-poster">
-                                    <img src="@(show.ThumbnailUrl ?? (show.Genre == "Anime" ? "/images/default-anime.jpg" : "/images/default-show.jpg"))" 
-                                         alt="@show.Title"
-                                         loading="lazy">
-                                    
-                                    @if (show.Rating.HasValue)
-                                    {
-                                        <div class="show-rating">
-                                            <i class="fas fa-star"></i>
-                                            <span>@show.Rating.Value.ToString("F1")</span>
-                                        </div>
-                                    }
-
-                                    @if (show.IsFeatured)
-                                    {
-                                        <div class="show-featured">
-                                            <i class="fas fa-crown"></i>
-                                        </div>
-                                    }
-
-                                    <div class="show-badge">
-                                        @if (show.Genre == "Anime")
-                                        {
-                                            <span class="badge-anime">
-                                                <i class="fas fa-dragon"></i> Anime
-                                            </span>
-                                        }
-                                        <span class="badge-seasons">
-                                            <i class="fas fa-layer-group"></i> @show.TotalSeasons S
-                                        </span>
-                                        <span class="badge-episodes">
-                                            <i class="fas fa-play-circle"></i> @show.TotalEpisodes Ep
-                                        </span>
-                                    </div>
-
-                                    <div class="show-overlay">
-                                        <div class="overlay-content">
-                                            <a href="@Url.Action("ShowDetails", new { id = show.Id })" 
-                                               class="btn-details">
-                                                <i class="fas fa-info-circle"></i>
-                                                <span>Details</span>
-                                            </a>
-                                            <button class="btn-wishlist" onclick="toggleWishlist(@show.Id, 'show')" 
-                                                    data-show-id="@show.Id">
-                                                <i class="fas fa-heart"></i>
-                                                <span>Wishlist</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="show-info">
-                                    <h6 class="show-title">@show.Title</h6>
-                                    <div class="show-meta">
-                                        <span class="genre @(show.Genre == "Anime" ? "text-danger" : "")">
-                                            @if (show.Genre == "Anime")
-                                            {
-                                                <i class="fas fa-dragon me-1"></i>
-                                            }
-                                            @show.Genre
-                                        </span>
-                                        <span class="year">@show.ReleaseYear</span>
-                                    </div>
-                                    <div class="show-stats">
-                                        <span class="seasons">
-                                            <i class="fas fa-layer-group"></i> @show.TotalSeasons @(show.TotalSeasons == 1 ? "Season" : "Seasons")
-                                        </span>
-                                        <span class="views">
-                                            <i class="fas fa-eye"></i> @show.ViewsCount
-                                        </span>
-                                    </div>
-                                    @if (show.TotalEpisodes > 0)
-                                    {
-                                        <div class="episode-info">
-                                            <i class="fas fa-play-circle"></i>
-                                            <span>@show.TotalEpisodes Episodes</span>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-    </section>
+        }
+    </div>
 
     <!-- Pagination -->
-    @if (ViewBag.TotalPages > 1)
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
     {
-        <section class="pagination-section">
-            <div class="container">
-                <nav aria-label="Shows pagination">
-                    <ul class="pagination">
-                        @if (ViewBag.CurrentPage > 1)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Shows", new { 
-                                    page = ViewBag.CurrentPage - 1, 
-                                    search = ViewBag.Search, 
-                                    genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy,
-                                    type = ViewBag.Type
-                                })">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        }
-
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Shows", new { 
-                                    page = i, 
-                                    search = ViewBag.Search, 
-                                    genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy,
-                                    type = ViewBag.Type
-                                })">@i</a>
-                            </li>
-                        }
-
-                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Shows", new { 
-                                    page = ViewBag.CurrentPage + 1, 
-                                    search = ViewBag.Search, 
-                                    genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy,
-                                    type = ViewBag.Type
-                                })">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            </div>
-        </section>
+        <nav class="pagination-nav">
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Shows", new { page = i, genre = ViewBag.CurrentGenre, sortBy = ViewBag.CurrentSort })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
     }
 </div>
 
-<!-- Custom CSS -->
 <style>
-    /* Page Hero */
-    .page-hero {
-        background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
-        padding: 80px 0;
-        position: relative;
-        overflow: hidden;
+    .browse-header {
+        background: linear-gradient(180deg, #141414 0%, #1a1a1a 100%);
+        padding: 40px 0 20px;
+        border-bottom: 1px solid #333;
     }
 
-    .page-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><circle cx="50" cy="50" r="40" fill="none" stroke="%23ff4d4d" stroke-width="2"/></svg>') repeat;
-        animation: rotate 60s linear infinite;
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 5px;
     }
 
-    .hero-title {
-        font-size: 4rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #fff, #ff4d4d);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 15px;
-        animation: fadeInUp 0.8s ease;
+    .page-subtitle {
+        color: #b3b3b3;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
     }
 
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: #9ca3af;
-        margin-bottom: 25px;
-        animation: fadeInUp 1s ease;
+    .filter-bar {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
     }
 
-    .hero-stats {
+    .filter-form {
         display: flex;
         gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        animation: fadeInUp 1.2s ease;
-    }
-
-    .stat-badge {
-        background: rgba(255,255,255,0.05);
-        backdrop-filter: blur(10px);
-        padding: 10px 25px;
-        border-radius: 30px;
-        color: white;
-        border: 1px solid rgba(255,77,77,0.3);
-        transition: all 0.3s ease;
-    }
-
-    .stat-badge:hover {
-        border-color: #ff4d4d;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(255,77,77,0.2);
-    }
-
-    .stat-badge i {
-        margin-right: 8px;
-        color: #ff4d4d;
-    }
-
-    /* Category Tabs */
-    .category-tabs {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
+        align-items: flex-end;
         flex-wrap: wrap;
     }
 
-    .tab-link {
-        padding: 12px 30px;
-        border-radius: 30px;
-        background: rgba(255,255,255,0.05);
-        color: #9ca3af;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255,255,255,0.1);
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
     }
 
-    .tab-link:hover {
-        background: rgba(255,77,77,0.1);
-        color: white;
-        border-color: #ff4d4d;
-        transform: translateY(-2px);
-    }
-
-    .tab-link.active {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        color: white;
-        border-color: transparent;
-        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
-    }
-
-    .tab-link i {
-        margin-right: 8px;
-    }
-
-    /* Filters Section */
-    .filters-wrapper {
-        background: #1a1a1a;
-        border-radius: 20px;
-        padding: 30px;
-        border: 1px solid rgba(255,255,255,0.05);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .search-box {
-        position: relative;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #ff4d4d;
-        z-index: 2;
-    }
-
-    .clear-search {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #9ca3af;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-    .clear-search:hover {
-        color: #ff4d4d;
-    }
+        .filter-group label {
+            display: block;
+            color: #b3b3b3;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
 
     .filter-select {
-        position: relative;
-    }
-
-    .select-arrow {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #ff4d4d;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .form-control, .form-select {
-        background: #2a2a2a;
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-        padding: 12px 15px 12px 45px;
-        color: white;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        background: #2a2a2a;
-        border-color: #ff4d4d;
-        box-shadow: 0 0 0 3px rgba(255,77,77,0.2);
-        color: white;
-        outline: none;
-    }
-
-    .btn-apply {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        border: none;
-        border-radius: 12px;
-        padding: 12px 20px;
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-apply::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
         width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s ease;
-    }
-
-    .btn-apply:hover::before {
-        left: 100%;
-    }
-
-    .btn-apply:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
-    }
-
-    /* Active Filters */
-    .active-filters {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .filters-label {
-        color: #9ca3af;
-        font-size: 0.9rem;
-        margin-right: 10px;
-    }
-
-    .filter-tag {
-        background: rgba(255,77,77,0.1);
-        border: 1px solid rgba(255,77,77,0.3);
-        border-radius: 30px;
-        padding: 8px 15px;
-        font-size: 0.9rem;
+        padding: 10px;
+        background: #2a2a2a;
+        border: 1px solid #333;
         color: white;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        animation: fadeIn 0.3s ease;
+        border-radius: 4px;
     }
 
-    .remove-filter {
-        color: #ff4d4d;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-    .remove-filter:hover {
-        color: #ff3333;
-        transform: scale(1.2);
-    }
-
-    .clear-all {
-        color: #ff4d4d;
-        text-decoration: none;
-        font-size: 0.9rem;
-        margin-left: auto;
-        transition: all 0.3s ease;
-    }
-
-    .clear-all:hover {
-        color: #ff3333;
-        transform: translateX(-5px);
-    }
-
-    /* Results Info */
-    .results-info {
-        background: #1a1a1a;
-        border-radius: 12px;
-        padding: 15px 20px;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .view-options {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-
-    .view-option {
-        background: transparent;
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #9ca3af;
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    .filter-btn {
+        background: #e50914;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 4px;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
     }
 
-    .view-option:hover {
-        border-color: #ff4d4d;
-        color: white;
+        .filter-btn:hover {
+            background: #f40612;
+        }
+
+    .results-count {
+        color: #b3b3b3;
+        font-size: 0.9rem;
     }
 
-    .view-option.active {
-        background: #ff4d4d;
-        border-color: #ff4d4d;
-        color: white;
-    }
-
-    /* Shows Grid */
     .shows-grid {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 20px;
-    }
-
-    .show-card-wrapper {
-        animation: fadeInUp 0.5s ease;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
     }
 
     .show-card {
         background: #1a1a1a;
-        border-radius: 16px;
+        border-radius: 8px;
         overflow: hidden;
-        transition: all 0.4s ease;
-        height: 100%;
-        border: 1px solid rgba(255,255,255,0.05);
-        position: relative;
+        cursor: pointer;
+        transition: transform 0.3s ease;
     }
 
-    .show-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(13,202,240,0.3);
-        border-color: rgba(13,202,240,0.3);
-    }
-
-    .anime-card:hover {
-        box-shadow: 0 20px 40px rgba(255,77,77,0.3);
-        border-color: rgba(255,77,77,0.3);
-    }
+        .show-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.2);
+        }
 
     .show-poster {
         position: relative;
@@ -688,15 +215,31 @@
         overflow: hidden;
     }
 
-    .show-poster img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s ease;
-    }
+        .show-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
 
     .show-card:hover .show-poster img {
-        transform: scale(1.1);
+        transform: scale(1.05);
+    }
+
+    .show-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+    }
+
+    .badge {
+        background: #e50914;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
     }
 
     .show-rating {
@@ -704,492 +247,113 @@
         top: 10px;
         right: 10px;
         background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(5px);
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
+        padding: 4px 10px;
+        border-radius: 4px;
         color: #ffd700;
-        border: 1px solid rgba(255,215,0,0.3);
+        font-size: 0.85rem;
         z-index: 2;
     }
 
-    .show-featured {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: linear-gradient(135deg, #ffd700, #ffa500);
-        color: #000;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.9rem;
-        z-index: 2;
-        box-shadow: 0 5px 15px rgba(255,215,0,0.3);
-    }
-
-    .show-badge {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        display: flex;
-        gap: 5px;
-        flex-wrap: wrap;
-        z-index: 2;
-    }
-
-    .badge-anime {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
-    }
-
-    .badge-seasons {
-        background: rgba(13,202,240,0.9);
-        backdrop-filter: blur(5px);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        box-shadow: 0 5px 15px rgba(13,202,240,0.3);
-    }
-
-    .badge-episodes {
-        background: rgba(255,255,255,0.2);
-        backdrop-filter: blur(5px);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .show-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-        display: flex;
-        align-items: flex-end;
-        padding: 20px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .show-card:hover .show-overlay {
-        opacity: 1;
-    }
-
-    .overlay-content {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-        transform: translateY(20px);
-        transition: transform 0.3s ease;
-    }
-
-    .show-card:hover .overlay-content {
-        transform: translateY(0);
-    }
-
-    .btn-details, .btn-wishlist {
-        padding: 8px 16px;
-        border-radius: 25px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        flex: 1;
-    }
-
-    .btn-details {
-        background: #ff4d4d;
-        color: white;
-    }
-
-    .btn-details:hover {
-        background: #ff3333;
-        transform: scale(1.05);
-    }
-
-    .btn-wishlist {
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.3);
-    }
-
-    .btn-wishlist:hover {
-        background: #ff4d4d;
-        border-color: #ff4d4d;
-        transform: scale(1.05);
-    }
+        .show-rating i {
+            margin-right: 4px;
+        }
 
     .show-info {
         padding: 15px;
     }
 
     .show-title {
-        color: white;
-        font-size: 0.95rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin: 0 0 5px 0;
+        margin: 0 0 8px 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .show-meta {
-        display: flex;
-        gap: 8px;
-        font-size: 0.8rem;
-        color: #9ca3af;
+        color: #b3b3b3;
+        font-size: 0.85rem;
         margin-bottom: 8px;
-    }
-
-    .show-meta .genre {
-        color: #0dcaf0;
-    }
-
-    .show-meta .genre.text-danger {
-        color: #ff4d4d;
-    }
-
-    .show-stats {
         display: flex;
-        gap: 12px;
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-bottom: 5px;
+        gap: 10px;
     }
 
-    .show-stats i {
-        margin-right: 4px;
-        color: #0dcaf0;
+    .show-genre {
+        color: #e50914;
     }
 
-    .anime-card .show-stats i {
-        color: #ff4d4d;
+    .show-episodes {
+        color: #b3b3b3;
+        font-size: 0.8rem;
     }
 
-    .episode-info {
-        font-size: 0.7rem;
-        color: #6c757d;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
+        .show-episodes i {
+            color: #e50914;
+            margin-right: 5px;
+        }
 
-    .episode-info i {
-        color: #0dcaf0;
-    }
-
-    .anime-card .episode-info i {
-        color: #ff4d4d;
-    }
-
-    /* No Results */
-    .no-results {
-        min-height: 400px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #1a1a1a;
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.05);
-        padding: 60px;
-    }
-
-    .no-results-content {
+    .empty-state {
+        grid-column: 1 / -1;
         text-align: center;
-        max-width: 400px;
+        padding: 80px;
+        color: #b3b3b3;
     }
 
-    .no-results i {
-        color: #ff4d4d;
-        opacity: 0.5;
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #e50914;
+            opacity: 0.5;
+        }
+
+    .pagination-nav {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
     }
 
-    .no-results h3 {
-        color: white;
-        margin: 20px 0 10px;
-    }
-
-    .no-results p {
-        color: #9ca3af;
-        margin-bottom: 30px;
-    }
-
-    .suggestions {
-        background: rgba(255,255,255,0.03);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 30px;
-        text-align: left;
-    }
-
-    .suggestions h5 {
-        color: #ff4d4d;
-        margin-bottom: 15px;
-    }
-
-    .suggestions ul {
+    .pagination {
+        display: flex;
+        gap: 5px;
         list-style: none;
         padding: 0;
-        margin: 0;
-    }
-
-    .suggestions li {
-        color: #9ca3af;
-        padding: 5px 0;
-        padding-left: 20px;
-        position: relative;
-    }
-
-    .suggestions li::before {
-        content: '•';
-        color: #ff4d4d;
-        position: absolute;
-        left: 5px;
-    }
-
-    .btn-clear {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-    }
-
-    .btn-clear:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
-        color: white;
-    }
-
-    /* Pagination */
-    .pagination {
-        gap: 5px;
-        justify-content: center;
-    }
-
-    .page-item.active .page-link {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        border-color: transparent;
-        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
     }
 
     .page-link {
+        display: block;
+        padding: 8px 15px;
         background: #1a1a1a;
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 10px !important;
+        border: 1px solid #333;
         color: white;
-        padding: 10px 15px;
-        transition: all 0.3s ease;
+        text-decoration: none;
+        border-radius: 4px;
     }
 
-    .page-link:hover {
-        background: #2a2a2a;
-        border-color: #ff4d4d;
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    /* Animations */
-    @@keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    @@keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @@keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    /* Responsive */
-    @@media (max-width: 1400px) {
-        .shows-grid {
-            grid-template-columns: repeat(5, 1fr);
-        }
+    .page-item.active .page-link {
+        background: #e50914;
+        border-color: #e50914;
     }
 
     @@media (max-width: 1200px) {
         .shows-grid {
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
         }
     }
 
     @@media (max-width: 992px) {
         .shows-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        .hero-title {
-            font-size: 3rem;
-        }
-        .category-tabs {
-            gap: 5px;
-        }
-        .tab-link {
-            padding: 8px 15px;
-            font-size: 0.9rem;
+            grid-template-columns: repeat(2, 1fr);
         }
     }
 
     @@media (max-width: 768px) {
         .shows-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
         }
-        .hero-title {
-            font-size: 2.5rem;
-        }
-        .filters-wrapper {
-            padding: 20px;
-        }
-        .view-options {
-            justify-content: flex-start;
-            margin-top: 10px;
-        }
-        .clear-all {
-            margin-left: 0;
-            width: 100%;
-            text-align: center;
-        }
-        .show-badge {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-    }
 
-    @@media (max-width: 576px) {
-        .shows-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .hero-title {
-            font-size: 2rem;
-        }
-        .stat-badge {
-            padding: 8px 15px;
-            font-size: 0.85rem;
-        }
-        .tab-link {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-        .btn-details, .btn-wishlist {
-            padding: 6px 10px;
-            font-size: 0.7rem;
-        }
-        .show-badge {
+        .filter-form {
             flex-direction: column;
-            align-items: flex-start;
-            gap: 2px;
-        }
-        .badge-anime, .badge-seasons, .badge-episodes {
-            padding: 3px 6px;
-            font-size: 0.6rem;
         }
     }
 </style>
-
-@section Scripts {
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
-
-        // View toggle (grid/list)
-        $('.view-option').click(function() {
-            $('.view-option').removeClass('active');
-            $(this).addClass('active');
-            
-            if ($(this).data('view') === 'list') {
-                $('.shows-grid').css('grid-template-columns', 'repeat(1, 1fr)');
-                $('.show-card').css('display', 'flex');
-                $('.show-poster').css('width', '150px');
-            } else {
-                $('.shows-grid').css('grid-template-columns', '');
-                $('.show-card').css('display', '');
-                $('.show-poster').css('width', '');
-            }
-        });
-
-        // Auto-submit on filter change
-        $('#genreSelect, #sortSelect').change(function() {
-            $('#filterForm').submit();
-        });
-
-        // Debounced search
-        let searchTimeout;
-        $('#searchInput').on('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                $('#filterForm').submit();
-            }, 500);
-        });
-
-        function toggleWishlist(itemId, type) {
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <text>
-                $.post('@Url.Action("ToggleWishlist", "Wishlist", new { area = "User" })', 
-                    { itemId: itemId, itemType: type })
-                    .done(function(response) {
-                        if (response.success) {
-                            toastr.success(response.message);
-                            // Update button appearance
-                            $(`[data-show-id="${itemId}"]`).toggleClass('in-wishlist');
-                        } else {
-                            toastr.info(response.message);
-                        }
-                    })
-                    .fail(function() {
-                        toastr.error('Error updating wishlist');
-                    });
-                </text>
-            }
-            else
-            {
-                <text>
-                toastr.warning('Please login to add to wishlist');
-                setTimeout(() => {
-                    window.location.href = '@Url.Action("Login", "Auth", new { area = "" })';
-                }, 1500);
-                </text>
-            }
-        }
-    </script>
-}

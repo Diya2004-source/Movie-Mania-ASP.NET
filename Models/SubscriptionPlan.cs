@@ -22,14 +22,15 @@ namespace MovieMania.Models
         [Required(ErrorMessage = "Price is required")]
         [Column(TypeName = "decimal(18,2)")]
         [Range(0, 1000, ErrorMessage = "Price must be between 0 and 1000")]
-        [Display(Name = "Price")]
+        [Display(Name = "Price (₹)")]
         public decimal Price { get; set; }
 
         [Display(Name = "Duration (days)")]
         [Range(1, 365, ErrorMessage = "Duration must be between 1 and 365 days")]
-        public int DurationInDays { get; set; } = 30;  // Changed from DurationDays
+        public int DurationInDays { get; set; } = 30;
 
         [Display(Name = "Features")]
+        [DataType(DataType.MultilineText)]
         public string Features { get; set; }
 
         [Display(Name = "Max Screens")]
@@ -41,7 +42,7 @@ namespace MovieMania.Models
         public string VideoQuality { get; set; } = "HD";
 
         [Display(Name = "Is Active")]
-        public bool IsActive { get; set; } = true;  // Changed from Status
+        public bool IsActive { get; set; } = true;
 
         [Display(Name = "Display Order")]
         public int DisplayOrder { get; set; }

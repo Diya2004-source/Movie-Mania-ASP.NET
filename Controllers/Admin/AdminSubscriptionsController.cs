@@ -8,7 +8,6 @@ using System.Linq;
 namespace MovieMania.Controllers.Admin
 {
     [Authorize(Roles = "admin")]
-    [Route("Admin/Subscriptions")]
     public class AdminSubscriptionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,8 +17,7 @@ namespace MovieMania.Controllers.Admin
             _context = context;
         }
 
-        // GET: Admin/Subscriptions
-        [HttpGet("")]
+        // GET: AdminSubscriptions
         public async Task<IActionResult> Index()
         {
             var plans = await _context.SubscriptionPlans
@@ -28,15 +26,14 @@ namespace MovieMania.Controllers.Admin
             return View("~/Views/Admin/Subscriptions/Index.cshtml", plans);
         }
 
-        // GET: Admin/Subscriptions/Create
-        [HttpGet("Create")]
+        // GET: AdminSubscriptions/Create
         public IActionResult Create()
         {
             return View("~/Views/Admin/Subscriptions/Create.cshtml");
         }
 
-        // POST: Admin/Subscriptions/Create
-        [HttpPost("Create")]
+        // POST: AdminSubscriptions/Create
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SubscriptionPlan plan)
         {
@@ -44,26 +41,27 @@ namespace MovieMania.Controllers.Admin
             {
                 if (!ModelState.IsValid)
                 {
-                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                    string errorMessage = string.Join("<br/>", errors);
-                    TempData["Error"] = $"❌ Validation failed: <br/>{errorMessage}";
+                    var errors = string.Join("<br/>", ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+                    TempData["Error"] = $"Validation failed:<br/>{errors}";
                     return View("~/Views/Admin/Subscriptions/Create.cshtml", plan);
                 }
 
                 plan.CreatedAt = DateTime.Now;
+                plan.IsActive = true;
+
                 await _context.SubscriptionPlans.AddAsync(plan);
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
-                    TempData["Success"] = $"✅ Plan '{plan.Name}' created successfully!";
+                    TempData["Success"] = $"✅ Plan '{plan.Name}' created successfully! Price: ₹{plan.Price:N2}";
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    TempData["Error"] = "❌ Plan was not created. Please try again.";
-                    return View("~/Views/Admin/Subscriptions/Create.cshtml", plan);
-                }
+
+                TempData["Error"] = "❌ Plan was not created.";
+                return View("~/Views/Admin/Subscriptions/Create.cshtml", plan);
             }
             catch (Exception ex)
             {
@@ -72,8 +70,7 @@ namespace MovieMania.Controllers.Admin
             }
         }
 
-        // GET: Admin/Subscriptions/Edit/5
-        [HttpGet("Edit/{id}")]
+        // GET: AdminSubscriptions/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var plan = await _context.SubscriptionPlans.FindAsync(id);
@@ -85,8 +82,8 @@ namespace MovieMania.Controllers.Admin
             return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
         }
 
-        // POST: Admin/Subscriptions/Edit/5
-        [HttpPost("Edit/{id}")]
+        // POST: AdminSubscriptions/Edit/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SubscriptionPlan plan)
         {
@@ -99,35 +96,38 @@ namespace MovieMania.Controllers.Admin
             {
                 if (!ModelState.IsValid)
                 {
-                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                    string errorMessage = string.Join("<br/>", errors);
-                    TempData["Error"] = $"❌ Validation failed: <br/>{errorMessage}";
+                    var errors = string.Join("<br/>", ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+                    TempData["Error"] = $"Validation failed:<br/>{errors}";
                     return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
                 }
 
-                var existingPlan = await _context.SubscriptionPlans.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                var existingPlan = await _context.SubscriptionPlans
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
                 if (existingPlan == null)
                 {
                     TempData["Error"] = $"❌ Plan with ID {id} not found.";
                     return RedirectToAction(nameof(Index));
                 }
 
+                // Preserve original CreatedAt
                 plan.CreatedAt = existingPlan.CreatedAt;
                 plan.UpdatedAt = DateTime.Now;
 
                 _context.SubscriptionPlans.Update(plan);
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
                     TempData["Success"] = $"✅ Plan '{plan.Name}' updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    TempData["Error"] = "❌ No changes were saved.";
-                    return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
-                }
+
+                TempData["Error"] = "❌ No changes were saved.";
+                return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
             }
             catch (Exception ex)
             {
@@ -136,8 +136,7 @@ namespace MovieMania.Controllers.Admin
             }
         }
 
-        // GET: Admin/Subscriptions/Delete/5
-        [HttpGet("Delete/{id}")]
+        // GET: AdminSubscriptions/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             var plan = await _context.SubscriptionPlans.FindAsync(id);
@@ -149,8 +148,8 @@ namespace MovieMania.Controllers.Admin
             return View("~/Views/Admin/Subscriptions/Delete.cshtml", plan);
         }
 
-        // POST: Admin/Subscriptions/Delete/5
-        [HttpPost("Delete/{id}")]
+        // POST: AdminSubscriptions/Delete/5
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -164,7 +163,7 @@ namespace MovieMania.Controllers.Admin
                 }
 
                 _context.SubscriptionPlans.Remove(plan);
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
@@ -183,8 +182,8 @@ namespace MovieMania.Controllers.Admin
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Admin/Subscriptions/ToggleStatus/5
-        [HttpPost("ToggleStatus/{id}")]
+        // POST: AdminSubscriptions/ToggleStatus/5
+        [HttpPost]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             try
@@ -197,11 +196,12 @@ namespace MovieMania.Controllers.Admin
 
                 plan.IsActive = !plan.IsActive;
                 plan.UpdatedAt = DateTime.Now;
-                int result = await _context.SaveChangesAsync();
+
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
-                    string status = plan.IsActive ? "activated" : "deactivated";
+                    var status = plan.IsActive ? "activated" : "deactivated";
                     return Json(new
                     {
                         success = true,
@@ -209,10 +209,8 @@ namespace MovieMania.Controllers.Admin
                         isActive = plan.IsActive
                     });
                 }
-                else
-                {
-                    return Json(new { success = false, message = "❌ No changes were saved." });
-                }
+
+                return Json(new { success = false, message = "❌ No changes were saved." });
             }
             catch (Exception ex)
             {
@@ -220,8 +218,7 @@ namespace MovieMania.Controllers.Admin
             }
         }
 
-        // GET: Admin/Subscriptions/Details/5
-        [HttpGet("Details/{id}")]
+        // GET: AdminSubscriptions/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var plan = await _context.SubscriptionPlans.FindAsync(id);

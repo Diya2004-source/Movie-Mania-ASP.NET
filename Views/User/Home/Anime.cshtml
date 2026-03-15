@@ -1,0 +1,322 @@
+﻿@model IEnumerable<MovieMania.Models.Movie>
+
+@{
+    ViewData["Title"] = "Anime";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="browse-header">
+    <div class="container-fluid px-4">
+        <h1 class="page-title">Anime</h1>
+        <p class="page-subtitle">Discover the best Japanese animation</p>
+
+        <div class="filter-bar">
+            <form method="get" class="filter-form">
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select name="sortBy" class="filter-select">
+                        <option value="latest" selected="@(ViewBag.CurrentSort == "latest")">Latest First</option>
+                        <option value="rating" selected="@(ViewBag.CurrentSort == "rating")">Top Rated</option>
+                        <option value="views" selected="@(ViewBag.CurrentSort == "views")">Most Viewed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="filter-btn">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="results-count">
+            Showing @Model.Count() of @ViewBag.TotalItems anime
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+    <div class="anime-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var anime in Model)
+            {
+                <div class="anime-card" onclick="location.href='/User/Home/MovieDetails/@anime.Id'">
+                    <div class="anime-poster">
+                        <img src="@(anime.ThumbnailUrl ?? "/images/default-movie.jpg")" alt="@anime.Title">
+                        @if (anime.Rating > 0)
+                        {
+                            <div class="anime-rating">
+                                <i class="fas fa-star"></i>
+                                <span>@string.Format("{0:F1}", anime.Rating)</span>
+                            </div>
+                        }
+                        @if (anime.ReleaseYear.HasValue)
+                        {
+                            <div class="anime-year">
+                                @anime.ReleaseYear.Value
+                            </div>
+                        }
+                    </div>
+                    <div class="anime-info">
+                        <h4 class="anime-title">@anime.Title</h4>
+                        <p class="anime-meta">@(anime.Genre ?? "Anime")</p>
+                        @if (anime.Duration.HasValue)
+                        {
+                            <p class="anime-duration">@(anime.Duration.Value) min</p>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-dragon"></i>
+                <h3>No anime found</h3>
+                <p>Check back later for new releases</p>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
+    {
+        <nav class="pagination-nav">
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Anime", new { page = i, sortBy = ViewBag.CurrentSort })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<style>
+    .browse-header {
+        background: linear-gradient(180deg, #141414 0%, #1a1a1a 100%);
+        padding: 40px 0 20px;
+        border-bottom: 1px solid #333;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #b3b3b3;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+    }
+
+    .filter-bar {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .filter-group label {
+            display: block;
+            color: #b3b3b3;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+    .filter-select {
+        width: 100%;
+        padding: 10px;
+        background: #2a2a2a;
+        border: 1px solid #333;
+        color: white;
+        border-radius: 4px;
+    }
+
+    .filter-btn {
+        background: #e50914;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .filter-btn:hover {
+            background: #f40612;
+        }
+
+    .results-count {
+        color: #b3b3b3;
+        font-size: 0.9rem;
+    }
+
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+    }
+
+    .anime-card {
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+        .anime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.2);
+        }
+
+    .anime-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+        .anime-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+    .anime-card:hover .anime-poster img {
+        transform: scale(1.05);
+    }
+
+    .anime-rating {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.8);
+        padding: 4px 10px;
+        border-radius: 4px;
+        color: #ffd700;
+        font-size: 0.85rem;
+        z-index: 2;
+    }
+
+    .anime-year {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(229, 9, 20, 0.9);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .anime-info {
+        padding: 12px;
+    }
+
+    .anime-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .anime-meta {
+        color: #b3b3b3;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    .anime-duration {
+        color: #b3b3b3;
+        font-size: 0.75rem;
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px;
+        color: #b3b3b3;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #e50914;
+            opacity: 0.5;
+        }
+
+    .pagination-nav {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 5px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .page-link {
+        display: block;
+        padding: 8px 15px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .page-item.active .page-link {
+        background: #e50914;
+        border-color: #e50914;
+    }
+
+    @@media (max-width: 1200px) {
+        .anime-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .anime-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .anime-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-form {
+            flex-direction: column;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .anime-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

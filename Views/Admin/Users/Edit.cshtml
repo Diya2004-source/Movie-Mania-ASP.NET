@@ -1,163 +1,160 @@
 ﻿@model MovieMania.Models.AppUser
 
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-5">
-    <div class="card card-dark p-4 shadow-lg">
-        <h2 class="mb-4 text-center text-light">
-            <i class="fas fa-user-edit me-2 text-warning"></i>Edit User
-        </h2>
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-light">
+                <i class="fas fa-user-edit me-2 text-warning"></i>Edit User
+            </h1>
+        </div>
+    </div>
 
-        <form asp-action="Edit" method="post">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CreatedAt" />
-            <input type="hidden" asp-for="Password" />
-            <input type="hidden" asp-for="TotalReferrals" />
-            <input type="hidden" asp-for="RewardPoints" />
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg bg-dark">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedAt" />
+                        <input type="hidden" asp-for="Password" />
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Name" class="form-label text-light"></label>
-                    <input asp-for="Name" class="form-control custom-input" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label text-light fw-bold"></label>
+                                <input asp-for="Name" class="form-control bg-secondary text-light border-0" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label text-light fw-bold"></label>
+                                <input asp-for="Email" class="form-control bg-secondary text-light border-0" type="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Role" class="form-label text-light fw-bold"></label>
+                                <select asp-for="Role" class="form-select bg-secondary text-light border-0">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ReferralCode" class="form-label text-light fw-bold">Referral Code</label>
+                                <input asp-for="ReferralCode" class="form-control bg-secondary text-light border-0" />
+                                <span asp-validation-for="ReferralCode" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="TotalReferrals" class="form-label text-light fw-bold">Total Referrals</label>
+                                <input asp-for="TotalReferrals" class="form-control bg-secondary text-light border-0" type="number" min="0" />
+                                <span asp-validation-for="TotalReferrals" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="RewardPoints" class="form-label text-light fw-bold">Reward Points</label>
+                                <input asp-for="RewardPoints" class="form-control bg-secondary text-light border-0" type="number" min="0" />
+                                <span asp-validation-for="RewardPoints" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check mt-4">
+                                    <input asp-for="IsActive" class="form-check-input" />
+                                    <label asp-for="IsActive" class="form-check-label text-light fw-bold"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProfilePicture" class="form-label text-light fw-bold">Profile Picture</label>
+                            <input type="file" name="profileImage" class="form-control bg-secondary text-light border-0" accept="image/*" />
+                            <small class="text-muted">Leave empty to keep current picture</small>
+                            @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                            {
+                                <div class="mt-2">
+                                    <img src="@Model.ProfilePicture" alt="Profile" style="max-height: 100px;" class="rounded" />
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-warning px-4">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-light ms-2 px-4">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
                 </div>
+            </div>
+        </div>
 
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Email" class="form-label text-light"></label>
-                    <input asp-for="Email" class="form-control custom-input" type="email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg bg-dark mb-3">
+                <div class="card-body p-4 text-center">
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                    {
+                        <img src="@Model.ProfilePicture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile">
+                    }
+                    else
+                    {
+                        <div class="default-avatar bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <span class="display-1 text-white">@Model.Name?.Substring(0, 1)</span>
+                        </div>
+                    }
+                    <h5 class="text-light">@Model.Name</h5>
+                    <p class="text-muted">@Model.Email</p>
+                    <span class="badge bg-@(Model.Role == "admin" ? "danger" : "info")">@Model.Role</span>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Role" class="form-label text-light"></label>
-                    <select asp-for="Role" class="form-control custom-input">
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                    <span asp-validation-for="Role" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="ReferralCode" class="form-label text-light"></label>
-                    <input asp-for="ReferralCode" class="form-control custom-input" />
-                    <span asp-validation-for="ReferralCode" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="ProfilePictureUrl" class="form-label text-light"></label>
-                    <input asp-for="ProfilePictureUrl" class="form-control custom-input" />
-                    <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="LastLoginAt" class="form-label text-light"></label>
-                    <input asp-for="LastLoginAt" class="form-control custom-input" type="datetime-local" />
-                    <span asp-validation-for="LastLoginAt" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-check">
-                        <input asp-for="IsActive" class="form-check-input" />
-                        <label asp-for="IsActive" class="form-check-label text-light">Active</label>
-                    </div>
+            <div class="card border-0 shadow-lg bg-dark">
+                <div class="card-body p-4">
+                    <h5 class="text-warning mb-3">
+                        <i class="fas fa-clock me-2"></i>Account Information
+                    </h5>
+                    <ul class="list-unstyled text-light">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-plus text-primary me-2"></i>
+                            <strong>Created:</strong> @Model.CreatedAt.ToString("dd MMM yyyy HH:mm")
+                        </li>
+                        @if (Model.LastLoginAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-sign-in-alt text-success me-2"></i>
+                                <strong>Last Login:</strong> @Model.LastLoginAt.Value.ToString("dd MMM yyyy HH:mm")
+                            </li>
+                        }
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-edit text-info me-2"></i>
+                                <strong>Updated:</strong> @Model.UpdatedAt.Value.ToString("dd MMM yyyy HH:mm")
+                            </li>
+                        }
+                        <li class="mb-2">
+                            <i class="fas fa-users text-warning me-2"></i>
+                            <strong>Total Referrals:</strong> @Model.TotalReferrals
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            <strong>Reward Points:</strong> @Model.RewardPoints
+                        </li>
+                    </ul>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="info-box p-3" style="background: #2a2a2a; border-radius: 8px;">
-                        <small class="text-muted d-block">Total Referrals</small>
-                        <span class="text-light fw-bold">@Model.TotalReferrals</span>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-box p-3" style="background: #2a2a2a; border-radius: 8px;">
-                        <small class="text-muted d-block">Reward Points</small>
-                        <span class="text-light fw-bold">@Model.RewardPoints</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-4 text-center">
-                <button type="submit" class="btn btn-warning btn-custom px-5">
-                    <i class="fas fa-save me-2"></i>Update User
-                </button>
-                <a asp-action="Index" class="btn btn-outline-light ms-2 btn-custom px-4">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<style>
-    body {
-        background: #0f0f0f;
-    }
-
-    .card-dark {
-        background: #1c1c1c;
-        border: none;
-        border-radius: 12px;
-        max-width: 800px;
-        margin: auto;
-    }
-
-    .custom-input {
-        background: #2a2a2a;
-        border: 1px solid #444;
-        color: white;
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-        .custom-input:focus {
-            background: #2a2a2a;
-            color: white;
-            border-color: #ffc107;
-            box-shadow: 0 0 8px rgba(255,193,7,0.4);
-        }
-
-    .btn-custom {
-        padding: 10px 20px;
-        border-radius: 8px;
-        transition: 0.3s;
-    }
-
-    .btn-warning {
-        background: #ffc107;
-        border: none;
-        color: #000;
-    }
-
-        .btn-warning:hover {
-            background: #ffca2c;
-            transform: translateY(-2px);
-        }
-
-    .btn-outline-light:hover {
-        background: white;
-        color: black;
-        transform: translateY(-2px);
-    }
-
-    .info-box {
-        background: #2a2a2a;
-        border-radius: 8px;
-        text-align: center;
-    }
-</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace MovieMania.Controllers.Admin
 {
@@ -12,14 +12,13 @@ namespace MovieMania.Controllers.Admin
     public class AdminWishlistController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly string viewFolder = "~/Views/Admin/Wishlist/";
+        private readonly string _viewPath = "~/Views/Admin/Wishlist/";
 
         public AdminWishlistController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/Wishlist
         [HttpGet("")]
         public async Task<IActionResult> Index()
         {
@@ -31,36 +30,34 @@ namespace MovieMania.Controllers.Admin
                 .OrderByDescending(w => w.AddedDate)
                 .ToListAsync();
 
-            return View(viewFolder + "Index.cshtml", wishlist);
+            return View(_viewPath + "Index.cshtml", wishlist);
         }
 
-        // GET: Admin/Wishlist/Details/5
         [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
-            var wishlistItem = await _context.Wishlists
+            var item = await _context.Wishlists
                 .Include(w => w.User)
                 .Include(w => w.Movie)
                 .Include(w => w.Show)
                 .FirstOrDefaultAsync(w => w.Id == id && w.IsActive);
 
-            if (wishlistItem == null)
+            if (item == null)
             {
-                TempData["Error"] = $"❌ Wishlist item with ID {id} not found.";
+                TempData["Error"] = $"Wishlist item with ID {id} not found.";
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(viewFolder + "Details.cshtml", wishlistItem);
+            return View(_viewPath + "Details.cshtml", item);
         }
 
-        // GET: Admin/Wishlist/User/5
         [HttpGet("User/{userId}")]
         public async Task<IActionResult> UserWishlist(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
             {
-                TempData["Error"] = $"❌ User with ID {userId} not found.";
+                TempData["Error"] = $"User with ID {userId} not found.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -73,11 +70,9 @@ namespace MovieMania.Controllers.Admin
 
             ViewBag.UserName = user.Name;
             ViewBag.UserId = userId;
-
-            return View(viewFolder + "UserWishlist.cshtml", wishlist);
+            return View(_viewPath + "UserWishlist.cshtml", wishlist);
         }
 
-        // GET: Admin/Wishlist/Movies
         [HttpGet("Movies")]
         public async Task<IActionResult> Movies()
         {
@@ -89,10 +84,9 @@ namespace MovieMania.Controllers.Admin
                 .ToListAsync();
 
             ViewBag.Type = "Movies";
-            return View(viewFolder + "Index.cshtml", movies);
+            return View(_viewPath + "Index.cshtml", movies);
         }
 
-        // GET: Admin/Wishlist/Shows
         [HttpGet("Shows")]
         public async Task<IActionResult> Shows()
         {
@@ -104,7 +98,7 @@ namespace MovieMania.Controllers.Admin
                 .ToListAsync();
 
             ViewBag.Type = "Shows";
-            return View(viewFolder + "Index.cshtml", shows);
+            return View(_viewPath + "Index.cshtml", shows);
         }
     }
 }

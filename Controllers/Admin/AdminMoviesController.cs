@@ -8,10 +8,12 @@ using System.Linq;
 namespace MovieMania.Controllers.Admin
 {
     [Authorize(Roles = "admin")]
+    [Route("Admin/Movies")]
     public class AdminMoviesController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly string _viewPath = "~/Views/Admin/Movies/";
 
         public AdminMoviesController(ApplicationDbContext context, IWebHostEnvironment env)
         {
@@ -19,221 +21,147 @@ namespace MovieMania.Controllers.Admin
             _env = env;
         }
 
-        // GET: AdminMovies
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             var movies = await _context.Movies
                 .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync();
-            return View("~/Views/Admin/Movies/Index.cshtml", movies);
+            return View(_viewPath + "Index.cshtml", movies);
         }
 
-        // GET: AdminMovies/Create
+        [HttpGet("Create")]
         public IActionResult Create()
         {
-            return View("~/Views/Admin/Movies/Create.cshtml");
+            return View(_viewPath + "Create.cshtml");
         }
 
-        // POST: AdminMovies/Create
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Movie movie, IFormFile? ThumbnailFile)
+        public async Task<IActionResult> Create(Movie movie, IFormFile? thumbnailFile)
         {
             try
             {
-                // Check if model state is valid
                 if (!ModelState.IsValid)
                 {
-                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                    string errorMessage = string.Join("<br/>", errors);
-                    TempData["Error"] = $"Validation failed: <br/>{errorMessage}";
-                    return View("~/Views/Admin/Movies/Create.cshtml", movie);
+                    var errors = string.Join("<br/>", ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+                    TempData["Error"] = $"Validation failed:<br/>{errors}";
+                    return View(_viewPath + "Create.cshtml", movie);
                 }
 
-                // Validate required fields
-                if (string.IsNullOrEmpty(movie.Title))
-                {
-                    TempData["Error"] = "Movie title is required!";
-                    return View("~/Views/Admin/Movies/Create.cshtml", movie);
-                }
-
-                // Handle file upload if provided
-                if (ThumbnailFile != null && ThumbnailFile.Length > 0)
-                {
-                    try
-                    {
-                        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "movies");
-                        Directory.CreateDirectory(uploadsFolder);
-
-                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ThumbnailFile.FileName;
-                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await ThumbnailFile.CopyToAsync(fileStream);
-                        }
-
-                        movie.ThumbnailUrl = "/uploads/movies/" + uniqueFileName;
-                    }
-                    catch (Exception ex)
-                    {
-                        TempData["Error"] = $"Error uploading file: {ex.Message}";
-                        return View("~/Views/Admin/Movies/Create.cshtml", movie);
-                    }
-                }
-
-                // Set default values
+                movie.ThumbnailUrl = await UploadFile(thumbnailFile, "movies");
                 movie.CreatedAt = DateTime.Now;
                 movie.ViewsCount = 0;
 
-                // Add to database
                 await _context.Movies.AddAsync(movie);
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
-                // Check if save was successful
                 if (result > 0)
                 {
-                    TempData["Success"] = $"✅ Movie '{movie.Title}' added successfully to database!";
+                    TempData["Success"] = $"Movie '{movie.Title}' added successfully!";
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    TempData["Error"] = "❌ Movie was not added to database. Please try again.";
-                    return View("~/Views/Admin/Movies/Create.cshtml", movie);
-                }
-            }
-            catch (DbUpdateException dbEx)
-            {
-                // Handle database-specific errors
-                var innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
-                TempData["Error"] = $"❌ Database error: {innerMessage}";
-                return View("~/Views/Admin/Movies/Create.cshtml", movie);
+
+                TempData["Error"] = "Movie was not added to database.";
+                return View(_viewPath + "Create.cshtml", movie);
             }
             catch (Exception ex)
             {
-                // Handle any other errors
-                TempData["Error"] = $"❌ Unexpected error: {ex.Message}";
-                return View("~/Views/Admin/Movies/Create.cshtml", movie);
+                TempData["Error"] = $"Error: {ex.Message}";
+                return View(_viewPath + "Create.cshtml", movie);
             }
         }
 
-        // GET: AdminMovies/Edit/5
+        [HttpGet("Edit/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
             var movie = await _context.Movies.FindAsync(id);
             if (movie == null)
             {
-                TempData["Error"] = $"❌ Movie with ID {id} not found.";
+                TempData["Error"] = $"Movie with ID {id} not found.";
                 return RedirectToAction(nameof(Index));
             }
-            return View("~/Views/Admin/Movies/Edit.cshtml", movie);
+            return View(_viewPath + "Edit.cshtml", movie);
         }
 
-        // POST: AdminMovies/Edit/5
-        [HttpPost]
+        [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Movie movie, IFormFile? ThumbnailFile)
+        public async Task<IActionResult> Edit(int id, Movie movie, IFormFile? thumbnailFile)
         {
             if (id != movie.Id)
-            {
-                TempData["Error"] = "❌ Movie ID mismatch.";
-                return RedirectToAction(nameof(Index));
-            }
+                return NotFound();
 
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                    string errorMessage = string.Join("<br/>", errors);
-                    TempData["Error"] = $"Validation failed: <br/>{errorMessage}";
-                    return View("~/Views/Admin/Movies/Edit.cshtml", movie);
+                    var errors = string.Join("<br/>", ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+                    TempData["Error"] = $"Validation failed:<br/>{errors}";
+                    return View(_viewPath + "Edit.cshtml", movie);
                 }
 
-                // Get existing movie to preserve some fields
-                var existingMovie = await _context.Movies.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
+                var existingMovie = await _context.Movies
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.Id == id);
+
                 if (existingMovie == null)
                 {
-                    TempData["Error"] = $"❌ Movie with ID {id} not found.";
+                    TempData["Error"] = $"Movie with ID {id} not found.";
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Handle file upload if provided
-                if (ThumbnailFile != null && ThumbnailFile.Length > 0)
-                {
-                    try
-                    {
-                        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "movies");
-                        Directory.CreateDirectory(uploadsFolder);
+                if (thumbnailFile != null)
+                    movie.ThumbnailUrl = await UploadFile(thumbnailFile, "movies");
 
-                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ThumbnailFile.FileName;
-                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await ThumbnailFile.CopyToAsync(fileStream);
-                        }
-
-                        movie.ThumbnailUrl = "/uploads/movies/" + uniqueFileName;
-                    }
-                    catch (Exception ex)
-                    {
-                        TempData["Error"] = $"Error uploading file: {ex.Message}";
-                        return View("~/Views/Admin/Movies/Edit.cshtml", movie);
-                    }
-                }
-
+                movie.CreatedAt = existingMovie.CreatedAt;
+                movie.ViewsCount = existingMovie.ViewsCount;
                 movie.UpdatedAt = DateTime.Now;
-                movie.CreatedAt = existingMovie.CreatedAt; // Preserve original creation date
-                movie.ViewsCount = existingMovie.ViewsCount; // Preserve view count
 
                 _context.Update(movie);
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
-                    TempData["Success"] = $"✅ Movie '{movie.Title}' updated successfully!";
+                    TempData["Success"] = $"Movie '{movie.Title}' updated successfully!";
+                    return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    TempData["Error"] = "❌ No changes were saved to the database.";
-                }
+
+                TempData["Error"] = "No changes were saved.";
+                return View(_viewPath + "Edit.cshtml", movie);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Movies.Any(m => m.Id == movie.Id))
+                if (!await _context.Movies.AnyAsync(m => m.Id == movie.Id))
                 {
-                    TempData["Error"] = $"❌ Movie with ID {movie.Id} no longer exists.";
+                    TempData["Error"] = $"Movie with ID {movie.Id} no longer exists.";
+                    return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    TempData["Error"] = "❌ Concurrency error. Please try again.";
-                }
-                return RedirectToAction(nameof(Index));
+                throw;
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"❌ Error: {ex.Message}";
-                return View("~/Views/Admin/Movies/Edit.cshtml", movie);
+                TempData["Error"] = $"Error: {ex.Message}";
+                return View(_viewPath + "Edit.cshtml", movie);
             }
-
-            return RedirectToAction(nameof(Index));
         }
 
-        // GET: AdminMovies/Delete/5
+        [HttpGet("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var movie = await _context.Movies.FindAsync(id);
             if (movie == null)
             {
-                TempData["Error"] = $"❌ Movie with ID {id} not found.";
+                TempData["Error"] = $"Movie with ID {id} not found.";
                 return RedirectToAction(nameof(Index));
             }
-            return View("~/Views/Admin/Movies/Delete.cshtml", movie);
+            return View(_viewPath + "Delete.cshtml", movie);
         }
 
-        // POST: AdminMovies/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -242,64 +170,89 @@ namespace MovieMania.Controllers.Admin
                 var movie = await _context.Movies.FindAsync(id);
                 if (movie == null)
                 {
-                    TempData["Error"] = $"❌ Movie with ID {id} not found.";
+                    TempData["Error"] = $"Movie with ID {id} not found.";
                     return RedirectToAction(nameof(Index));
                 }
 
                 _context.Movies.Remove(movie);
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
-                {
-                    TempData["Success"] = $"✅ Movie '{movie.Title}' deleted successfully!";
-                }
+                    TempData["Success"] = $"Movie '{movie.Title}' deleted successfully!";
                 else
-                {
-                    TempData["Error"] = "❌ Movie was not deleted from database.";
-                }
+                    TempData["Error"] = "Movie was not deleted.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"❌ Error deleting movie: {ex.Message}";
+                TempData["Error"] = $"Error deleting movie: {ex.Message}";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: AdminMovies/ToggleStatus/5
-        [HttpPost]
+        [HttpPost("ToggleStatus/{id}")]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             try
             {
                 var movie = await _context.Movies.FindAsync(id);
                 if (movie == null)
-                {
-                    TempData["Error"] = $"❌ Movie with ID {id} not found.";
-                    return RedirectToAction(nameof(Index));
-                }
+                    return Json(new { success = false, message = "Movie not found" });
 
                 movie.IsActive = !movie.IsActive;
                 movie.UpdatedAt = DateTime.Now;
 
-                int result = await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
-                    string status = movie.IsActive ? "activated" : "deactivated";
-                    TempData["Success"] = $"✅ Movie '{movie.Title}' {status} successfully!";
+                    var status = movie.IsActive ? "activated" : "deactivated";
+                    return Json(new
+                    {
+                        success = true,
+                        message = $"Movie '{movie.Title}' {status} successfully!",
+                        isActive = movie.IsActive
+                    });
                 }
-                else
-                {
-                    TempData["Error"] = "❌ Status change failed.";
-                }
+
+                return Json(new { success = false, message = "No changes were saved." });
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"❌ Error: {ex.Message}";
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var movie = await _context.Movies
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (movie == null)
+            {
+                TempData["Error"] = $"Movie with ID {id} not found.";
+                return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
+            return View(_viewPath + "Details.cshtml", movie);
+        }
+
+        private async Task<string?> UploadFile(IFormFile? file, string subFolder)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", subFolder);
+            Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            await file.CopyToAsync(fileStream);
+
+            return $"/uploads/{subFolder}/{uniqueFileName}";
         }
     }
 }

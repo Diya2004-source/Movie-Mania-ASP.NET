@@ -1,14 +1,16 @@
-﻿// Controllers/User/PaymentController.cs
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
-using MovieMania.ViewModels;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
 
 namespace MovieMania.Controllers.User
 {
     [Authorize(Roles = "user")]
+    [Route("User/[controller]")]
     public class PaymentController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,111 +20,119 @@ namespace MovieMania.Controllers.User
             _context = context;
         }
 
-        // GET: User/Payment/Checkout
-        public async Task<IActionResult> Checkout(int? subscriptionId)
+        [HttpGet("history")]
+        public async Task<IActionResult> History()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Unauthorized();
-            }
-            var userId = int.Parse(userIdClaim);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return RedirectToAction("Login", "Auth", new { area = "Guest" });
 
-            if (subscriptionId.HasValue)
-            {
-                var subscription = await _context.UserSubscriptions
-                    .Include(us => us.SubscriptionPlan)
-                    .FirstOrDefaultAsync(us => us.Id == subscriptionId && us.UserId == userId);
+            var userId = int.Parse(userIdClaim.Value);
 
-                if (subscription == null)
-                {
-                    return NotFound();
-                }
+            var payments = await _context.Payments
+                .Include(p => p.SubscriptionPlan)
+                .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.PaymentDate)
+                .ToListAsync();
 
-                var viewModel = new CheckoutViewModel
-                {
-                    SubscriptionId = subscription.Id,
-                    PlanName = subscription.SubscriptionPlan?.Name ?? "Unknown Plan",
-                    Amount = subscription.SubscriptionPlan?.Price ?? 0,
-                    UserEmail = User.FindFirstValue(ClaimTypes.Email) ?? "",
-                    UserName = User.FindFirstValue(ClaimTypes.Name) ?? ""
-                };
-
-                return View(viewModel);
-            }
-
-            return RedirectToAction("Subscription", "Profile");
+            return View("~/Views/User/Payment/History.cshtml", payments);
         }
 
-        // POST: User/Payment/Process
-        [HttpPost]
-        public async Task<IActionResult> Process([FromBody] PaymentProcessViewModel model)
+        [HttpGet("process")]
+        public async Task<IActionResult> Process(int planId)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Json(new { success = false, message = "User not authenticated" });
-            }
-            var userId = int.Parse(userIdClaim);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return RedirectToAction("Login", "Auth", new { area = "Guest" });
 
-            if (!IsValidPaymentMethod(model))
-            {
-                return Json(new { success = false, message = "Invalid payment details" });
-            }
+            var userId = int.Parse(userIdClaim.Value);
+            var plan = await _context.SubscriptionPlans.FindAsync(planId);
 
-            var subscription = await _context.UserSubscriptions
-                .Include(us => us.SubscriptionPlan)
-                .FirstOrDefaultAsync(us => us.Id == model.SubscriptionId && us.UserId == userId);
+            if (plan == null)
+                return NotFound();
 
-            if (subscription == null)
-            {
-                return Json(new { success = false, message = "Subscription not found" });
-            }
+            // Check if user already has active subscription
+            var existingSubscription = await _context.UserSubscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive);
 
-            var paymentSuccess = await ProcessPaymentWithGateway(model);
+            ViewBag.ExistingSubscription = existingSubscription;
+            ViewBag.Plan = plan;
 
-            if (!paymentSuccess)
-            {
-                return Json(new { success = false, message = "Payment failed. Please try again." });
-            }
+            return View("~/Views/User/Payment/Process.cshtml");
+        }
 
+        [HttpPost("complete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Complete(int planId, string paymentMethod)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Json(new { success = false, message = "User not logged in" });
+
+            var userId = int.Parse(userIdClaim.Value);
+            var plan = await _context.SubscriptionPlans.FindAsync(planId);
+
+            if (plan == null)
+                return Json(new { success = false, message = "Plan not found" });
+
+            // Create payment record
             var payment = new Payment
             {
                 UserId = userId,
-                SubscriptionPlanId = subscription.SubscriptionPlanId,
-                Amount = subscription.SubscriptionPlan?.Price ?? 0,
+                SubscriptionPlanId = planId,
+                Amount = plan.Price,
+                PaymentMethod = paymentMethod,
                 PaymentDate = DateTime.Now,
-                PaymentMethod = model.PaymentMethod,
-                TransactionId = GenerateTransactionId(),
-                Status = "Completed",
-                PaymentDetails = System.Text.Json.JsonSerializer.Serialize(model)
+                Status = "completed",
+                TransactionId = Guid.NewGuid().ToString(),
+                PaymentDetails = $"Payment for {plan.Name} plan",
+                CreatedAt = DateTime.Now
             };
 
             _context.Payments.Add(payment);
 
-            subscription.PaymentStatus = "Paid";
-            subscription.Status = "Active";
-            subscription.PaymentReference = payment.TransactionId;
+            // Deactivate old active subscription if exists
+            var existingSubscription = await _context.UserSubscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive);
 
+            if (existingSubscription != null)
+            {
+                existingSubscription.IsActive = false;
+            }
+
+            // Create new subscription
+            var subscription = new UserSubscription
+            {
+                UserId = userId,
+                PlanId = planId,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(plan.DurationInDays),
+                IsActive = true,
+                PaymentStatus = "paid",
+                CreatedAt = DateTime.Now
+            };
+
+            _context.UserSubscriptions.Add(subscription);
             await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Payment successful! Your subscription is now active.";
 
             return Json(new
             {
                 success = true,
-                message = "Payment successful! 🎉",
-                redirectUrl = Url.Action("Confirmation", new { id = payment.Id })
+                message = "Payment successful! Subscription activated.",
+                redirectUrl = Url.Action("Index", "Home")
             });
         }
 
-        // GET: User/Payment/Confirmation/5
-        public async Task<IActionResult> Confirmation(int id)
+        [HttpGet("invoice/{id}")]
+        public async Task<IActionResult> Invoice(int id)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Unauthorized();
-            }
-            var userId = int.Parse(userIdClaim);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return RedirectToAction("Login", "Auth", new { area = "Guest" });
+
+            var userId = int.Parse(userIdClaim.Value);
 
             var payment = await _context.Payments
                 .Include(p => p.SubscriptionPlan)
@@ -130,76 +140,9 @@ namespace MovieMania.Controllers.User
                 .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
 
             if (payment == null)
-            {
                 return NotFound();
-            }
 
-            return View(payment);
-        }
-
-        // GET: User/Payment/History
-        public async Task<IActionResult> History(int page = 1)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                return Unauthorized();
-            }
-            var userId = int.Parse(userIdClaim);
-
-            int pageSize = 10;
-
-            var query = _context.Payments
-                .Include(p => p.SubscriptionPlan)
-                .Where(p => p.UserId == userId)
-                .OrderByDescending(p => p.PaymentDate);
-
-            var totalItems = await query.CountAsync();
-            var payments = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            return View(payments);
-        }
-
-        // Helper methods
-        private bool IsValidPaymentMethod(PaymentProcessViewModel model)
-        {
-            if (string.IsNullOrEmpty(model.PaymentMethod))
-                return false;
-
-            return model.PaymentMethod.ToLower() switch
-            {
-                "card" => !string.IsNullOrEmpty(model.CardNumber) &&
-                          model.CardNumber.Length >= 15 &&
-                          !string.IsNullOrEmpty(model.CardExpiry) &&
-                          !string.IsNullOrEmpty(model.CardCvv) &&
-                          model.CardCvv.Length >= 3,
-
-                "upi" => !string.IsNullOrEmpty(model.UpiId) &&
-                         model.UpiId.Contains("@"),
-
-                "netbanking" => !string.IsNullOrEmpty(model.BankName) &&
-                                !string.IsNullOrEmpty(model.AccountNumber),
-
-                _ => false
-            };
-        }
-
-        private async Task<bool> ProcessPaymentWithGateway(PaymentProcessViewModel model)
-        {
-            await Task.Delay(2000);
-            return new Random().Next(1, 100) <= 90;
-        }
-
-        private string GenerateTransactionId()
-        {
-            return "TXN" + DateTime.Now.Ticks.ToString() +
-                   new Random().Next(1000, 9999).ToString();
+            return View("~/Views/User/Payment/Invoice.cshtml", payment);
         }
     }
 }

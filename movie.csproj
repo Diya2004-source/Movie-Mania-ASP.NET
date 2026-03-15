@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Admin\Anime\Create.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="obj\Debug\" />
     <Folder Include="Services\" />
     <Folder Include="Views\Admin\AdminAuth\" />
@@ -15,6 +19,10 @@
     <Folder Include="wwwroot\images\users\" />
     <Folder Include="wwwroot\images\offers\" />
     <Folder Include="wwwroot\videos\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Admin\Anime\Create.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

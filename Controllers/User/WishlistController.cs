@@ -2,13 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
-using MovieMania.ViewModels;
 using System.Security.Claims;
 
 namespace MovieMania.Controllers.User
 {
     [Authorize(Roles = "user")]
-    [Area("User")]
     public class WishlistController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,14 +16,31 @@ namespace MovieMania.Controllers.User
             _context = context;
         }
 
+        // Helper method to get current user ID
+        private int? GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
         // GET: User/Wishlist
         public async Task<IActionResult> Index(string filter = "all", int page = 1)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            // Use the helper method to get user ID
+            var userId = GetCurrentUserId();
+
             if (userId == null)
             {
-                return RedirectToAction("Login", "Auth", new { area = "" });
+                // Log for debugging
+                Console.WriteLine("Wishlist Index: No UserId found, redirecting to login");
+                return RedirectToAction("Login", "Auth", new { area = "Guest" });
             }
+
+            Console.WriteLine($"Wishlist Index: UserId {userId} found");
 
             int pageSize = 20;
 
@@ -35,16 +50,30 @@ namespace MovieMania.Controllers.User
                 .Where(w => w.UserId == userId && w.IsActive);
 
             // Apply filters
-            query = filter switch
+            switch (filter)
             {
-                "movies" => query.Where(w => w.ItemType == "Movie"),
-                "shows" => query.Where(w => w.ItemType == "Show"),
-                "anime" => query.Where(w => w.ItemType == "Show" && w.Show.Genre == "Anime"),
-                "watched" => query.Where(w => w.IsWatched),
-                "unwatched" => query.Where(w => !w.IsWatched),
-                "high" => query.Where(w => w.Priority == 1 && !w.IsWatched),
-                _ => query
-            };
+                case "movies":
+                    query = query.Where(w => w.ItemType == "Movie");
+                    break;
+                case "shows":
+                    query = query.Where(w => w.ItemType == "Show" && w.Show.Genre != "Anime");
+                    break;
+                case "anime":
+                    query = query.Where(w => w.ItemType == "Show" && w.Show.Genre == "Anime");
+                    break;
+                case "watched":
+                    query = query.Where(w => w.IsWatched);
+                    break;
+                case "unwatched":
+                    query = query.Where(w => !w.IsWatched);
+                    break;
+                case "high":
+                    query = query.Where(w => w.Priority == 1 && !w.IsWatched);
+                    break;
+                default:
+                    // all - no filter
+                    break;
+            }
 
             // Sorting
             query = query.OrderByDescending(w => w.Priority)
@@ -74,17 +103,18 @@ namespace MovieMania.Controllers.User
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
             ViewBag.Stats = stats;
 
-            return View(wishlist);
+            return View("~/Views/User/Wishlist/Index.cshtml", wishlist);
         }
 
         // POST: User/Wishlist/Add
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int? movieId, int? showId, int priority = 1, string notes = "")
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            var userId = GetCurrentUserId();
             if (userId == null)
             {
-                return Json(new { success = false, message = "Please login first" });
+                return Json(new { success = false, message = "Please login first", redirect = "/Auth/Login" });
             }
 
             if (!movieId.HasValue && !showId.HasValue)
@@ -147,44 +177,45 @@ namespace MovieMania.Controllers.User
             });
         }
 
-        // POST: User/Wishlist/Update
+        // POST: User/Wishlist/Remove
         [HttpPost]
-        public async Task<IActionResult> Update([FromBody] WishlistUpdateViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remove(int id)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            var userId = GetCurrentUserId();
             if (userId == null)
             {
                 return Json(new { success = false, message = "Please login first" });
             }
 
             var wishlist = await _context.Wishlists
-                .FirstOrDefaultAsync(w => w.Id == model.Id && w.UserId == userId);
+                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
 
             if (wishlist == null)
             {
                 return Json(new { success = false, message = "Item not found" });
             }
 
-            if (model.Priority.HasValue)
-                wishlist.Priority = model.Priority.Value;
-
-            if (model.Notes != null)
-                wishlist.Notes = model.Notes;
-
-            if (model.NotificationEnabled.HasValue)
-                wishlist.NotificationEnabled = model.NotificationEnabled.Value;
-
+            wishlist.IsActive = false;
             wishlist.UpdatedDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = "Updated successfully" });
+            var newCount = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.IsActive);
+
+            return Json(new
+            {
+                success = true,
+                message = "Removed from wishlist",
+                count = newCount
+            });
         }
 
         // POST: User/Wishlist/MarkAsWatched
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsWatched(int id, decimal? rating = null)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            var userId = GetCurrentUserId();
             if (userId == null)
             {
                 return Json(new { success = false, message = "Please login first" });
@@ -224,73 +255,13 @@ namespace MovieMania.Controllers.User
 
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = "Marked as watched! 🎉" });
-        }
-
-        // POST: User/Wishlist/Remove
-        [HttpPost]
-        public async Task<IActionResult> Remove(int id)
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                return Json(new { success = false, message = "Please login first" });
-            }
-
-            var wishlist = await _context.Wishlists
-                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
-
-            if (wishlist == null)
-            {
-                return Json(new { success = false, message = "Item not found" });
-            }
-
-            wishlist.IsActive = false;
-            wishlist.UpdatedDate = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            return Json(new
-            {
-                success = true,
-                message = "Removed from wishlist",
-                count = await _context.Wishlists.CountAsync(w => w.UserId == userId && w.IsActive)
-            });
-        }
-
-        // POST: User/Wishlist/TogglePriority
-        [HttpPost]
-        public async Task<IActionResult> TogglePriority(int id)
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                return Json(new { success = false, message = "Please login first" });
-            }
-
-            var wishlist = await _context.Wishlists
-                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
-
-            if (wishlist == null)
-            {
-                return Json(new { success = false, message = "Item not found" });
-            }
-
-            wishlist.Priority = wishlist.Priority == 1 ? 2 : 1;
-            wishlist.UpdatedDate = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            return Json(new
-            {
-                success = true,
-                priority = wishlist.Priority,
-                message = wishlist.Priority == 1 ? "Marked as high priority" : "Marked as normal priority"
-            });
+            return Json(new { success = true, message = "Marked as watched!" });
         }
 
         // GET: User/Wishlist/GetWishlistCount
         public async Task<IActionResult> GetWishlistCount()
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            var userId = GetCurrentUserId();
             if (userId == null)
             {
                 return Json(0);
@@ -299,6 +270,20 @@ namespace MovieMania.Controllers.User
             var count = await _context.Wishlists
                 .CountAsync(w => w.UserId == userId && w.IsActive);
             return Json(count);
+        }
+
+        // Test method to check session
+        public IActionResult TestSession()
+        {
+            var userId = GetCurrentUserId();
+            var userName = User.Identity?.Name ?? "Unknown";
+
+            if (userId == null)
+            {
+                return Content("❌ No user logged in");
+            }
+
+            return Content($"✅ Logged in! UserId: {userId}, UserName: {userName}");
         }
     }
 }

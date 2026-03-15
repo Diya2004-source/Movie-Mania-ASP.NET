@@ -11,7 +11,7 @@
             <h2 class="fw-bold text-light">
                 <i class="fas fa-receipt me-2 text-primary"></i>Payment Details
             </h2>
-            <span class="badge @(Model.Status == "Completed" ? "bg-success" : Model.Status == "Pending" ? "bg-warning" : "bg-secondary") p-3">
+            <span class="badge @(Model.Status == "completed" ? "bg-success" : Model.Status == "pending" ? "bg-warning" : "bg-secondary") p-3">
                 @Model.Status
             </span>
         </div>
@@ -43,7 +43,7 @@
                     <table class="table table-dark table-borderless">
                         <tr>
                             <th class="text-muted" style="width: 140px;">Amount:</th>
-                            <td class="fw-bold text-success fs-5">$@Model.Amount.ToString("N2")</td>
+                            <td class="fw-bold text-success fs-5">₹ @Model.Amount.ToString("N2")</td>
                         </tr>
                         <tr>
                             <th class="text-muted">Payment Method:</th>
@@ -122,30 +122,45 @@
                         <tr>
                             <th class="text-muted">Status:</th>
                             <td>
-                                @if (Model.Status == "Completed")
+                                @if (Model.Status == "completed")
                                 {
                                     <span class="badge bg-success">Completed</span>
                                 }
-                                else if (Model.Status == "Pending")
+                                else if (Model.Status == "pending")
                                 {
                                     <span class="badge bg-warning">Pending</span>
                                 }
-                                else if (Model.Status == "Failed")
+                                else if (Model.Status == "failed")
                                 {
                                     <span class="badge bg-danger">Failed</span>
                                 }
-                                else if (Model.Status == "Refunded")
+                                else if (Model.Status == "refunded")
                                 {
                                     <span class="badge bg-secondary">Refunded</span>
                                 }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Model.Status</span>
+                                }
                             </td>
                         </tr>
+                        <tr>
+                            <th class="text-muted">Created At:</th>
+                            <td class="text-white">@Model.CreatedAt.ToString("dd MMM yyyy HH:mm:ss")</td>
+                        </tr>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <tr>
+                                <th class="text-muted">Updated At:</th>
+                                <td class="text-white">@Model.UpdatedAt.Value.ToString("dd MMM yyyy HH:mm:ss")</td>
+                            </tr>
+                        }
                         <tr>
                             <th class="text-muted">Payment Details:</th>
                             <td>
                                 @if (!string.IsNullOrEmpty(Model.PaymentDetails))
                                 {
-                                    <pre class="text-muted small">@Model.PaymentDetails</pre>
+                                    <pre class="text-muted small" style="white-space: pre-wrap; max-width: 300px;">@Model.PaymentDetails</pre>
                                 }
                                 else
                                 {
@@ -185,14 +200,41 @@
     .info-section {
         background: #2a2a2a;
         border-radius: 8px;
+        transition: transform 0.2s;
     }
+
+        .info-section:hover {
+            transform: translateY(-2px);
+        }
 
     .table-dark {
         --bs-table-bg: transparent;
     }
 
+    .table th {
+        font-weight: 500;
+        color: #aaa;
+    }
+
+    .table td {
+        color: white;
+    }
+
     .badge {
         font-size: 0.9rem;
         padding: 8px 15px;
+    }
+
+    pre {
+        background: #1c1c1c;
+        padding: 10px;
+        border-radius: 5px;
+        border-left: 3px solid #4A80F0;
+    }
+
+    code {
+        background: #1c1c1c;
+        padding: 3px 6px;
+        border-radius: 4px;
     }
 </style>

@@ -13,39 +13,34 @@ namespace MovieMania.Models
         [Required]
         public int UserId { get; set; }
 
-        public int? SubscriptionPlanId { get; set; }
-
         [Required]
+        public int SubscriptionPlanId { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
-        [Range(0.01, 9999.99, ErrorMessage = "Amount must be between 0.01 and 9999.99")]
-        [Display(Name = "Amount")]
         public decimal Amount { get; set; }
 
-        [Display(Name = "Payment Date")]
-        [DataType(DataType.DateTime)]
-        public DateTime PaymentDate { get; set; } = DateTime.Now;
-
         [StringLength(50)]
-        [Display(Name = "Payment Method")]
-        public string? PaymentMethod { get; set; }
+        public string? PaymentMethod { get; set; }  // Make nullable
+
+        public DateTime PaymentDate { get; set; }
+
+        [StringLength(20)]
+        public string? Status { get; set; }  // Make nullable
 
         [StringLength(100)]
-        [Display(Name = "Transaction ID")]
-        public string? TransactionId { get; set; }
+        public string? TransactionId { get; set; }  // Make nullable
 
-        [Required]
-        [StringLength(20)]
-        [Display(Name = "Status")]
-        public string Status { get; set; } = "Pending";
+        [StringLength(500)]
+        public string? PaymentDetails { get; set; }  // ADD THIS - for admin details view
 
-        [Display(Name = "Payment Details")]
-        public string? PaymentDetails { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-        // Navigation Properties
+        // Navigation properties
         [ForeignKey("UserId")]
-        public virtual AppUser? User { get; set; }
+        public virtual AppUser? User { get; set; }  // Make nullable
 
         [ForeignKey("SubscriptionPlanId")]
-        public virtual SubscriptionPlan? SubscriptionPlan { get; set; }
+        public virtual SubscriptionPlan? SubscriptionPlan { get; set; }  // Make nullable
     }
 }

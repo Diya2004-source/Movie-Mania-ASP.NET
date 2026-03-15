@@ -1,615 +1,208 @@
 ﻿@model IEnumerable<MovieMania.Models.Movie>
 
 @{
-    ViewData["Title"] = "Browse Movies";
-    Layout = "_UserLayout";
+    ViewData["Title"] = "Movies";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
-<div class="movies-page">
-    <!-- Hero Banner -->
-    <section class="page-hero mb-5">
-        <div class="container">
-            <div class="hero-content text-center">
-                <h1 class="hero-title">Discover Movies</h1>
-                <p class="hero-subtitle">Explore our collection of thousands of movies</p>
-                <div class="hero-stats">
-                    <span class="stat-badge">
-                        <i class="fas fa-film"></i> @Model.Count()+ Movies
-                    </span>
-                    <span class="stat-badge">
-                        <i class="fas fa-star text-warning"></i> Top Rated
-                    </span>
-                    <span class="stat-badge">
-                        <i class="fas fa-clock"></i> New Releases Daily
-                    </span>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="browse-header">
+    <div class="container-fluid px-4">
+        <h1 class="page-title">Movies</h1>
+        <p class="page-subtitle">Explore our collection of thousands of movies</p>
 
-    <!-- Filters Section -->
-    <section class="filters-section mb-5">
-        <div class="container">
-            <div class="filters-wrapper">
-                <form method="get" class="row g-3 align-items-end" id="filterForm">
-                    <!-- Search Bar -->
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label text-muted mb-2">
-                            <i class="fas fa-search me-2"></i>Search Movies
-                        </label>
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="form-control" name="search" 
-                                   value="@ViewBag.Search" 
-                                   placeholder="Search by title, cast, director..."
-                                   id="searchInput">
-                            @if (!string.IsNullOrEmpty(ViewBag.Search))
+        <div class="filter-bar">
+            <form method="get" class="filter-form">
+                <div class="filter-group">
+                    <label>Genre</label>
+                    <select name="genre" class="filter-select">
+                        <option value="All">All Genres</option>
+                        @if (ViewBag.Genres != null)
+                        {
+                            var genres = ViewBag.Genres as List<string>;
+                            if (genres != null)
                             {
-                                <a href="@Url.Action("Movies")" class="clear-search">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Genre Filter -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label text-muted mb-2">
-                            <i class="fas fa-tag me-2"></i>Genre
-                        </label>
-                        <div class="filter-select">
-                            <i class="fas fa-chevron-down select-arrow"></i>
-                            <select class="form-select" name="genre" id="genreSelect">
-                                <option value="All">All Genres</option>
-                                @if (ViewBag.Genres != null)
+                                foreach (var genre in genres)
                                 {
-                                    @foreach (var genre in ViewBag.Genres)
-                                    {
-                                        <option value="@genre" selected="@(genre == ViewBag.Genre)">
-                                            @genre
-                                        </option>
-                                    }
+                                    <option value="@genre" selected="@(genre == ViewBag.CurrentGenre)">@genre</option>
                                 }
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Sort By -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label text-muted mb-2">
-                            <i class="fas fa-sort me-2"></i>Sort By
-                        </label>
-                        <div class="filter-select">
-                            <i class="fas fa-chevron-down select-arrow"></i>
-                            <select class="form-select" name="sortBy" id="sortSelect">
-                                <option value="latest" selected="@(ViewBag.SortBy == "latest")">Latest First</option>
-                                <option value="rating" selected="@(ViewBag.SortBy == "rating")">Top Rated</option>
-                                <option value="year" selected="@(ViewBag.SortBy == "year")">Release Year</option>
-                                <option value="title" selected="@(ViewBag.SortBy == "title")">Title A-Z</option>
-                                <option value="views" selected="@(ViewBag.SortBy == "views")">Most Viewed</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Apply Button -->
-                    <div class="col-lg-2 col-md-6">
-                        <button type="submit" class="btn-apply w-100">
-                            <i class="fas fa-filter me-2"></i>Apply
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Active Filters -->
-                @if (!string.IsNullOrEmpty(ViewBag.Search) || (!string.IsNullOrEmpty(ViewBag.Genre) && ViewBag.Genre != "All"))
-                {
-                    <div class="active-filters mt-4">
-                        <span class="filters-label">Active Filters:</span>
-                        @if (!string.IsNullOrEmpty(ViewBag.Search))
-                        {
-                            <span class="filter-tag">
-                                <i class="fas fa-search me-1"></i>
-                                "@ViewBag.Search"
-                                <a href="@Url.Action("Movies", new { genre = ViewBag.Genre, sortBy = ViewBag.SortBy })" class="remove-filter">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            </span>
+                            }
                         }
-                        @if (!string.IsNullOrEmpty(ViewBag.Genre) && ViewBag.Genre != "All")
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select name="sortBy" class="filter-select">
+                        <option value="latest" selected="@(ViewBag.CurrentSort == "latest")">Latest First</option>
+                        <option value="rating" selected="@(ViewBag.CurrentSort == "rating")">Top Rated</option>
+                        <option value="views" selected="@(ViewBag.CurrentSort == "views")">Most Viewed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="filter-btn">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="results-count">
+            Showing @Model.Count() of @(ViewBag.TotalItems != null ? ViewBag.TotalItems.ToString() : "0") movies
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+    <div class="movies-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var movie in Model)
+            {
+                <div class="movie-card" onclick="location.href='/User/Home/MovieDetails/@movie.Id'">
+                    <div class="movie-poster">
+                        <img src="@(movie.ThumbnailUrl ?? "/images/default-movie.jpg")" alt="@movie.Title">
+                        @if (movie.Rating > 0)
                         {
-                            <span class="filter-tag">
-                                <i class="fas fa-tag me-1"></i>
-                                @ViewBag.Genre
-                                <a href="@Url.Action("Movies", new { search = ViewBag.Search, sortBy = ViewBag.SortBy })" class="remove-filter">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            </span>
-                        }
-                        <a href="@Url.Action("Movies")" class="clear-all">
-                            <i class="fas fa-undo-alt me-1"></i>Clear All
-                        </a>
-                    </div>
-                }
-            </div>
-        </div>
-    </section>
-
-    <!-- Results Info -->
-    <section class="results-section mb-4">
-        <div class="container">
-            <div class="results-info">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <p class="mb-0">
-                            <i class="fas fa-film me-2 text-primary"></i>
-                            Showing <strong>@Model.Count()</strong> of <strong>@ViewBag.TotalItems</strong> movies
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <div class="view-options">
-                            <button class="view-option active" data-view="grid">
-                                <i class="fas fa-th"></i>
-                            </button>
-                            <button class="view-option" data-view="list">
-                                <i class="fas fa-list"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Movies Grid -->
-    <section class="movies-grid-section mb-5">
-        <div class="container">
-            @if (!Model.Any())
-            {
-                <div class="no-results">
-                    <div class="no-results-content">
-                        <i class="fas fa-film fa-4x mb-3"></i>
-                        <h3>No Movies Found</h3>
-                        <p>We couldn't find any movies matching your criteria.</p>
-                        <div class="suggestions">
-                            <h5>Suggestions:</h5>
-                            <ul>
-                                <li>Check your spelling</li>
-                                <li>Try more general keywords</li>
-                                <li>Try different genre</li>
-                                <li>Browse all movies</li>
-                            </ul>
-                        </div>
-                        <a href="@Url.Action("Movies")" class="btn-clear">
-                            <i class="fas fa-undo me-2"></i>Clear Filters
-                        </a>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="movies-grid" id="moviesGrid">
-                    @foreach (var movie in Model)
-                    {
-                        <div class="movie-card-wrapper" data-aos="fade-up" data-aos-delay="@(movie.Id * 20)">
-                            <div class="movie-card">
-                                <div class="movie-poster">
-                                    <img src="@(movie.ThumbnailUrl ?? "/images/default-movie.jpg")" 
-                                         alt="@movie.Title"
-                                         loading="lazy">
-                                    
-                                    @if (movie.Rating.HasValue)
-                                    {
-                                        <div class="movie-rating">
-                                            <i class="fas fa-star"></i>
-                                            <span>@movie.Rating.Value.ToString("F1")</span>
-                                        </div>
-                                    }
-
-                                    @if (movie.IsFeatured)
-                                    {
-                                        <div class="movie-featured">
-                                            <i class="fas fa-crown"></i>
-                                        </div>
-                                    }
-
-                                    @if (!string.IsNullOrEmpty(movie.VideoUrl))
-                                    {
-                                        <div class="movie-badge watch-badge">
-                                            <i class="fas fa-play"></i> Available
-                                        </div>
-                                    }
-
-                                    <div class="movie-overlay">
-                                        <div class="overlay-content">
-                                            <a href="@Url.Action("MovieDetails", new { id = movie.Id })" 
-                                               class="btn-details">
-                                                <i class="fas fa-info-circle"></i>
-                                                <span>Details</span>
-                                            </a>
-                                            <button class="btn-wishlist" onclick="toggleWishlist(@movie.Id, 'movie')" 
-                                                    data-movie-id="@movie.Id">
-                                                <i class="fas fa-heart"></i>
-                                                <span>Wishlist</span>
-                                            </button>
-                                            @if (!string.IsNullOrEmpty(movie.TrailerUrl))
-                                            {
-                                                <a href="@movie.TrailerUrl" target="_blank" class="btn-trailer">
-                                                    <i class="fab fa-youtube"></i>
-                                                </a>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="movie-info">
-                                    <h6 class="movie-title">@movie.Title</h6>
-                                    <div class="movie-meta">
-                                        <span class="genre">@movie.Genre</span>
-                                        <span class="year">@movie.ReleaseYear</span>
-                                    </div>
-                                    @if (!string.IsNullOrEmpty(movie.Director))
-                                    {
-                                        <div class="movie-director">
-                                            <i class="fas fa-user-tie"></i> @movie.Director
-                                        </div>
-                                    }
-                                    <div class="movie-stats">
-                                        <span class="views">
-                                            <i class="fas fa-eye"></i> @movie.ViewsCount
-                                        </span>
-                                        @if (movie.Duration.HasValue)
-                                        {
-                                            <span class="duration">
-                                                <i class="far fa-clock"></i> @movie.Duration min
-                                            </span>
-                                        }
-                                    </div>
-                                </div>
+                            <div class="movie-rating">
+                                <i class="fas fa-star"></i>
+                                <span>@string.Format("{0:F1}", movie.Rating)</span>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
+                    <div class="movie-info">
+                        <h4 class="movie-title">@movie.Title</h4>
+                        <p class="movie-meta">
+                            @(movie.Genre ?? "General") ·
+                            @if (movie.ReleaseYear.HasValue)
+                            {
+                                @movie.ReleaseYear.Value.ToString()
+                            }
+                            else
+                            {
+                                @:2026
+                            }
+                        </p>
+                        <button class="watch-btn" onclick="location.href='/User/Home/MovieDetails/@movie.Id'">Watch Now</button>
+                    </div>
                 </div>
             }
-        </div>
-    </section>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-film"></i>
+                <h3>No movies found</h3>
+                <p>Try adjusting your filters</p>
+            </div>
+        }
+    </div>
 
     <!-- Pagination -->
-    @if (ViewBag.TotalPages > 1)
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
     {
-        <section class="pagination-section">
-            <div class="container">
-                <nav aria-label="Movies pagination">
-                    <ul class="pagination">
-                        @if (ViewBag.CurrentPage > 1)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Movies", new { 
-                                    page = ViewBag.CurrentPage - 1, 
-                                    search = ViewBag.Search, 
-                                    genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy
-                                })">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        }
-
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Movies", new { 
-                                    page = i, 
-                                    search = ViewBag.Search, 
-                                    genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy
-                                })">@i</a>
-                            </li>
-                        }
-
-                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Movies", new { 
-                                    page = ViewBag.CurrentPage + 1, 
-                                    search = ViewBag.Search, 
-                                    genre = ViewBag.Genre,
-                                    sortBy = ViewBag.SortBy
-                                })">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            </div>
-        </section>
+        <nav class="pagination-nav">
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Movies", new { page = i, genre = ViewBag.CurrentGenre, sortBy = ViewBag.CurrentSort })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
     }
 </div>
 
-<!-- Custom CSS -->
 <style>
-    /* Page Hero */
-    .page-hero {
-        background: linear-gradient(135deg, #0a0c0f 0%, #1a1a1a 100%);
-        padding: 80px 0;
-        position: relative;
-        overflow: hidden;
+    .browse-header {
+        background: linear-gradient(180deg, #141414 0%, #1a1a1a 100%);
+        padding: 40px 0 20px;
+        border-bottom: 1px solid #333;
     }
 
-    .page-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><circle cx="50" cy="50" r="40" fill="none" stroke="%23ff4d4d" stroke-width="2"/></svg>') repeat;
-        animation: rotate 60s linear infinite;
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 5px;
     }
 
-    .hero-title {
-        font-size: 4rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #fff, #ff4d4d);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 15px;
-        animation: fadeInUp 0.8s ease;
+    .page-subtitle {
+        color: #b3b3b3;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
     }
 
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: #9ca3af;
-        margin-bottom: 25px;
-        animation: fadeInUp 1s ease;
+    .filter-bar {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
     }
 
-    .hero-stats {
+    .filter-form {
         display: flex;
         gap: 20px;
-        justify-content: center;
+        align-items: flex-end;
         flex-wrap: wrap;
-        animation: fadeInUp 1.2s ease;
     }
 
-    .stat-badge {
-        background: rgba(255,255,255,0.05);
-        backdrop-filter: blur(10px);
-        padding: 10px 25px;
-        border-radius: 30px;
-        color: white;
-        border: 1px solid rgba(255,77,77,0.3);
-        transition: all 0.3s ease;
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
     }
 
-    .stat-badge:hover {
-        border-color: #ff4d4d;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(255,77,77,0.2);
-    }
-
-    .stat-badge i {
-        margin-right: 8px;
-        color: #ff4d4d;
-    }
-
-    /* Filters Section */
-    .filters-wrapper {
-        background: #1a1a1a;
-        border-radius: 20px;
-        padding: 30px;
-        border: 1px solid rgba(255,255,255,0.05);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .search-box {
-        position: relative;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #ff4d4d;
-        z-index: 2;
-    }
-
-    .clear-search {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #9ca3af;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-    .clear-search:hover {
-        color: #ff4d4d;
-    }
+        .filter-group label {
+            display: block;
+            color: #b3b3b3;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
 
     .filter-select {
-        position: relative;
-    }
-
-    .select-arrow {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #ff4d4d;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .form-control, .form-select {
-        background: #2a2a2a;
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-        padding: 12px 15px 12px 45px;
-        color: white;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        background: #2a2a2a;
-        border-color: #ff4d4d;
-        box-shadow: 0 0 0 3px rgba(255,77,77,0.2);
-        color: white;
-        outline: none;
-    }
-
-    .btn-apply {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        border: none;
-        border-radius: 12px;
-        padding: 12px 20px;
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-apply::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
         width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s ease;
-    }
-
-    .btn-apply:hover::before {
-        left: 100%;
-    }
-
-    .btn-apply:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
-    }
-
-    /* Active Filters */
-    .active-filters {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .filters-label {
-        color: #9ca3af;
-        font-size: 0.9rem;
-        margin-right: 10px;
-    }
-
-    .filter-tag {
-        background: rgba(255,77,77,0.1);
-        border: 1px solid rgba(255,77,77,0.3);
-        border-radius: 30px;
-        padding: 8px 15px;
-        font-size: 0.9rem;
+        padding: 10px;
+        background: #2a2a2a;
+        border: 1px solid #333;
         color: white;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        animation: fadeIn 0.3s ease;
+        border-radius: 4px;
     }
 
-    .remove-filter {
-        color: #ff4d4d;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-    .remove-filter:hover {
-        color: #ff3333;
-        transform: scale(1.2);
-    }
-
-    .clear-all {
-        color: #ff4d4d;
-        text-decoration: none;
-        font-size: 0.9rem;
-        margin-left: auto;
-        transition: all 0.3s ease;
-    }
-
-    .clear-all:hover {
-        color: #ff3333;
-        transform: translateX(-5px);
-    }
-
-    /* Results Info */
-    .results-info {
-        background: #1a1a1a;
-        border-radius: 12px;
-        padding: 15px 20px;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .view-options {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-
-    .view-option {
-        background: transparent;
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #9ca3af;
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    .filter-btn {
+        background: #e50914;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 4px;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
     }
 
-    .view-option:hover {
-        border-color: #ff4d4d;
-        color: white;
+        .filter-btn:hover {
+            background: #f40612;
+        }
+
+    .results-count {
+        color: #b3b3b3;
+        font-size: 0.9rem;
+        margin-top: 15px;
     }
 
-    .view-option.active {
-        background: #ff4d4d;
-        border-color: #ff4d4d;
-        color: white;
-    }
-
-    /* Movies Grid */
     .movies-grid {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 20px;
-    }
-
-    .movie-card-wrapper {
-        animation: fadeInUp 0.5s ease;
     }
 
     .movie-card {
         background: #1a1a1a;
-        border-radius: 16px;
+        border-radius: 8px;
         overflow: hidden;
-        transition: all 0.4s ease;
-        height: 100%;
-        border: 1px solid rgba(255,255,255,0.05);
-        position: relative;
+        cursor: pointer;
+        transition: transform 0.3s ease;
     }
 
-    .movie-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(255,77,77,0.3);
-        border-color: rgba(255,77,77,0.3);
-    }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.2);
+        }
 
     .movie-poster {
         position: relative;
@@ -617,15 +210,15 @@
         overflow: hidden;
     }
 
-    .movie-poster img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s ease;
-    }
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
 
     .movie-card:hover .movie-poster img {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     .movie-rating {
@@ -633,134 +226,19 @@
         top: 10px;
         right: 10px;
         background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(5px);
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
+        padding: 4px 10px;
+        border-radius: 4px;
         color: #ffd700;
-        border: 1px solid rgba(255,215,0,0.3);
+        font-size: 0.85rem;
         z-index: 2;
-    }
-
-    .movie-featured {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: linear-gradient(135deg, #ffd700, #ffa500);
-        color: #000;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.9rem;
-        z-index: 2;
-        box-shadow: 0 5px 15px rgba(255,215,0,0.3);
-    }
-
-    .watch-badge {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        background: linear-gradient(135deg, #00c853, #00a844);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        z-index: 2;
-        box-shadow: 0 5px 15px rgba(0,200,83,0.3);
-    }
-
-    .movie-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-        display: flex;
-        align-items: flex-end;
-        padding: 20px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .movie-card:hover .movie-overlay {
-        opacity: 1;
-    }
-
-    .overlay-content {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-        transform: translateY(20px);
-        transition: transform 0.3s ease;
-    }
-
-    .movie-card:hover .overlay-content {
-        transform: translateY(0);
-    }
-
-    .btn-details, .btn-wishlist, .btn-trailer {
-        padding: 8px 16px;
-        border-radius: 25px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-details {
-        background: #ff4d4d;
-        color: white;
-        flex: 1;
-    }
-
-    .btn-details:hover {
-        background: #ff3333;
-        transform: scale(1.05);
-    }
-
-    .btn-wishlist {
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.3);
-        flex: 1;
-    }
-
-    .btn-wishlist:hover {
-        background: #ff4d4d;
-        border-color: #ff4d4d;
-        transform: scale(1.05);
-    }
-
-    .btn-trailer {
-        background: rgba(255,0,0,0.2);
-        color: white;
-        border: 1px solid rgba(255,0,0,0.3);
-        padding: 8px 12px;
-    }
-
-    .btn-trailer:hover {
-        background: #ff0000;
-        border-color: #ff0000;
-        transform: scale(1.05);
     }
 
     .movie-info {
-        padding: 15px;
+        padding: 12px;
     }
 
     .movie-title {
-        color: white;
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 600;
         margin: 0 0 5px 0;
         white-space: nowrap;
@@ -769,181 +247,82 @@
     }
 
     .movie-meta {
-        display: flex;
-        gap: 8px;
-        font-size: 0.8rem;
-        color: #9ca3af;
-        margin-bottom: 8px;
+        color: #b3b3b3;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
     }
 
-    .movie-meta .genre {
-        color: #ff4d4d;
+    .watch-btn {
+        width: 100%;
+        background: transparent;
+        border: 1px solid #e50914;
+        color: #e50914;
+        padding: 6px 0;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
     }
 
-    .movie-director {
-        font-size: 0.75rem;
-        color: #6c757d;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-bottom: 8px;
-    }
+        .watch-btn:hover {
+            background: #e50914;
+            color: white;
+        }
 
-    .movie-director i {
-        color: #ff4d4d;
-        margin-right: 4px;
-    }
-
-    .movie-stats {
-        display: flex;
-        gap: 12px;
-        font-size: 0.7rem;
-        color: #6c757d;
-    }
-
-    .movie-stats i {
-        margin-right: 4px;
-        color: #ff4d4d;
-    }
-
-    /* No Results */
-    .no-results {
-        min-height: 400px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #1a1a1a;
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.05);
-        padding: 60px;
-    }
-
-    .no-results-content {
+    .empty-state {
+        grid-column: 1 / -1;
         text-align: center;
-        max-width: 400px;
+        padding: 80px;
+        color: #b3b3b3;
+        background: #1a1a1a;
+        border-radius: 8px;
     }
 
-    .no-results i {
-        color: #ff4d4d;
-        opacity: 0.5;
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #e50914;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+    .pagination-nav {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
     }
 
-    .no-results h3 {
-        color: white;
-        margin: 20px 0 10px;
-    }
-
-    .no-results p {
-        color: #9ca3af;
-        margin-bottom: 30px;
-    }
-
-    .suggestions {
-        background: rgba(255,255,255,0.03);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 30px;
-        text-align: left;
-    }
-
-    .suggestions h5 {
-        color: #ff4d4d;
-        margin-bottom: 15px;
-    }
-
-    .suggestions ul {
+    .pagination {
+        display: flex;
+        gap: 5px;
         list-style: none;
         padding: 0;
-        margin: 0;
-    }
-
-    .suggestions li {
-        color: #9ca3af;
-        padding: 5px 0;
-        padding-left: 20px;
-        position: relative;
-    }
-
-    .suggestions li::before {
-        content: '•';
-        color: #ff4d4d;
-        position: absolute;
-        left: 5px;
-    }
-
-    .btn-clear {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-    }
-
-    .btn-clear:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(255,77,77,0.3);
-        color: white;
-    }
-
-    /* Pagination */
-    .pagination {
-        gap: 5px;
-        justify-content: center;
-    }
-
-    .page-item.active .page-link {
-        background: linear-gradient(135deg, #ff4d4d, #ff3333);
-        border-color: transparent;
-        box-shadow: 0 5px 15px rgba(255,77,77,0.3);
     }
 
     .page-link {
+        display: block;
+        padding: 8px 15px;
         background: #1a1a1a;
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 10px !important;
+        border: 1px solid #333;
         color: white;
-        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 4px;
         transition: all 0.3s ease;
     }
 
-    .page-link:hover {
-        background: #2a2a2a;
-        border-color: #ff4d4d;
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    /* Animations */
-    @@keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    @@keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+        .page-link:hover {
+            background: #e50914;
+            border-color: #e50914;
+            color: white;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
 
-    @@keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    /* Responsive */
-    @@media (max-width: 1400px) {
-        .movies-grid {
-            grid-template-columns: repeat(5, 1fr);
-        }
+    .page-item.active .page-link {
+        background: #e50914;
+        border-color: #e50914;
     }
 
     @@media (max-width: 1200px) {
@@ -956,119 +335,29 @@
         .movies-grid {
             grid-template-columns: repeat(3, 1fr);
         }
-        .hero-title {
-            font-size: 3rem;
-        }
     }
 
     @@media (max-width: 768px) {
         .movies-grid {
             grid-template-columns: repeat(2, 1fr);
         }
-        .hero-title {
-            font-size: 2.5rem;
+
+        .filter-form {
+            flex-direction: column;
         }
-        .filters-wrapper {
-            padding: 20px;
-        }
-        .view-options {
-            justify-content: flex-start;
-            margin-top: 10px;
-        }
-        .clear-all {
-            margin-left: 0;
+
+        .filter-group {
             width: 100%;
-            text-align: center;
         }
     }
 
-    @@media (max-width: 576px) {
+    @@media (max-width: 480px) {
         .movies-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            grid-template-columns: 1fr;
         }
-        .hero-title {
+
+        .page-title {
             font-size: 2rem;
-        }
-        .stat-badge {
-            padding: 8px 15px;
-            font-size: 0.85rem;
-        }
-        .btn-details, .btn-wishlist {
-            padding: 6px 10px;
-            font-size: 0.7rem;
         }
     }
 </style>
-
-@section Scripts {
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
-
-        // View toggle (grid/list)
-        $('.view-option').click(function() {
-            $('.view-option').removeClass('active');
-            $(this).addClass('active');
-            
-            if ($(this).data('view') === 'list') {
-                $('.movies-grid').css('grid-template-columns', 'repeat(1, 1fr)');
-                $('.movie-card').css('display', 'flex');
-                $('.movie-poster').css('width', '150px');
-            } else {
-                $('.movies-grid').css('grid-template-columns', '');
-                $('.movie-card').css('display', '');
-                $('.movie-poster').css('width', '');
-            }
-        });
-
-        // Auto-submit on filter change
-        $('#genreSelect, #sortSelect').change(function() {
-            $('#filterForm').submit();
-        });
-
-        // Debounced search
-        let searchTimeout;
-        $('#searchInput').on('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                $('#filterForm').submit();
-            }, 500);
-        });
-
-        function toggleWishlist(itemId, type) {
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <text>
-                $.post('@Url.Action("ToggleWishlist", "Wishlist", new { area = "User" })', 
-                    { itemId: itemId, itemType: type })
-                    .done(function(response) {
-                        if (response.success) {
-                            toastr.success(response.message);
-                            // Update button appearance
-                            $(`[data-movie-id="${itemId}"]`).toggleClass('in-wishlist');
-                        } else {
-                            toastr.info(response.message);
-                        }
-                    })
-                    .fail(function() {
-                        toastr.error('Error updating wishlist');
-                    });
-                </text>
-            }
-            else
-            {
-                <text>
-                toastr.warning('Please login to add to wishlist');
-                setTimeout(() => {
-                    window.location.href = '@Url.Action("Login", "Auth", new { area = "" })';
-                }, 1500);
-                </text>
-            }
-        }
-    </script>
-}
