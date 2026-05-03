@@ -68,7 +68,7 @@ namespace MovieMania.Models
         [DataType(DataType.DateTime)]
         public DateTime? UpdatedAt { get; set; }
 
-        // Navigation Properties
+        // Navigation Properties to navigate
         [ForeignKey("ShowId")]
         public virtual Show Show { get; set; }
 

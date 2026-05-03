@@ -17,7 +17,7 @@ namespace MovieMania.Controllers.User
             _context = context;
         }
 
-        // GET: /User/Home
+        //Code to GET: /User/Home
         public async Task<IActionResult> Index()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -29,7 +29,7 @@ namespace MovieMania.Controllers.User
 
             ViewBag.UserName = user?.Name ?? "User";
 
-            // Build a dashboard view model instead of using ViewBag
+            // Build a dashboard view model rather than using ViewBag
             var dashboard = new DashboardViewModel
             {
                 Movies = await _context.Movies
@@ -56,7 +56,7 @@ namespace MovieMania.Controllers.User
         }
     }
 
-    // Simple ViewModel for dashboard
+    // ViewModel for dashboard
     public class DashboardViewModel
     {
         public List<Movie> Movies { get; set; } = new();

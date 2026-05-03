@@ -31,7 +31,7 @@ namespace MovieMania.Controllers.User
                 .OrderByDescending(s => s.StartDate)
                 .FirstOrDefaultAsync();
 
-            // Get subscription history
+            // Get subscription history of user
             var subscriptionHistory = await _context.UserSubscriptions
                 .Include(s => s.SubscriptionPlan)
                 .Where(s => s.UserId == userId)

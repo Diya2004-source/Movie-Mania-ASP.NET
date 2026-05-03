@@ -29,7 +29,7 @@ namespace MovieMania.Controllers.User
             if (user == null)
                 return NotFound();
 
-            // Get user's active subscription
+            // Get user's active subscription from database
             var activeSubscription = await _context.UserSubscriptions
                 .Include(s => s.SubscriptionPlan)
                 .Where(s => s.UserId == userId && s.IsActive)
@@ -94,7 +94,7 @@ namespace MovieMania.Controllers.User
                 return View(model);
             }
 
-            // Update password
+            // Update password of user
             user.Password = model.NewPassword;
 
             // Check if UpdatedAt property exists

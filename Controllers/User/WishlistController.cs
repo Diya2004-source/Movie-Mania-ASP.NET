@@ -27,7 +27,7 @@ namespace MovieMania.Controllers.User
             return null;
         }
 
-        // GET: User/Wishlist
+        //Methid to GET: User/Wishlist
         public async Task<IActionResult> Index(string filter = "all", int page = 1)
         {
             // Use the helper method to get user ID
@@ -75,7 +75,7 @@ namespace MovieMania.Controllers.User
                     break;
             }
 
-            // Sorting
+            //Apply Sorting
             query = query.OrderByDescending(w => w.Priority)
                          .ThenByDescending(w => w.AddedDate);
 

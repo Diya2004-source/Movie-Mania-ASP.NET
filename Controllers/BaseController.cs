@@ -6,7 +6,7 @@ namespace MovieMania.Controllers
     {
         protected int? GetCurrentUserId()
         {
-            // Try to get from session first
+            //Will Try to get from session first
             var userId = HttpContext.Session.GetInt32("UserId");
 
             // If not in session, try to get from cookie    

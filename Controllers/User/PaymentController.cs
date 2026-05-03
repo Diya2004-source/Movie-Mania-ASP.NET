@@ -75,7 +75,7 @@ namespace MovieMania.Controllers.User
             if (plan == null)
                 return Json(new { success = false, message = "Plan not found" });
 
-            // Create payment record
+            // Create payment record 
             var payment = new Payment
             {
                 UserId = userId,
@@ -100,7 +100,7 @@ namespace MovieMania.Controllers.User
                 existingSubscription.IsActive = false;
             }
 
-            // Create new subscription
+            // Create new subscription of user
             var subscription = new UserSubscription
             {
                 UserId = userId,
