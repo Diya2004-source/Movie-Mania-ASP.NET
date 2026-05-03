@@ -11,5 +11,5 @@ namespace movie.Controllers
         }
     }
 }
-
+      
 //return RedirectToAction("Index", "Home", new { area = "User" });

@@ -17,7 +17,7 @@ namespace MovieMania.Controllers.User
         }
 
         // Helper method to get current user ID
-        private int? GetCurrentUserId()
+        private int? GetCurrentUserId()  
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
