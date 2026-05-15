@@ -65,7 +65,7 @@ namespace MovieMania.Controllers.User
                 .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive);
 
             if (subscription == null)
-                return Json(new { success = false, message = "No active subscription found" });
+                return Json(new { success = false, message = "No active subscriptions found" });
 
             subscription.IsActive = false;
             // Remove UpdatedAt if it doesn't exist in your model
