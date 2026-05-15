@@ -280,7 +280,7 @@ namespace MovieMania.Controllers.User
 
             if (userId == null)
             {
-                return Content("❌ No user logged in");
+                return Content("No user logged in");
             }
 
             return Content($"✅ Logged in! UserId: {userId}, UserName: {userName}");
