@@ -1,0 +1,244 @@
+﻿@model MovieMania.Models.Wishlist
+
+@{
+    ViewData["Title"] = "Wishlist Item Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card card-dark p-4 shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-light">
+                <i class="fas fa-heart me-2 text-danger"></i>Wishlist Item Details
+            </h2>
+            <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary") p-3">
+                @(Model.IsActive ? "ACTIVE" : "INACTIVE")
+            </span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-danger mb-3"><i class="fas fa-user me-2"></i>User Information</h5>
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Name:</th>
+                            <td class="fw-bold text-white">@(Model.User?.Name ?? "Unknown")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Email:</th>
+                            <td class="text-white">@(Model.User?.Email ?? "N/A")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">User ID:</th>
+                            <td class="text-white">#@Model.UserId</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-danger mb-3"><i class="fas fa-info-circle me-2"></i>Item Information</h5>
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Type:</th>
+                            <td>
+                                @if (Model.ItemType == "Movie")
+                                {
+                                    <span class="badge bg-primary px-3 py-2"><i class="fas fa-film me-1"></i>Movie</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info px-3 py-2"><i class="fas fa-tv me-1"></i>Show</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Title:</th>
+                            <td class="fw-bold text-white">
+                                @if (Model.ItemType == "Movie" && Model.Movie != null)
+                                {
+                                    @Model.Movie.Title
+                                }
+                                else if (Model.ItemType == "Show" && Model.Show != null)
+                                {
+                                    @Model.Show.Title
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not available</span>
+                                }
+                            </td>
+                        </tr>
+                        @if (Model.ItemType == "Movie" && Model.Movie != null)
+                        {
+                            <tr>
+                                <th class="text-muted">Genre:</th>
+                                <td class="text-white">@Model.Movie.Genre</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Year:</th>
+                                <td class="text-white">@Model.Movie.ReleaseYear</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Rating:</th>
+                                <td>
+                                    @if (Model.Movie.Rating.HasValue)
+                                    {
+                                        <span class="badge bg-warning text-dark">@Model.Movie.Rating.Value.ToString("F1")</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        else if (Model.ItemType == "Show" && Model.Show != null)
+                        {
+                            <tr>
+                                <th class="text-muted">Seasons:</th>
+                                <td class="text-white">@Model.Show.TotalSeasons</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Episodes:</th>
+                                <td class="text-white">@Model.Show.TotalEpisodes</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-danger mb-3"><i class="fas fa-clock me-2"></i>Timeline</h5>
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Added Date:</th>
+                            <td class="text-white">@Model.AddedDate.ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                        @if (Model.UpdatedDate.HasValue)
+                        {
+                            <tr>
+                                <th class="text-muted">Updated:</th>
+                                <td class="text-white">@Model.UpdatedDate.Value.ToString("dd MMM yyyy HH:mm")</td>
+                            </tr>
+                        }
+                        @if (Model.WatchedDate.HasValue)
+                        {
+                            <tr>
+                                <th class="text-muted">Watched:</th>
+                                <td class="text-white">@Model.WatchedDate.Value.ToString("dd MMM yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                    <h5 class="text-danger mb-3"><i class="fas fa-chart-simple me-2"></i>Status</h5>
+                    <table class="table table-dark table-borderless">
+                        <tr>
+                            <th class="text-muted" style="width: 120px;">Priority:</th>
+                            <td>
+                                @if (Model.Priority == 1)
+                                {
+                                    <span class="badge bg-danger">High</span>
+                                }
+                                else if (Model.Priority == 2)
+                                {
+                                    <span class="badge bg-warning">Medium</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Low</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Watched:</th>
+                            <td>
+                                @if (Model.IsWatched)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                        </tr>
+                        @if (Model.UserRating.HasValue)
+                        {
+                            <tr>
+                                <th class="text-muted">User Rating:</th>
+                                <td>
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-star me-1"></i>@Model.UserRating.Value.ToString("F1")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.ItemType == "Show" && Model.WatchedSeasons.HasValue)
+                        {
+                            <tr>
+                                <th class="text-muted">Progress:</th>
+                                <td class="text-white">
+                                    Season @Model.WatchedSeasons/@(Model.Show?.TotalSeasons ?? 0)
+                                    @if (Model.WatchedEpisodes.HasValue)
+                                    {
+                                        <br />
+                                
+                                        <small>Episode @Model.WatchedEpisodes</small>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="info-section p-3 mb-3" style="background: #2a2a2a; border-radius: 8px;">
+                <h5 class="text-danger mb-3"><i class="fas fa-note-sticky me-2"></i>Notes</h5>
+                <p class="text-white mb-0">@Model.Notes</p>
+            </div>
+        }
+
+        <div class="text-center mt-4">
+            <a asp-action="Index" class="btn btn-outline-light btn-lg px-4">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: #0f0f0f;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 15px;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .info-section {
+        background: #2a2a2a;
+        border-radius: 8px;
+    }
+
+    .table-dark {
+        --bs-table-bg: transparent;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+</style>

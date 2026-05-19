@@ -1,0 +1,82 @@
+﻿@model MovieMania.Models.Show
+@{
+    ViewData["Title"] = "Anime Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid p-4 bg-dark text-white" style="min-height: 100vh;">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="position-relative">
+                @* Using ThumbnailUrl as the primary image source *@
+                <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/no-thumb.jpg" : Model.ThumbnailUrl)"
+                     class="img-fluid rounded border border-danger shadow-lg w-100" style="aspect-ratio: 2/3; object-fit: cover;" />
+
+                @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                {
+                    <a href="@Model.TrailerUrl" target="_blank" class="btn btn-danger w-100 mt-3">
+                        <i class="bi bi-play-fill"></i> Watch Trailer
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card bg-secondary bg-opacity-10 border-0 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="fw-bold mb-0">@Model.Title</h1>
+                        <p class="text-info mb-0">Admin Management View</p>
+                    </div>
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger") p-2 px-3">
+                        @(Model.IsActive ? "ACTIVE" : "INACTIVE")
+                    </span>
+                </div>
+
+                <div class="row mt-4 text-white-50">
+                    <div class="col-md-6">
+                        <p><strong class="text-white">Genre:</strong> @Model.Genre</p>
+                        <p><strong class="text-white">Release Year:</strong> @Model.ReleaseYear</p>
+                        <p><strong class="text-white">Language:</strong> @(Model.Language ?? "Not Specified")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong class="text-white">Total Seasons:</strong> @Model.TotalSeasons</p>
+                        <p><strong class="text-white">Rating:</strong> <span class="badge bg-warning text-dark">@Model.Rating <i class="bi bi-star-fill"></i></span></p>
+                        <p><strong class="text-white">Views:</strong> @Model.ViewsCount</p>
+                    </div>
+                </div>
+                <hr class="border-secondary" />
+                <h5 class="text-white">Description</h5>
+                <p class="text-white-50">@Model.Description</p>
+            </div>
+
+            <div class="card bg-secondary bg-opacity-10 border-0 p-4 mt-4 text-center border border-secondary border-dashed">
+                <i class="bi bi-collection-play fs-1 text-secondary mb-3"></i>
+                @if (Model.Episodes == null || !Model.Episodes.Any())
+                {
+                    <h5 class="text-white">No Episodes Yet</h5>
+                    <p class="text-white-50">Click below to start adding content to this series.</p>
+                }
+                else
+                {
+                    <h5 class="text-white">@Model.Episodes.Count() Episodes Found</h5>
+                }
+
+                @* Corrected Link to AddEpisode Action *@
+                <div class="mt-2">
+                    <a asp-action="AddEpisode" asp-route-id="@Model.Id" class="btn btn-primary rounded-pill px-4 shadow">
+                        <i class="bi bi-plus-lg me-1"></i> Add New Episode
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 justify-content-center mt-5 border-top border-secondary pt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 fw-bold text-dark">
+            <i class="bi bi-pencil-square me-1"></i> Edit Anime
+        </a>
+        <a asp-action="Index" class="btn btn-outline-light px-4">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+</div>

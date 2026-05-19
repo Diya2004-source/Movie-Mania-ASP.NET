@@ -1,0 +1,174 @@
+﻿@model MovieMania.ViewModels.ReferralViewModel
+
+@{
+    ViewData["Title"] = "My Referrals";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-2">Refer & Earn</h2>
+                    <p class="mb-0">Share your referral code with friends and earn rewards</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark text-light h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Referrals</h6>
+                    <h3 class="mb-0">@Model.TotalReferrals</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-light h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Rewards</h6>
+                    <h3 class="mb-0 text-success">₹@Model.TotalRewards.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-light h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Pending Rewards</h6>
+                    <h3 class="mb-0 text-warning">₹@Model.PendingRewards.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark text-light">
+                <div class="card-body">
+                    <h5 class="mb-3">Your Referral Code</h5>
+                    <div class="referral-code-box p-4 text-center bg-secondary rounded">
+                        <h2 class="display-4 fw-bold text-primary mb-3">@Model.ReferralCode</h2>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-primary" onclick="copyReferralCode()">
+                                <i class="fas fa-copy me-2"></i>Copy Code
+                            </button>
+                            <button class="btn btn-outline-success" onclick="shareReferral()">
+                                <i class="fas fa-share-alt me-2"></i>Share Link
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Share this code with friends. When they sign up and subscribe, you both get rewards!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark text-light">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">Referral History</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ReferralHistory != null && Model.ReferralHistory.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Friend</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Reward</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var referral in Model.ReferralHistory)
+                                    {
+                                        <tr>
+                                            <td>@referral.ReferredUserEmail</td>
+                                            <td>@referral.ReferralDate.ToString("dd MMM yyyy")</td>
+                                            <td>
+                                                @if (referral.Status == "Completed")
+                                                {
+                                                    <span class="badge bg-success">Completed</span>
+                                                }
+                                                else if (referral.Status == "Pending")
+                                                {
+                                                    <span class="badge bg-warning">Pending</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@referral.Status</span>
+                                                }
+                                            </td>
+                                            <td class="text-success">₹@referral.RewardAmount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">No referrals yet. Share your code to get started!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #4A80F0, #3768d8);
+    }
+
+    .referral-code-box {
+        border: 2px dashed #4A80F0;
+        border-radius: 10px;
+    }
+
+    .table-dark {
+        --bs-table-bg: transparent;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function copyReferralCode() {
+            navigator.clipboard.writeText('@Model.ReferralCode').then(function() {
+                toastr.success('Referral code copied to clipboard!');
+            }, function() {
+                toastr.error('Failed to copy code');
+            });
+        }
+
+        function shareReferral() {
+            const link = '@Model.ReferralLink';
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join MovieMania',
+                    text: 'Sign up using my referral link and get rewards!',
+                    url: link
+                }).catch(console.error);
+            } else {
+                copyReferralCode();
+            }
+        }
+    </script>
+}

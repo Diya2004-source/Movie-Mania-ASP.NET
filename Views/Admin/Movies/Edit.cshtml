@@ -1,0 +1,206 @@
+﻿@model MovieMania.Models.Movie
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Edit Movie";
+}
+
+<div class="container mt-5">
+    <div class="card card-dark p-4 shadow-lg">
+        <h2 class="mb-4 text-center text-light">
+            <i class="fas fa-edit me-2 text-warning"></i>Edit Movie
+        </h2>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="ViewsCount" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Title" class="form-label text-light"></label>
+                    <input asp-for="Title" class="form-control custom-input" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Genre" class="form-label text-light"></label>
+                    <input asp-for="Genre" class="form-control custom-input" />
+                    <span asp-validation-for="Genre" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="ReleaseDate" class="form-label text-light"></label>
+                    <input asp-for="ReleaseDate" type="date" class="form-control custom-input" />
+                    <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="ReleaseYear" class="form-label text-light"></label>
+                    <input asp-for="ReleaseYear" class="form-control custom-input" />
+                    <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Duration" class="form-label text-light"></label>
+                    <input asp-for="Duration" class="form-control custom-input" />
+                    <span asp-validation-for="Duration" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Rating" class="form-label text-light"></label>
+                    <input asp-for="Rating" class="form-control custom-input" step="0.1" />
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Language" class="form-label text-light"></label>
+                    <input asp-for="Language" class="form-control custom-input" />
+                    <span asp-validation-for="Language" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Country" class="form-label text-light"></label>
+                    <input asp-for="Country" class="form-control custom-input" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Director" class="form-label text-light"></label>
+                    <input asp-for="Director" class="form-control custom-input" />
+                    <span asp-validation-for="Director" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Cast" class="form-label text-light"></label>
+                    <input asp-for="Cast" class="form-control custom-input" />
+                    <span asp-validation-for="Cast" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Description" class="form-label text-light"></label>
+                    <textarea asp-for="Description" class="form-control custom-input" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VideoUrl" class="form-label text-light"></label>
+                    <input asp-for="VideoUrl" class="form-control custom-input" />
+                    <span asp-validation-for="VideoUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TrailerUrl" class="form-label text-light"></label>
+                    <input asp-for="TrailerUrl" class="form-control custom-input" />
+                    <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ThumbnailUrl" class="form-label text-light"></label>
+                    <input asp-for="ThumbnailUrl" class="form-control custom-input" />
+                    <span asp-validation-for="ThumbnailUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label text-light">Current Thumbnail</label><br />
+                    @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                    {
+                        <img src="@Model.ThumbnailUrl" width="150" style="border-radius:8px; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No thumbnail</span>
+                    }
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label text-light">Change Thumbnail (Upload new file)</label>
+                    <input type="file" name="ThumbnailFile" class="form-control custom-input" accept="image/*" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label text-light">Active</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input asp-for="IsFeatured" class="form-check-input" />
+                        <label asp-for="IsFeatured" class="form-check-label text-light">Featured</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-warning btn-custom px-5">
+                    <i class="fas fa-save me-2"></i>Update Movie
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light btn-custom px-4 ms-2">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    body {
+        background: #0f0f0f;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 12px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .custom-input {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+        .custom-input:focus {
+            background: #2a2a2a;
+            color: white;
+            border-color: #ffc107;
+            box-shadow: 0 0 8px rgba(255,193,7,0.4);
+        }
+
+    .btn-custom {
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        border: none;
+        color: #000;
+    }
+
+        .btn-warning:hover {
+            background: #ffca2c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,193,7,0.3);
+        }
+
+    .btn-outline-light:hover {
+        background: white;
+        color: black;
+        transform: translateY(-2px);
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

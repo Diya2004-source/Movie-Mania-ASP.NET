@@ -1,0 +1,161 @@
+﻿@model MovieMania.Models.AppUser
+
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-light">
+                <i class="fas fa-user-edit me-2 text-warning"></i>Edit User
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg bg-dark">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedAt" />
+                        <input type="hidden" asp-for="Password" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label text-light fw-bold"></label>
+                                <input asp-for="Name" class="form-control bg-secondary text-light border-0" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label text-light fw-bold"></label>
+                                <input asp-for="Email" class="form-control bg-secondary text-light border-0" type="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Role" class="form-label text-light fw-bold"></label>
+                                <select asp-for="Role" class="form-select bg-secondary text-light border-0">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ReferralCode" class="form-label text-light fw-bold">Referral Code</label>
+                                <input asp-for="ReferralCode" class="form-control bg-secondary text-light border-0" />
+                                <span asp-validation-for="ReferralCode" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="TotalReferrals" class="form-label text-light fw-bold">Total Referrals</label>
+                                <input asp-for="TotalReferrals" class="form-control bg-secondary text-light border-0" type="number" min="0" />
+                                <span asp-validation-for="TotalReferrals" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="RewardPoints" class="form-label text-light fw-bold">Reward Points</label>
+                                <input asp-for="RewardPoints" class="form-control bg-secondary text-light border-0" type="number" min="0" />
+                                <span asp-validation-for="RewardPoints" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check mt-4">
+                                    <input asp-for="IsActive" class="form-check-input" />
+                                    <label asp-for="IsActive" class="form-check-label text-light fw-bold"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProfilePicture" class="form-label text-light fw-bold">Profile Picture</label>
+                            <input type="file" name="profileImage" class="form-control bg-secondary text-light border-0" accept="image/*" />
+                            <small class="text-muted">Leave empty to keep current picture</small>
+                            @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                            {
+                                <div class="mt-2">
+                                    <img src="@Model.ProfilePicture" alt="Profile" style="max-height: 100px;" class="rounded" />
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-warning px-4">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-light ms-2 px-4">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg bg-dark mb-3">
+                <div class="card-body p-4 text-center">
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                    {
+                        <img src="@Model.ProfilePicture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile">
+                    }
+                    else
+                    {
+                        <div class="default-avatar bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <span class="display-1 text-white">@Model.Name?.Substring(0, 1)</span>
+                        </div>
+                    }
+                    <h5 class="text-light">@Model.Name</h5>
+                    <p class="text-muted">@Model.Email</p>
+                    <span class="badge bg-@(Model.Role == "admin" ? "danger" : "info")">@Model.Role</span>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg bg-dark">
+                <div class="card-body p-4">
+                    <h5 class="text-warning mb-3">
+                        <i class="fas fa-clock me-2"></i>Account Information
+                    </h5>
+                    <ul class="list-unstyled text-light">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-plus text-primary me-2"></i>
+                            <strong>Created:</strong> @Model.CreatedAt.ToString("dd MMM yyyy HH:mm")
+                        </li>
+                        @if (Model.LastLoginAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-sign-in-alt text-success me-2"></i>
+                                <strong>Last Login:</strong> @Model.LastLoginAt.Value.ToString("dd MMM yyyy HH:mm")
+                            </li>
+                        }
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-edit text-info me-2"></i>
+                                <strong>Updated:</strong> @Model.UpdatedAt.Value.ToString("dd MMM yyyy HH:mm")
+                            </li>
+                        }
+                        <li class="mb-2">
+                            <i class="fas fa-users text-warning me-2"></i>
+                            <strong>Total Referrals:</strong> @Model.TotalReferrals
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            <strong>Reward Points:</strong> @Model.RewardPoints
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

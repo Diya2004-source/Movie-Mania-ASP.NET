@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieMania - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Render Styles section if any -->
+    @await RenderSectionAsync("Styles", required: false)
+
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 70px;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #1a1a1a;
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar-brand {
+            color: #ff4d4d !important;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-right: 40px;
+        }
+
+        .navbar-nav {
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: #ffffff !important;
+            font-weight: 500;
+            padding: 8px 0 !important;
+            position: relative;
+        }
+
+            .nav-link:hover {
+                color: #ff4d4d !important;
+            }
+
+            .nav-link.active {
+                color: #ff4d4d !important;
+            }
+
+                .nav-link.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 2px;
+                    background-color: #ff4d4d;
+                }
+
+        /* Login and Register buttons - ONLY these two buttons */
+        .btn-login {
+            background: transparent;
+            border: 2px solid #ff4d4d;
+            color: #ffffff;
+            padding: 8px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-login:hover {
+                background: #ff4d4d;
+                color: #ffffff;
+            }
+
+        .btn-register {
+            background: #ff4d4d;
+            border: none;
+            color: #ffffff;
+            padding: 8px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-register:hover {
+                background: #cc0000;
+                color: #ffffff;
+            }
+
+        /* Footer */
+        .footer {
+            background-color: #1a1a1a;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+        }
+
+            .footer h5 {
+                color: #ff4d4d;
+            }
+
+            .footer a {
+                color: #9ca3af;
+                text-decoration: none;
+            }
+
+                .footer a:hover {
+                    color: #ff4d4d;
+                }
+
+        /* Responsive */
+        @@media (max-width: 991px) {
+            .navbar-nav {
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .btn-login, .btn-register {
+                display: block;
+                margin: 10px 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                MovieMania
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "GuestHome" ? "active" : "")"
+                           href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "GuestMovies" ? "active" : "")"
+                           href="/Movies">Movies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "GuestShows" ? "active" : "")"
+                           href="/Shows">TV Shows</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "GuestAnime" ? "active" : "")"
+                           href="/Anime">Anime</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex">
+                    <!-- ONLY Login and Register buttons - always show these -->
+                    <a href="/Auth/Login" class="btn-login">Login</a>
+                    <a href="/Auth/Register" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>MovieMania</h5>
+                    <p>Your ultimate destination for unlimited entertainment. Stream thousands of movies and TV shows in stunning quality.</p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/Movies">Movies</a></li>
+                        <li><a href="/Shows">TV Shows</a></li>
+                        <li><a href="/Anime">Anime</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>My Account</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/Auth/Login">Login</a></li>
+                        <li><a href="/Auth/Register">Register</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Support</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; @DateTime.Now.Year MovieMania. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

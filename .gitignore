@@ -1,0 +1,46 @@
+﻿# Visual Studio / .NET
+.vs/
+bin/
+obj/
+Debug/
+Release/
+*.user
+*.suo
+*.userprefs
+*.cache
+*.log
+
+# Rider
+.idea/
+
+# NuGet packages
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+*.nuget.props
+*.nuget.targets
+
+# Publish output
+publish/
+
+# IIS Express
+IISExpress/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# User-specific files
+*.dbmdl
+*.dbproj.user
+*.pdb
+
+# Others
+*.DS_Store
+*.vsconfig
+*.vscode/
+
+# SQL Server database files
+*.mdf
+*.ldf

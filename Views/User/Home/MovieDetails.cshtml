@@ -1,0 +1,307 @@
+﻿@model MovieMania.Models.Movie
+
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="movie-details-page">
+    <!-- Hero Section -->
+    <section class="movie-hero"
+             style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)),
+                    url('@(Model.ThumbnailUrl ?? "/images/default-backdrop.jpg")') center/cover no-repeat fixed;">
+        <div class="container">
+            <div class="row align-items-center min-vh-60">
+                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
+                    <div class="movie-poster-wrapper">
+                        <img src="@(Model.ThumbnailUrl ?? "/images/default-movie.jpg")"
+                             alt="@Model.Title"
+                             class="img-fluid rounded movie-poster">
+                        @if (Model.Rating > 0)
+                        {
+                            <div class="rating-badge">
+                                <i class="fas fa-star"></i>
+                                <span>@string.Format("{0:F1}", Model.Rating)</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="movie-info">
+                        <h1 class="movie-title">@Model.Title</h1>
+                        <div class="movie-meta">
+                            @if (Model.ReleaseYear.HasValue)
+                            {
+                                <span class="meta-item"><i class="far fa-calendar-alt"></i> @Model.ReleaseYear.Value</span>
+                            }
+                            <span class="meta-item"><i class="fas fa-tag"></i> @Model.Genre</span>
+                            @if (Model.Duration.HasValue)
+                            {
+                                <span class="meta-item"><i class="far fa-clock"></i> @Model.Duration.Value min</span>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Language))
+                            {
+                                <span class="meta-item"><i class="fas fa-language"></i> @Model.Language</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            <p class="movie-description">@Model.Description</p>
+                        }
+                        <div class="movie-actions">
+                            <button class="btn-watch" onclick="playMovie(@Model.Id)">
+                                <i class="fas fa-play me-2"></i>Play Now
+                            </button>
+                            <button class="btn-wishlist" onclick="addToWishlist(@Model.Id)">
+                                <i class="fas fa-plus me-2"></i>My List
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Movie Details Section -->
+    <section class="details-section py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="details-card">
+                        <h3 class="section-title">Movie Info</h3>
+                        <table class="details-table">
+                            @if (!string.IsNullOrEmpty(Model.Director))
+                            {
+                                <tr><th>Director:</th><td>@Model.Director</td></tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Cast))
+                            {
+                                <tr><th>Cast:</th><td>@Model.Cast</td></tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Country))
+                            {
+                                <tr><th>Country:</th><td>@Model.Country</td></tr>
+                            }
+                            @if (Model.ReleaseDate.HasValue)
+                            {
+                                <tr><th>Release Date:</th><td>@Model.ReleaseDate.Value.ToString("MMMM dd, yyyy")</td></tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h3 class="section-title">Stats</h3>
+                        <div class="stat-item">
+                            <i class="fas fa-eye"></i>
+                            <div>
+                                <span class="stat-value">@Model.ViewsCount</span>
+                                <span class="stat-label">Views</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <div>
+                                <span class="stat-value">@(Model.Rating > 0 ? string.Format("{0:F1}", Model.Rating) : "N/A")</span>
+                                <span class="stat-label">Rating</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .movie-details-page {
+        background: #141414;
+        min-height: 100vh;
+        color: white;
+    }
+
+    .movie-hero {
+        min-height: 70vh;
+        padding: 100px 0 50px;
+        position: relative;
+    }
+
+    .movie-poster-wrapper {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .rating-badge {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: rgba(0,0,0,0.8);
+        padding: 8px 16px;
+        border-radius: 4px;
+        color: #ffd700;
+        font-weight: 600;
+        border: 1px solid rgba(255,215,0,0.3);
+    }
+
+    .movie-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: white;
+    }
+
+    .movie-meta {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .meta-item {
+        background: rgba(255,255,255,0.1);
+        padding: 6px 18px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #b3b3b3;
+    }
+
+        .meta-item i {
+            margin-right: 6px;
+            color: #e50914;
+        }
+
+    .movie-description {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #b3b3b3;
+        margin-bottom: 25px;
+        max-width: 700px;
+    }
+
+    .movie-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-watch {
+        background: #e50914;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-wishlist {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .details-section {
+        background: #0f0f0f;
+    }
+
+    .details-card, .stats-card {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 25px;
+        border: 1px solid #333;
+    }
+
+    .section-title {
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e50914;
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+
+    .details-table {
+        width: 100%;
+    }
+
+        .details-table tr {
+            border-bottom: 1px solid #333;
+        }
+
+        .details-table th {
+            padding: 12px 15px 12px 0;
+            color: #b3b3b3;
+            font-weight: 500;
+            width: 120px;
+        }
+
+        .details-table td {
+            padding: 12px 0;
+            color: white;
+        }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #333;
+    }
+
+        .stat-item i {
+            width: 40px;
+            height: 40px;
+            background: rgba(229,9,20,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e50914;
+            font-size: 1.2rem;
+        }
+
+    @@media (max-width: 768px) {
+        .movie-title {
+            font-size: 2.2rem;
+        }
+
+        .movie-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function playMovie(id) {
+            window.location.href = '/User/Home/PlayMovie/' + id;
+        }
+
+        function addToWishlist(id) {
+            fetch('/User/Wishlist/Add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify({ movieId: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Added to your list!');
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    </script>
+}

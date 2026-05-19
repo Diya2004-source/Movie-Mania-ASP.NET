@@ -1,0 +1,313 @@
+﻿@model MovieMania.ViewModels.LoginViewModel
+
+@{
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+    ViewData["Title"] = "Login";
+}
+
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h2>Welcome Back</h2>
+                        <p>Please login to your account</p>
+                    </div>
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post" class="auth-form">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Hidden field for return URL -->
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input asp-for="Password" class="form-control" type="password" placeholder="Enter your password" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- OPTIONAL REFERRAL CODE FIELD -->
+                        <div class="form-group mb-4">
+                            <label asp-for="ReferralCode" class="form-label">Referral Code (Optional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-gift"></i>
+                                </span>
+                                <input asp-for="ReferralCode" class="form-control" placeholder="Enter referral code if you have one" />
+                            </div>
+                            <span asp-validation-for="ReferralCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" class="form-check-input" />
+                                <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-link">Forgot Password?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-auth w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>Don't have an account? <a asp-action="Register">Create Account</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Auth Container */
+        .auth-container {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        /* Auth Card */
+        .auth-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        /* Auth Header */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .auth-header h2 {
+                color: #fff;
+                font-size: 28px;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+
+            .auth-header p {
+                color: #888;
+                font-size: 14px;
+            }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-group {
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+        }
+
+            .input-group:focus-within {
+                border-color: #ff4d4d;
+                box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2);
+            }
+
+        .input-group-text {
+            background: #2a2a2a;
+            border: none;
+            color: #ff4d4d;
+            padding: 12px 15px;
+        }
+
+        .form-control {
+            background: #2a2a2a;
+            border: none;
+            color: #fff;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+            .form-control:focus {
+                background: #2a2a2a;
+                color: #fff;
+                box-shadow: none;
+                outline: none;
+            }
+
+            .form-control::placeholder {
+                color: #666;
+            }
+
+        /* Forgot Link */
+        .forgot-link {
+            color: #ff4d4d;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+            .forgot-link:hover {
+                color: #ff3333;
+                text-decoration: underline;
+            }
+
+        /* Checkbox */
+        .form-check {
+            padding-left: 0;
+        }
+
+        .form-check-input {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+            .form-check-input:checked {
+                background-color: #ff4d4d;
+                border-color: #ff4d4d;
+            }
+
+        .form-check-label {
+            color: #ccc;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Auth Button */
+        .btn-auth {
+            background: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+            .btn-auth:hover {
+                background: #ff3333;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(255, 77, 77, 0.4);
+            }
+
+        /* Auth Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+
+            .auth-footer p {
+                color: #888;
+                font-size: 14px;
+                margin: 0;
+            }
+
+            .auth-footer a {
+                color: #ff4d4d;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s;
+            }
+
+                .auth-footer a:hover {
+                    color: #ff3333;
+                    text-decoration: underline;
+                }
+
+        /* Alerts */
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 83, 0.1);
+            color: #00c853;
+            border-left: 4px solid #00c853;
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
+            border-left: 4px solid #ff4d4d;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        /* Validation Messages */
+        .text-danger {
+            color: #ff4d4d !important;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .auth-card {
+                padding: 50px 20px;
+            }
+
+            .auth-header h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

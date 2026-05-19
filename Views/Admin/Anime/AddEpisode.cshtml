@@ -1,0 +1,336 @@
+﻿@model MovieMania.Models.Episode
+
+@{
+    ViewData["Title"] = "Add Episode";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .episode-card {
+        background: #111827;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.08);
+        overflow: hidden;
+    }
+
+    .episode-header {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        background-color: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        color: white !important;
+        box-shadow: none !important;
+    }
+
+        .form-control:focus,
+        textarea:focus {
+            border-color: #3b82f6 !important;
+            background-color: rgba(255,255,255,0.12) !important;
+        }
+
+        .form-control::placeholder,
+        textarea::placeholder {
+            color: rgba(255,255,255,0.55);
+        }
+
+    .form-label {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .preview-box {
+        background: rgba(255,255,255,0.05);
+        border: 1px dashed rgba(255,255,255,0.15);
+        border-radius: 15px;
+        padding: 15px;
+    }
+</style>
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-9">
+
+            <div class="episode-card shadow-lg">
+
+                <div class="episode-header p-4 text-white">
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+                        <div>
+                            <h2 class="fw-bold mb-1">
+                                <i class="bi bi-plus-circle-fill me-2"></i>
+                                Add New Episode
+                            </h2>
+
+                            <p class="mb-0 text-light">
+                                Anime :
+                                <span class="fw-semibold">
+                                    @ViewBag.AnimeTitle
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="mt-3 mt-md-0">
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                Admin Panel
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body p-4 text-white">
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show rounded-4">
+
+                            <strong>
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Validation Error
+                            </strong>
+
+                            <div asp-validation-summary="All" class="mt-2"></div>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert">
+                            </button>
+
+                        </div>
+                    }
+
+                    <form asp-action="AddEpisode"
+                          asp-route-id="@Model.ShowId"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="ShowId" />
+
+                        <div class="row">
+
+                            <div class="col-md-8 mb-4">
+
+                                <label asp-for="Title" class="form-label">
+                                    Episode Title
+                                </label>
+
+                                <input asp-for="Title"
+                                       class="form-control py-3"
+                                       placeholder="Enter episode title..."
+                                       required />
+
+                                <span asp-validation-for="Title"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+
+                                <label asp-for="Duration" class="form-label">
+                                    Duration (Minutes)
+                                </label>
+
+                                <input asp-for="Duration"
+                                       type="number"
+                                       min="1"
+                                       class="form-control py-3"
+                                       placeholder="24" />
+
+                                <span asp-validation-for="Duration"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label asp-for="SeasonNumber" class="form-label">
+                                    Season Number
+                                </label>
+
+                                <input asp-for="SeasonNumber"
+                                       type="number"
+                                       min="1"
+                                       value="1"
+                                       class="form-control py-3" />
+
+                                <span asp-validation-for="SeasonNumber"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label asp-for="EpisodeNumber" class="form-label">
+                                    Episode Number
+                                </label>
+
+                                <input asp-for="EpisodeNumber"
+                                       type="number"
+                                       min="1"
+                                       class="form-control py-3"
+                                       placeholder="1"
+                                       required />
+
+                                <span asp-validation-for="EpisodeNumber"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label asp-for="VideoUrl" class="form-label">
+                                Video URL
+                            </label>
+
+                            <input asp-for="VideoUrl"
+                                   class="form-control py-3"
+                                   placeholder="https://example.com/video.m3u8"
+                                   required />
+
+                            <small class="text-secondary">
+                                Supports MP4, M3U8 and streaming links
+                            </small>
+
+                            <span asp-validation-for="VideoUrl"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label asp-for="ThumbnailUrl" class="form-label">
+                                Thumbnail URL
+                            </label>
+
+                            <input asp-for="ThumbnailUrl"
+                                   class="form-control py-3"
+                                   placeholder="https://example.com/image.jpg" />
+
+                            <span asp-validation-for="ThumbnailUrl"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label asp-for="Description" class="form-label">
+                                Description
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      rows="5"
+                                      class="form-control"
+                                      placeholder="Write episode description..."></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label asp-for="ReleaseDate" class="form-label">
+                                    Release Date
+                                </label>
+
+                                <input asp-for="ReleaseDate"
+                                       type="date"
+                                       class="form-control py-3" />
+
+                            </div>
+
+                            <div class="col-md-6 mb-4 d-flex align-items-center">
+
+                                <div class="form-check form-switch mt-4">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           asp-for="IsActive" />
+
+                                    <label class="form-check-label fw-semibold ms-2"
+                                           asp-for="IsActive">
+                                        Active Episode
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="preview-box mb-4">
+
+                            <h6 class="fw-bold text-info mb-3">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                Tips
+                            </h6>
+
+                            <ul class="mb-0 text-light small">
+                                <li>Use direct MP4 or M3U8 links for smooth streaming.</li>
+                                <li>Episode numbers should be unique per season.</li>
+                                <li>Thumbnail URL is optional.</li>
+                                <li>Description helps users understand episode content.</li>
+                            </ul>
+
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3">
+
+                            <button type="submit"
+                                    class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow">
+
+                                <i class="bi bi-save me-2"></i>
+                                Save Episode
+
+                            </button>
+
+                            <a asp-action="Details"
+                               asp-route-id="@Model.ShowId"
+                               class="btn btn-outline-light px-5 py-3 rounded-pill">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

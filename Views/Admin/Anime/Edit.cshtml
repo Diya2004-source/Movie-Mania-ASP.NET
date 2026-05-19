@@ -1,0 +1,247 @@
+﻿@model MovieMania.Models.Show
+
+@{
+    ViewData["Title"] = "Edit Anime";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4 bg-dark text-white" style="min-height:100vh;">
+
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+
+            <div class="card bg-black border-secondary shadow-lg rounded-4 overflow-hidden">
+
+                <div class="card-header bg-warning bg-gradient text-dark p-4 border-0">
+                    <h2 class="fw-bold mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Edit Anime
+                    </h2>
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <strong>Validation Error!</strong>
+
+                            <div asp-validation-summary="All"></div>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert">
+                            </button>
+                        </div>
+                    }
+
+                    <form asp-action="Edit"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ThumbnailUrl" />
+                        <input type="hidden" asp-for="CreatedAt" />
+                        <input type="hidden" asp-for="ViewsCount" />
+
+                        <div class="row g-4">
+
+                            <div class="col-md-8">
+                                <label asp-for="Title"
+                                       class="form-label fw-bold">
+                                    Anime Title
+                                </label>
+
+                                <input asp-for="Title"
+                                       class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none"
+                                       required />
+
+                                <span asp-validation-for="Title"
+                                      class="text-danger small">
+                                </span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Genre"
+                                       class="form-label fw-bold">
+                                    Genre
+                                </label>
+
+                                <input asp-for="Genre"
+                                       readonly
+                                       class="form-control bg-dark text-white border-secondary shadow-none" />
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-bold text-info">
+                                    Current Thumbnail
+                                </label>
+
+                                <div class="mb-3">
+
+                                    @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                                    {
+                                        <img src="@Model.ThumbnailUrl"
+                                             class="img-fluid rounded shadow border border-secondary"
+                                             style="height:200px; width:100%; object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-secondary text-center p-5 rounded">
+                                            No Image
+                                        </div>
+                                    }
+
+                                </div>
+
+                                <label class="form-label fw-bold">
+                                    Upload New Thumbnail
+                                </label>
+
+                                <input type="file"
+                                       name="ThumbnailFile"
+                                       class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none"
+                                       accept="image/*" />
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="mb-4">
+                                    <label asp-for="TrailerUrl"
+                                           class="form-label fw-bold">
+                                        Trailer URL
+                                    </label>
+
+                                    <input asp-for="TrailerUrl"
+                                           class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none"
+                                           placeholder="https://youtube.com/..." />
+
+                                    <span asp-validation-for="TrailerUrl"
+                                          class="text-danger small">
+                                    </span>
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-6 mb-4">
+                                        <label asp-for="ReleaseYear"
+                                               class="form-label fw-bold">
+                                            Release Year
+                                        </label>
+
+                                        <input asp-for="ReleaseYear"
+                                               type="number"
+                                               class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none" />
+                                    </div>
+
+                                    <div class="col-6 mb-4">
+                                        <label asp-for="Rating"
+                                               class="form-label fw-bold">
+                                            Rating
+                                        </label>
+
+                                        <input asp-for="Rating"
+                                               type="number"
+                                               step="0.1"
+                                               class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none" />
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-6 mb-4">
+                                        <label asp-for="TotalEpisodes"
+                                               class="form-label fw-bold">
+                                            Total Episodes
+                                        </label>
+
+                                        <input asp-for="TotalEpisodes"
+                                               type="number"
+                                               min="1"
+                                               class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none" />
+                                    </div>
+
+                                    <div class="col-6 mb-4">
+                                        <label asp-for="TotalSeasons"
+                                               class="form-label fw-bold">
+                                            Total Seasons
+                                        </label>
+
+                                        <input asp-for="TotalSeasons"
+                                               type="number"
+                                               min="1"
+                                               class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none" />
+                                    </div>
+
+                                </div>
+
+                                <div class="form-check form-switch mt-3">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           asp-for="IsActive" />
+
+                                    <label class="form-check-label fw-bold"
+                                           asp-for="IsActive">
+                                        Active Anime
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <label asp-for="Description"
+                                       class="form-label fw-bold">
+                                    Description
+                                </label>
+
+                                <textarea asp-for="Description"
+                                          rows="5"
+                                          class="form-control bg-secondary bg-opacity-25 text-white border-secondary shadow-none">
+                                </textarea>
+
+                                <span asp-validation-for="Description"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-5 pt-4 border-top border-secondary d-flex gap-3">
+
+                            <button type="submit"
+                                    class="btn btn-warning px-5 fw-bold shadow text-dark">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Update Anime
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-light px-4">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
