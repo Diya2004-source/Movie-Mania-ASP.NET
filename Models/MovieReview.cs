@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieMania.Models
 {
-    [Table("MovieReviews")]
+    [Table("MovieReview")]
     public class MovieReview
     {
         [Key]
