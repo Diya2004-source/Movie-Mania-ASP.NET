@@ -41,9 +41,12 @@ namespace movie.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+<<<<<<< HEAD
                     b.Property<bool>("IsPaymentDone")
                         .HasColumnType("bit");
 
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime2");
 
@@ -57,17 +60,24 @@ namespace movie.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+<<<<<<< HEAD
                     b.Property<string>("PaymentStatus")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                     b.Property<string>("ProfilePicture")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ReferralCode")
+<<<<<<< HEAD
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+=======
+                        .HasColumnType("nvarchar(max)");
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
 
                     b.Property<int>("RewardPoints")
                         .HasColumnType("int");
@@ -99,6 +109,10 @@ namespace movie.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+<<<<<<< HEAD
+=======
+                        .IsRequired()
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
@@ -121,6 +135,10 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
+<<<<<<< HEAD
+=======
+                        .IsRequired()
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 

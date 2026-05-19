@@ -8,7 +8,11 @@ namespace movie.Migrations
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
+<<<<<<< HEAD
         /// <inheritdoc />
+=======
+        
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(

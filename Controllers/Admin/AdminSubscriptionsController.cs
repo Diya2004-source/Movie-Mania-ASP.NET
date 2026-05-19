@@ -109,7 +109,11 @@ namespace MovieMania.Controllers.Admin
 
                 if (existingPlan == null)
                 {
+<<<<<<< HEAD
                     TempData["Error"] = $" Plan with ID {id} not found.";
+=======
+                    TempData["Error"] = $"❌ Plan with ID {id} not found.";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -122,16 +126,28 @@ namespace MovieMania.Controllers.Admin
 
                 if (result > 0)
                 {
+<<<<<<< HEAD
                     TempData["Success"] = $" Plan '{plan.Name}' updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
 
                 TempData["Error"] = " No changes were saved.";
+=======
+                    TempData["Success"] = $"✅ Plan '{plan.Name}' updated successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                TempData["Error"] = "❌ No changes were saved.";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                 return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
             }
             catch (Exception ex)
             {
+<<<<<<< HEAD
                 TempData["Error"] = $" Error: {ex.Message}";
+=======
+                TempData["Error"] = $"❌ Error: {ex.Message}";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                 return View("~/Views/Admin/Subscriptions/Edit.cshtml", plan);
             }
         }
@@ -142,7 +158,11 @@ namespace MovieMania.Controllers.Admin
             var plan = await _context.SubscriptionPlans.FindAsync(id);
             if (plan == null)
             {
+<<<<<<< HEAD
                 TempData["Error"] = $" Plan with ID {id} not found.";
+=======
+                TempData["Error"] = $"❌ Plan with ID {id} not found.";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/Subscriptions/Delete.cshtml", plan);
@@ -158,7 +178,11 @@ namespace MovieMania.Controllers.Admin
                 var plan = await _context.SubscriptionPlans.FindAsync(id);
                 if (plan == null)
                 {
+<<<<<<< HEAD
                     TempData["Error"] = $" Plan with ID {id} not found.";
+=======
+                    TempData["Error"] = $"❌ Plan with ID {id} not found.";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -167,16 +191,28 @@ namespace MovieMania.Controllers.Admin
 
                 if (result > 0)
                 {
+<<<<<<< HEAD
                     TempData["Success"] = $" Plan '{plan.Name}' deleted successfully!";
                 }
                 else
                 {
                     TempData["Error"] = " Plan was not deleted.";
+=======
+                    TempData["Success"] = $"✅ Plan '{plan.Name}' deleted successfully!";
+                }
+                else
+                {
+                    TempData["Error"] = "❌ Plan was not deleted.";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                 }
             }
             catch (Exception ex)
             {
+<<<<<<< HEAD
                 TempData["Error"] = $" Error: {ex.Message}";
+=======
+                TempData["Error"] = $"❌ Error: {ex.Message}";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
             }
 
             return RedirectToAction(nameof(Index));
@@ -205,7 +241,11 @@ namespace MovieMania.Controllers.Admin
                     return Json(new
                     {
                         success = true,
+<<<<<<< HEAD
                         message = $" Plan '{plan.Name}' {status} successfully!",
+=======
+                        message = $"✅ Plan '{plan.Name}' {status} successfully!",
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                         isActive = plan.IsActive
                     });
                 }
@@ -224,7 +264,11 @@ namespace MovieMania.Controllers.Admin
             var plan = await _context.SubscriptionPlans.FindAsync(id);
             if (plan == null)
             {
+<<<<<<< HEAD
                 TempData["Error"] = $" Plan with ID {id} not found.";
+=======
+                TempData["Error"] = $"❌ Plan with ID {id} not found.";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/Subscriptions/Details.cshtml", plan);

@@ -1,11 +1,19 @@
+<<<<<<< HEAD
 ﻿@* @model IEnumerable<MovieMania.Models.Wishlist>
 @{
     ViewData["Title"] = "My List";
     var stats = ViewBag.Stats;
+=======
+﻿@model IEnumerable<MovieMania.Models.Wishlist>
+
+@{
+    ViewData["Title"] = "My List";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <div class="wishlist-page">
+<<<<<<< HEAD
     <div class="wishlist-header">
         <div class="container-fluid px-4">
             <div class="row align-items-center">
@@ -35,11 +43,23 @@
     </div>
 
     <div class="container-fluid px-4 py-5">
+=======
+    <!-- Header -->
+    <div class="wishlist-header">
+        <div class="container-fluid px-4">
+            <h1 class="page-title">My List</h1>
+            <p class="page-subtitle">Your personal collection of movies and shows</p>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4 py-4">
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         @if (Model != null && Model.Any())
         {
             <div class="wishlist-grid">
                 @foreach (var item in Model)
                 {
+<<<<<<< HEAD
                     var title = item.ItemType == "Movie" ? item.Movie?.Title : item.Show?.Title;
                     var poster = item.ItemType == "Movie" ? item.Movie?.ThumbnailUrl : item.Show?.ThumbnailUrl;
                     var rating = item.ItemType == "Movie" ? item.Movie?.Rating : item.Show?.Rating;
@@ -80,6 +100,51 @@
                             <div class="item-meta">
                                 <span class="item-genre">@(item.Movie?.Genre ?? item.Show?.Genre ?? "General")</span>
                                 <span class="item-date">Added @item.AddedDate.ToString("dd MMM")</span>
+=======
+                    <div class="wishlist-card" onclick="location.href='@(item.MovieId != null ? "/User/Home/MovieDetails/" + item.MovieId : "/User/Home/ShowDetails/" + item.ShowId)'">
+                        <div class="wishlist-poster">
+                            <img src="@(item.Movie?.ThumbnailUrl ?? item.Show?.ThumbnailUrl ?? "/images/default-movie.jpg")"
+                                 alt="@(item.Movie?.Title ?? item.Show?.Title)">
+
+                            <!-- Item Type Badge -->
+                            <div class="type-badge @(item.MovieId != null ? "movie-badge" : "show-badge")">
+                                @(item.MovieId != null ? "Movie" : "TV Show")
+                            </div>
+
+                            <!-- Rating Badge (if available) -->
+                            @if ((item.MovieId != null && item.Movie?.Rating > 0) || (item.ShowId != null && item.Show?.Rating > 0))
+                            {
+                                <div class="rating-badge">
+                                    <i class="fas fa-star"></i>
+                                    <span>
+                                        @(item.MovieId != null ? string.Format("{0:F1}", item.Movie?.Rating) : string.Format("{0:F1}", item.Show?.Rating))
+                                    </span>
+                                </div>
+                            }
+
+                            <!-- Remove Button -->
+                            <button class="remove-btn" onclick="event.stopPropagation(); removeFromWishlist(@item.Id)">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                            <!-- Hover Overlay with Play Button -->
+                            <div class="wishlist-overlay">
+                                <button class="play-btn" onclick="event.stopPropagation(); location.href='@(item.MovieId != null ? "/User/Home/MovieDetails/" + item.MovieId : "/User/Home/ShowDetails/" + item.ShowId)'">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <span class="quick-info">Quick Play</span>
+                            </div>
+                        </div>
+                        <div class="wishlist-info">
+                            <h4 class="item-title">@(item.Movie?.Title ?? item.Show?.Title)</h4>
+                            <div class="item-meta">
+                                <span class="item-genre">@(item.Movie?.Genre ?? item.Show?.Genre ?? "General")</span>
+                                <span class="item-year">@(item.Movie?.ReleaseYear ?? item.Show?.ReleaseYear)</span>
+                            </div>
+                            <div class="item-added">
+                                <i class="far fa-calendar-alt"></i>
+                                Added on @item.AddedDate.ToString("dd MMM yyyy")
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                             </div>
                         </div>
                     </div>
@@ -90,16 +155,31 @@
         {
             <div class="empty-wishlist">
                 <div class="empty-state-content">
+<<<<<<< HEAD
                     <i class="fas fa-layer-group mb-4"></i>
                     <h2>Your list is waiting...</h2>
                     <p>You haven't added any @(ViewBag.CurrentFilter == "all" ? "items" : ViewBag.CurrentFilter) yet.</p>
                     <a href="/" class="btn-browse">Browse Catalog</a>
+=======
+                    <i class="fas fa-heart-broken"></i>
+                    <h2>Your list is empty</h2>
+                    <p>Start adding movies and shows to your personal collection</p>
+                    <div class="empty-state-actions">
+                        <a href="/User/Home/Movies" class="btn-browse">
+                            <i class="fas fa-film me-2"></i>Browse Movies
+                        </a>
+                        <a href="/User/Home/Shows" class="btn-browse">
+                            <i class="fas fa-tv me-2"></i>Browse Shows
+                        </a>
+                    </div>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
                 </div>
             </div>
         }
     </div>
 </div>
 
+<<<<<<< HEAD
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -238,12 +318,70 @@
         position: relative;
         aspect-ratio: 2/3;
         cursor: pointer;
+=======
+<style>
+    .wishlist-page {
+        background-color: #141414;
+        min-height: 100vh;
+        color: #ffffff;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Header */
+    .wishlist-header {
+        background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+        padding: 40px 0 20px;
+        border-bottom: 1px solid #333;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #b3b3b3;
+        font-size: 1.1rem;
+    }
+
+    /* Wishlist Grid */
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+    }
+
+    /* Wishlist Card */
+    .wishlist-card {
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid #333;
+    }
+
+        .wishlist-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px rgba(229, 9, 20, 0.3);
+            border-color: #e50914;
+        }
+
+    /* Poster */
+    .wishlist-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     }
 
         .wishlist-poster img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+<<<<<<< HEAD
         }
 
     /* Badges */
@@ -257,14 +395,41 @@
         font-weight: 800;
         text-transform: uppercase;
         z-index: 2;
+=======
+            transition: transform 0.5s ease;
+        }
+
+    .wishlist-card:hover .wishlist-poster img {
+        transform: scale(1.1);
+    }
+
+    /* Badges */
+    .type-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 2;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     }
 
     .movie-badge {
         background: #e50914;
+<<<<<<< HEAD
+=======
+        color: white;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     }
 
     .show-badge {
         background: #2e7d32;
+<<<<<<< HEAD
     }
 
     .anime-badge {
@@ -282,17 +447,27 @@
         font-size: 0.65rem;
         font-weight: 800;
         text-transform: uppercase;
+=======
+        color: white;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     }
 
     .rating-badge {
         position: absolute;
+<<<<<<< HEAD
         top: 12px;
         right: 12px;
         background: rgba(0,0,0,0.8);
+=======
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.8);
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         padding: 4px 10px;
         border-radius: 4px;
         color: #ffd700;
         font-size: 0.8rem;
+<<<<<<< HEAD
         font-weight: 700;
     }
 
@@ -307,12 +482,72 @@
         gap: 15px;
         opacity: 0;
         transition: 0.3s;
+=======
+        font-weight: 600;
+        z-index: 2;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+        .rating-badge i {
+            margin-right: 4px;
+            font-size: 0.7rem;
+        }
+
+    /* Remove Button */
+    .remove-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(229, 9, 20, 0.9);
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 3;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .wishlist-card:hover .remove-btn {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .remove-btn:hover {
+        background: #ff0000;
+        transform: scale(1.1) !important;
+    }
+
+    /* Hover Overlay */
+    .wishlist-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        padding: 30px 20px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     }
 
     .wishlist-card:hover .wishlist-overlay {
         opacity: 1;
     }
 
+<<<<<<< HEAD
     .action-btn {
         width: 45px;
         height: 45px;
@@ -341,21 +576,62 @@
         }
 
     /* Info */
+=======
+    .play-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e50914;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+    }
+
+        .play-btn:hover {
+            transform: scale(1.15);
+            background: #ff0f1f;
+        }
+
+    .quick-info {
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Info Section */
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     .wishlist-info {
         padding: 15px;
     }
 
     .item-title {
         font-size: 1rem;
+<<<<<<< HEAD
         font-weight: 700;
         margin-bottom: 5px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+=======
+        font-weight: 600;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #ffffff;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
     }
 
     .item-meta {
         display: flex;
+<<<<<<< HEAD
         justify-content: space-between;
         font-size: 0.8rem;
         color: var(--text-gray);
@@ -878,3 +1154,239 @@
         margin-top: 20px;
     }
 </style>
+=======
+        gap: 10px;
+        font-size: 0.85rem;
+        color: #b3b3b3;
+        margin-bottom: 8px;
+    }
+
+    .item-genre {
+        color: #e50914;
+    }
+
+    .item-added {
+        font-size: 0.75rem;
+        color: #808080;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .item-added i {
+            color: #e50914;
+            font-size: 0.7rem;
+        }
+
+    /* Empty State */
+    .empty-wishlist {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .empty-state-content {
+        max-width: 500px;
+        padding: 40px;
+    }
+
+        .empty-state-content i {
+            font-size: 5rem;
+            color: #e50914;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-content h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .empty-state-content p {
+            color: #b3b3b3;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+    .empty-state-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-browse {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #e50914;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+        .btn-browse:hover {
+            background: #ff0f1f;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3);
+            color: white;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .wishlist-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .wishlist-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .wishlist-header {
+            padding: 30px 0 15px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .wishlist-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .empty-state-actions {
+            flex-direction: column;
+        }
+
+        .btn-browse {
+            width: 100%;
+        }
+
+        .empty-state-content h2 {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Animation for cards */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .wishlist-card {
+        animation: fadeIn 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+
+        .wishlist-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .wishlist-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .wishlist-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .wishlist-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .wishlist-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .wishlist-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .wishlist-card:nth-child(7) {
+            animation-delay: 0.7s;
+        }
+
+        .wishlist-card:nth-child(8) {
+            animation-delay: 0.8s;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        function removeFromWishlist(id) {
+            if (confirm('Remove this item from your list?')) {
+                fetch('/User/Wishlist/Remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ id: id })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert('Removed from your list');
+                        // Reload the page to update the list
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error removing from wishlist');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error removing from wishlist');
+                });
+            }
+        }
+
+        // Add animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.wishlist-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+}
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d

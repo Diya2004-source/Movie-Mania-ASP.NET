@@ -152,15 +152,22 @@ namespace MovieMania.Controllers.Admin
         [HttpGet("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+<<<<<<< HEAD
             var movie = await _context.Movies
                 .FirstOrDefaultAsync(m => m.Id == id);
 
+=======
+            var movie = await _context.Movies.FindAsync(id);
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
             if (movie == null)
             {
                 TempData["Error"] = $"Movie with ID {id} not found.";
                 return RedirectToAction(nameof(Index));
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
             return View(_viewPath + "Delete.cshtml", movie);
         }
 
@@ -170,6 +177,7 @@ namespace MovieMania.Controllers.Admin
         {
             try
             {
+<<<<<<< HEAD
                 var movie = await _context.Movies
                     .Include(m => m.Reviews)
                     .Include(m => m.UserActivities)
@@ -208,10 +216,34 @@ namespace MovieMania.Controllers.Admin
             {
                 TempData["Error"] = "Error deleting movie: " +
                     (ex.InnerException?.Message ?? ex.Message);
+=======
+                var movie = await _context.Movies.FindAsync(id);
+                if (movie == null)
+                {
+                    TempData["Error"] = $"Movie with ID {id} not found.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.Movies.Remove(movie);
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                    TempData["Success"] = $"Movie '{movie.Title}' deleted successfully!";
+                else
+                    TempData["Error"] = "Movie was not deleted.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error deleting movie: {ex.Message}";
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
             }
 
             return RedirectToAction(nameof(Index));
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         [HttpPost("ToggleStatus/{id}")]
         public async Task<IActionResult> ToggleStatus(int id)
         {

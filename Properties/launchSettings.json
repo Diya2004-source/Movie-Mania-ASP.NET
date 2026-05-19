@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "iisSettings": {
@@ -30,9 +31,23 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
+=======
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Movie_Mania_ASP.NET": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:9005;http://localhost:9005",
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d

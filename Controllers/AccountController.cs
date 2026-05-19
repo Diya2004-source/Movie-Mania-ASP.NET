@@ -11,5 +11,10 @@ namespace movie.Controllers
         }
     }
 }
+<<<<<<< HEAD
 
 //return RedirectToAction("Index", "Home", new { area = "User" });
+=======
+      
+//returning RedirectToAction("Index", "Home", new { area = "User" });
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d

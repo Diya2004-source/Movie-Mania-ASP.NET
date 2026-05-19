@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿//using System;
 //using System.Collections.Generic;
 //using System.ComponentModel.DataAnnotations;
@@ -69,6 +70,9 @@
 //}
 
 using System;
+=======
+﻿using System;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -98,8 +102,14 @@ namespace MovieMania.Models
         public string? Role { get; set; } = "user";
 
         [StringLength(500)]
+<<<<<<< HEAD
         public string? ProfilePicture { get; set; }
 
+=======
+        public string? ProfilePicture { get; set; }  // This is the correct property name (not ProfilePictureUrl)
+
+        // Computed property for view compatibility
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         [NotMapped]
         public string? ProfilePictureUrl
         {
@@ -107,6 +117,7 @@ namespace MovieMania.Models
             set { ProfilePicture = value; }
         }
 
+<<<<<<< HEAD
         // 🔥 IMPORTANT CHANGE
         public bool IsActive { get; set; } = false; // ❗ default false until payment
 
@@ -124,6 +135,15 @@ namespace MovieMania.Models
         public string? ReferralCode { get; set; }
 
         // ================= DATES =================
+=======
+        public bool IsActive { get; set; } = true;
+
+        // Referral and Rewards System
+        public int TotalReferrals { get; set; } = 0;  // Add this
+        public int RewardPoints { get; set; } = 0;    // Add this
+        public string? ReferralCode { get; set; }     // Add this
+
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
@@ -133,7 +153,11 @@ namespace MovieMania.Models
         [DataType(DataType.DateTime)]
         public DateTime? UpdatedAt { get; set; }
 
+<<<<<<< HEAD
         // ================= RELATIONS =================
+=======
+        // Navigation properties
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
         public virtual ICollection<Wishlist>? Wishlists { get; set; }
         public virtual ICollection<UserSubscription>? Subscriptions { get; set; }
         public virtual ICollection<Payment>? Payments { get; set; }
