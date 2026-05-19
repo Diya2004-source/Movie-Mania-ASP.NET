@@ -13,7 +13,7 @@ namespace MovieMania.Models
 
         [Required(ErrorMessage = "Movie title is require")]
         [StringLength(200, MinimumLength = 2, ErrorMessage = "Title must be between 2 and 200 characters")]
-        [Display(Name = "Movie Titl")]
+        [Display(Name = "Movie Title")]
         public string Title { get; set; }
 
         [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
