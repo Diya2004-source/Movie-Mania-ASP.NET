@@ -1,0 +1,44 @@
+﻿@model MovieMania.Models.Show
+
+@{
+    ViewData["Title"] = "Delete Anime";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="card bg-dark text-white border-danger mx-auto shadow-lg" style="max-width: 500px;">
+        <div class="card-body text-center p-5">
+
+            <i class="bi bi-exclamation-triangle-fill text-danger display-1 mb-4"></i>
+
+            <h3 class="fw-bold">Delete Anime?</h3>
+
+            <p class="text-light">
+                You are about to delete
+                <strong class="text-warning">@Model.Title</strong>.
+            </p>
+
+            <p class="text-danger small">
+                This will permanently remove all episodes.
+            </p>
+
+            <form asp-action="DeleteConfirmed"
+                  asp-route-id="@Model.Id"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-danger w-100 mb-3 py-2 fw-bold">
+                    YES, DELETE
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-light w-100 py-2">
+                    Cancel
+                </a>
+
+            </form>
+        </div>
+    </div>
+</div>

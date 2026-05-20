@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Admin Profile";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-dark text-light">
+                <div class="card-body text-center">
+                    <div class="profile-image mb-3">
+                        <div class="default-avatar bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
+                            <span class="display-4 text-white">@(ViewBag.UserName?.Substring(0, 1) ?? "A")</span>
+                        </div>
+                    </div>
+                    <h4>@ViewBag.UserName</h4>
+                    <p class="text-muted">@ViewBag.Email</p>
+                    <p class="text-muted">
+                        <small>Last Login: @ViewBag.LoginTime</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card bg-dark text-light">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ChangePassword" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" name="currentPassword" class="form-control bg-secondary text-light border-0" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="newPassword" class="form-control bg-secondary text-light border-0" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" name="confirmPassword" class="form-control bg-secondary text-light border-0" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .default-avatar {
+        background: linear-gradient(135deg, #4A80F0, #3768d8);
+    }
+</style>

@@ -1,0 +1,386 @@
+﻿@* @model IEnumerable<MovieMania.Models.SubscriptionPlan>
+@{
+    ViewData["Title"] = "Subscription Plans";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0 text-light">
+                <i class="fas fa-crown me-2 text-warning"></i>Subscription Plans
+            </h1>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Create New Plan
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var plan in Model)
+        {
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-lg @(plan.IsActive ? "bg-dark" : "bg-secondary") text-light" style="border-radius: 15px;">
+                    @if (!plan.IsActive)
+                    {
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-secondary px-3 py-2">Inactive</span>
+                        </div>
+                    }
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title mb-0 text-warning fw-bold">@plan.Name</h4>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-light p-0" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a asp-action="Details" asp-route-id="@plan.Id" class="dropdown-item">
+                                            <i class="fas fa-info-circle me-2 text-info"></i>Details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Edit" asp-route-id="@plan.Id" class="dropdown-item">
+                                            <i class="fas fa-edit me-2 text-warning"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a asp-action="Delete" asp-route-id="@plan.Id" class="dropdown-item text-danger">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <h1 class="display-3 fw-bold text-success mb-0">
+                                ₹ @plan.Price.ToString("N0")
+                            </h1>
+                            <span class="text-muted">/ @plan.DurationInDays days</span>
+                        </div>
+
+                        <div class="mb-4">
+                            @if (!string.IsNullOrEmpty(plan.Description))
+                            {
+                                <p class="text-light-50 mb-3">@plan.Description</p>
+                            }
+
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="fas fa-tv text-primary me-2 fs-5"></i>
+                                    <strong>Video Quality:</strong>
+                                    @if (plan.VideoQuality == "4K")
+                                    {
+                                        <span class="badge bg-danger ms-2">4K Ultra HD</span>
+                                    }
+                                    else if (plan.VideoQuality == "Full HD")
+                                    {
+                                        <span class="badge bg-info ms-2">1080p</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary ms-2">@plan.VideoQuality</span>
+                                    }
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-mobile-alt text-primary me-2 fs-5"></i>
+                                    <strong>Max Screens:</strong>
+                                    <span class="badge bg-primary ms-2">@plan.MaxScreens</span>
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-calendar text-primary me-2 fs-5"></i>
+                                    <strong>Created:</strong> @plan.CreatedAt.ToString("dd MMM yyyy")
+                                </li>
+                            </ul>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(plan.Features))
+                        {
+                            <div class="mb-3 p-3" style="background: #2a2a2a; border-radius: 10px;">
+                                <small class="text-warning d-block mb-2">
+                                    <i class="fas fa-star me-1"></i>Features:
+                                </small>
+                                <p class="small text-light mb-0">@plan.Features</p>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">
+                                <i class="fas fa-hashtag me-1"></i>Order: @plan.DisplayOrder
+                            </span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input status-toggle"
+                                       type="checkbox"
+                                       data-id="@plan.Id"
+                                       @(plan.IsActive ? "checked" : "")>
+                                <label class="form-check-label small text-light">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<form id="deleteForm" method="post" style="display: none;">
+    <input type="hidden" name="id" id="deleteId" />
+</form>
+
+@section Scripts {
+    <script>
+        // Toggle status
+        document.querySelectorAll('.status-toggle').forEach(toggle => {
+            toggle.addEventListener('change', async function() {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch(`/AdminSubscriptions/ToggleStatus/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                    } else {
+                        this.checked = !this.checked;
+                        showNotification(data.message, 'error');
+                    }
+                } catch (error) {
+                    this.checked = !this.checked;
+                    showNotification('Error updating status', 'error');
+                }
+            });
+        });
+
+       
+
+        function showNotification(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+    </script>
+} *@
+
+
+@model IEnumerable<MovieMania.Models.SubscriptionPlan>
+@{
+    ViewData["Title"] = "Subscription Plans";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0 text-light">
+                <i class="fas fa-crown me-2 text-warning"></i>Subscription Plans
+            </h1>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Create New Plan
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var plan in Model)
+        {
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-lg @(plan.IsActive ? "bg-dark" : "bg-secondary") text-light" style="border-radius: 15px;">
+                    @if (!plan.IsActive)
+                    {
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-secondary px-3 py-2">Inactive</span>
+                        </div>
+                    }
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title mb-0 text-warning fw-bold">@plan.Name</h4>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-light p-0" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a asp-action="Details" asp-route-id="@plan.Id" class="dropdown-item">
+                                            <i class="fas fa-info-circle me-2 text-info"></i>Details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Edit" asp-route-id="@plan.Id" class="dropdown-item">
+                                            <i class="fas fa-edit me-2 text-warning"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a asp-action="Delete" asp-route-id="@plan.Id" class="dropdown-item text-danger">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <h1 class="display-3 fw-bold text-success mb-0">
+                                ₹ @plan.Price.ToString("N0")
+                            </h1>
+                            <span class="text-muted">/ @plan.DurationInDays days</span>
+                        </div>
+
+                        <div class="mb-4">
+                            @if (!string.IsNullOrEmpty(plan.Description))
+                            {
+                                <p class="text-light-50 mb-3">@plan.Description</p>
+                            }
+
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="fas fa-tv text-primary me-2 fs-5"></i>
+                                    <strong>Video Quality:</strong>
+                                    @if (plan.VideoQuality == "4K")
+                                    {
+                                        <span class="badge bg-danger ms-2">4K Ultra HD</span>
+                                    }
+                                    else if (plan.VideoQuality == "Full HD")
+                                    {
+                                        <span class="badge bg-info ms-2">1080p</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary ms-2">@plan.VideoQuality</span>
+                                    }
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-mobile-alt text-primary me-2 fs-5"></i>
+                                    <strong>Max Screens:</strong>
+                                    <span class="badge bg-primary ms-2">@plan.MaxScreens</span>
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-calendar text-primary me-2 fs-5"></i>
+                                    <strong>Created:</strong> @plan.CreatedAt.ToString("dd MMM yyyy")
+                                </li>
+                            </ul>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(plan.Features))
+                        {
+                            <div class="mb-3 p-3" style="background: #2a2a2a; border-radius: 10px;">
+                                <small class="text-warning d-block mb-2">
+                                    <i class="fas fa-star me-1"></i>Features:
+                                </small>
+                                <p class="small text-light mb-0">@plan.Features</p>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">
+                                <i class="fas fa-hashtag me-1"></i>Order: @plan.DisplayOrder
+                            </span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input status-toggle"
+                                       type="checkbox"
+                                       data-id="@plan.Id"
+                                       @(plan.IsActive ? "checked" : "")>
+                                <label class="form-check-label small text-light">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<form id="deleteForm" method="post" style="display: none;">
+    <input type="hidden" name="id" id="deleteId" />
+</form>
+
+@section Scripts {
+    <script>
+        // Toggle status
+        document.querySelectorAll('.status-toggle').forEach(toggle => {
+            toggle.addEventListener('change', async function() {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch(`/AdminSubscriptions/ToggleStatus/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                    } else {
+                        this.checked = !this.checked;
+                        showNotification(data.message, 'error');
+                    }
+                } catch (error) {
+                    this.checked = !this.checked;
+                    showNotification('Error updating status', 'error');
+                }
+            });
+        });
+
+        function showNotification(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+    </script>
+}

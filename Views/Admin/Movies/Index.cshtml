@@ -1,0 +1,309 @@
+@model IEnumerable<MovieMania.Models.Movie>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Movies Management";
+}
+
+<div class="container mt-4">
+    <div class="card card-dark p-4 shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-light">
+                <i class="fas fa-film me-2 text-primary"></i>Movies List
+            </h2>
+            <div>
+                <span class="badge bg-info me-2 p-2">Total Movies: @Model.Count()</span>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Movie
+                </a>
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-striped mb-0">
+                <thead class="table-secondary text-dark">
+                    <tr>
+                        <th>Thumbnail</th>
+                        <th>Title</th>
+                        <th>Genre</th>
+                        <th>Year</th>
+                        <th>Duration</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Featured</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var movie in Model.OrderByDescending(m => m.CreatedAt))
+                    {
+                        <tr class="movie-row">
+                            <td>
+                                @if (!string.IsNullOrEmpty(movie.ThumbnailUrl))
+                                {
+                                    <img src="@movie.ThumbnailUrl" width="60" height="80" style="border-radius:8px; object-fit:cover; border: 2px solid #ff4d4d;" />
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center"
+                                         style="width:60px; height:80px; background: #2a2a2a; border-radius:8px; border: 2px solid #ff4d4d;">
+                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td class="fw-bold text-white">@movie.Title</td>
+                            <td class="text-white">@movie.Genre</td>
+                            <td class="text-white">@movie.ReleaseYear</td>
+                            <td class="text-white">@(movie.Duration) min</td>
+                            <td>
+                                @if (movie.Rating.HasValue)
+                                {
+                                    <span class="badge bg-warning text-dark px-3 py-2">
+                                        <i class="fas fa-star me-1"></i>@movie.Rating.Value.ToString("F1")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </td>
+                            <td>
+                                @if (movie.IsActive)
+                                {
+                                    <span class="badge bg-success px-3 py-2">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary px-3 py-2">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                @if (movie.IsFeatured)
+                                {
+                                    <span class="badge bg-info px-3 py-2">Featured</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm" title="Edit Movie">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@movie.Id" class="btn btn-danger btn-sm" title="Delete Movie">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-film fa-4x mb-3"></i>
+                <h5 class="text-light">No movies found</h5>
+                <p class="text-muted">Click "Add New Movie" to create your first movie.</p>
+                <a asp-action="Create" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>Add New Movie
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    body {
+        background: #0f0f0f;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card-dark {
+        background: #1c1c1c;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Table Styling */
+    .table {
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        width: 100%;
+    }
+
+        .table thead th {
+            background: #2a2a2a;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            padding: 15px 12px;
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            background: #1e1e1e;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+            .table tbody tr:hover {
+                background: #252525;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 77, 77, 0.2);
+            }
+
+                /* FIX: Ensure text stays visible on hover */
+                .table tbody tr:hover td,
+                .table tbody tr:hover td span,
+                .table tbody tr:hover td .text-white,
+                .table tbody tr:hover td .fw-bold {
+                    color: #ffffff !important;
+                }
+
+                .table tbody tr:hover .text-muted {
+                    color: #aaa !important;
+                }
+
+        .table td {
+            padding: 15px 12px;
+            vertical-align: middle;
+            border: none;
+            color: #fff;
+        }
+
+    /* Badge Styling */
+    .badge {
+        font-size: 0.85rem;
+        font-weight: 500;
+        border-radius: 20px;
+    }
+
+        .badge.bg-warning {
+            background: #ffc107 !important;
+            color: #000 !important;
+        }
+
+        .badge.bg-info {
+            background: #0dcaf0 !important;
+            color: #000 !important;
+        }
+
+        .badge.bg-success {
+            background: #00c853 !important;
+        }
+
+        .badge.bg-secondary {
+            background: #6c757d !important;
+        }
+
+    /* Button Group Styling */
+    .btn-group {
+        gap: 5px;
+    }
+
+    .btn-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        border: none;
+        margin: 0 2px;
+    }
+
+        .btn-sm:hover {
+            transform: scale(1.1);
+        }
+
+    .btn-warning {
+        background: #ffc107;
+    }
+
+        .btn-warning:hover {
+            background: #ffb300;
+        }
+
+    .btn-danger {
+        background: #ff4d4d;
+    }
+
+        .btn-danger:hover {
+            background: #ff3333;
+        }
+
+    /* Alert Styling */
+    .alert {
+        border: none;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: rgba(0, 200, 83, 0.15);
+        color: #00c853;
+        border-left: 4px solid #00c853;
+    }
+
+    .alert-danger {
+        background: rgba(255, 77, 77, 0.15);
+        color: #ff4d4d;
+        border-left: 4px solid #ff4d4d;
+    }
+
+    .btn-close {
+        filter: invert(1);
+    }
+
+    /* Thumbnail Styling */
+    .movie-thumbnail {
+        border: 2px solid #ff4d4d;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .card-dark {
+            padding: 15px !important;
+        }
+
+        .table {
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            width: 28px;
+            height: 28px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 8px !important;
+        }
+    }
+</style>

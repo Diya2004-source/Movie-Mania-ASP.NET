@@ -1,0 +1,325 @@
+﻿@* @model dynamic
+@{
+    ViewData["Title"] = "Complete Payment";
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+    var plans = ViewBag.Plans as List<MovieMania.Models.SubscriptionPlan>;
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5 text-white">
+        <h2 class="display-5 fw-bold">Unlock MovieMania</h2>
+        <p class="lead">Choose a plan to continue. Logged in as: <span class="text-warning">@ViewBag.Email</span></p>
+    </div>
+
+    <div class="row justify-content-center">
+        @foreach (var plan in plans)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 bg-dark text-white border-warning shadow-lg" style="border-radius: 15px; border-width: 2px;">
+                    <div class="card-body text-center p-4">
+                        <h3 class="card-title text-warning text-uppercase">@plan.Name</h3>
+                        <h1 class="my-4 text-success">₹ @plan.Price.ToString("N0")</h1>
+                        <p class="text-muted small">Valid for @plan.DurationInDays Days</p>
+
+                        <hr class="bg-secondary">
+
+                        <ul class="list-unstyled mb-4 text-start">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> @plan.VideoQuality Quality</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> @plan.MaxScreens Screens</li>
+                        </ul>
+
+                        <button class="btn btn-warning btn-lg w-100 fw-bold"
+                                onclick="payWithRazorpay(@plan.Id, @plan.Price, '@plan.Name')">
+                            ACTIVATE PLAN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function payWithRazorpay(planId, price, planName) {
+            var options = {
+                "key": "iFmaDnWoIv8wv4yuCGGPGAjH", // TODO: Replace with your actual Key ID
+                "amount": price * 100,
+                "currency": "INR",
+                "name": "Movie Mania",
+                "description": "Subscription for " + planName,
+                "handler": function (response) {
+                    capturePayment(response.razorpay_payment_id, planId);
+                },
+                "prefill": {
+                    "name": "@ViewBag.Name",
+                    "email": "@ViewBag.Email"
+                },
+                "theme": {
+                    "color": "#ffc107"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+
+        function capturePayment(paymentId, planId) {
+            // Ensure the key 'subscriptionPlanId' matches the Controller parameter exactly
+            $.post("/Auth/CaptureRazorpayPayment", {
+                userId: "@ViewBag.UserId",
+                subscriptionPlanId: planId,
+                razorpayPaymentId: paymentId
+            }, function (data) {
+                if (data.success) {
+                    alert("Payment successful! Redirecting to login...");
+                    window.location.href = "/Auth/Login";
+                } else {
+                    alert("Verification Failed: " + data.message);
+                }
+            });
+        }
+    </script>
+} *@
+
+
+@* @model dynamic
+@{
+    ViewData["Title"] = "Complete Payment";
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+    var plans = ViewBag.Plans as List<MovieMania.Models.SubscriptionPlan>;
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5 text-white">
+        <h2 class="display-5 fw-bold">Unlock MovieMania</h2>
+        <p class="lead">
+            Choose a plan to continue. Logged in as:
+            <span class="text-warning">@ViewBag.Email</span>
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        @foreach (var plan in plans)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 bg-dark text-white border-warning shadow-lg"
+                     style="border-radius: 15px; border-width: 2px;">
+
+                    <div class="card-body text-center p-4">
+                        <h3 class="card-title text-warning text-uppercase">@plan.Name</h3>
+                        <h1 class="my-4 text-success">₹ @plan.Price.ToString("N0")</h1>
+                        <p class="text-muted small">Valid for @plan.DurationInDays Days</p>
+
+                        <hr class="bg-secondary">
+
+                        <ul class="list-unstyled mb-4 text-start">
+                            <li><i class="fas fa-check text-success me-2"></i> @plan.VideoQuality Quality</li>
+                            <li><i class="fas fa-check text-success me-2"></i> @plan.MaxScreens Screens</li>
+                        </ul>
+
+                        <button class="btn btn-warning btn-lg w-100 fw-bold"
+                                onclick="startPayment(@plan.Id, @plan.Price, '@plan.Name')">
+                            ACTIVATE PLAN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function startPayment(planId, price, planName) {
+
+            // 🔹 Step 1: Create Order from Backend
+            $.post("/Auth/CreateOrder", {
+                amount: price
+            }, function (order) {
+
+                var options = {
+                    "key": "rzp_test_Sklsy8ES5fNnQO", // ✅ Key ID only
+                    "amount": order.amount,
+                    "currency": "INR",
+                    "name": "Movie Mania",
+                    "description": "Subscription for " + planName,
+                    "order_id": order.id, // ✅ IMPORTANT
+
+                    "handler": function (response) {
+                        verifyPayment(response, planId);
+                    },
+
+                    "prefill": {
+                        "name": "@ViewBag.Name",
+                        "email": "@ViewBag.Email"
+                    },
+
+                    "theme": {
+                        "color": "#ffc107"
+                    }
+                };
+
+                var rzp = new Razorpay(options);
+                rzp.open();
+            });
+        }
+
+        function verifyPayment(response, planId) {
+
+            $.post("/Auth/CaptureRazorpayPayment", {
+                userId: "@ViewBag.UserId",
+                subscriptionPlanId: planId,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+            },
+            function (data) {
+                if (data.success) {
+                    alert("✅ Payment successful!");
+                    window.location.href = "/Auth/Login";
+                } else {
+                    alert("❌ Payment verification failed: " + data.message);
+                }
+            });
+        }
+    </script>
+} *@
+
+
+@model dynamic
+@{
+    ViewData["Title"] = "Complete Payment";
+    Layout = "~/Views/Shared/_GuestLayout.cshtml";
+    var plans = ViewBag.Plans as List<MovieMania.Models.SubscriptionPlan>;
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5 text-white">
+        <h2 class="display-5 fw-bold">Unlock MovieMania</h2>
+        <p class="lead">
+            Logged in as: <span class="text-warning">@ViewBag.Email</span>
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        @foreach (var plan in plans)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card bg-dark text-white border-warning shadow-lg p-4 text-center">
+
+                    <h3 class="text-warning">@plan.Name</h3>
+                    <h1 class="text-success">₹ @plan.Price</h1>
+
+                    <button class="btn btn-warning w-100"
+                            onclick="startPayment(@plan.Id, @plan.Price, '@plan.Name')">
+                        ACTIVATE PLAN
+                    </button>
+
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- ✅ DEMO BUTTON -->
+    <div class="text-center mt-5">
+        <button id="demoSuccessBtn" class="btn btn-success btn-lg d-none">
+            ✅ Payment Done (Demo)
+        </button>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function startPayment(planId, price, planName) {
+
+        $.post("/Auth/CreateOrder", { amount: price })
+        .done(function (order) {
+
+            var options = {
+                "key": "rzp_test_Skm5zcDuIhucIg",
+                "amount": order.amount,
+                "currency": "INR",
+                "name": "Movie Mania",
+                "description": planName,
+                "order_id": order.id,
+
+                "handler": function (response) {
+                    verifyPayment(response, planId);
+                },
+
+                "modal": {
+                    "ondismiss": function () {
+                        console.log("Razorpay closed");
+                    }
+                },
+
+                "prefill": {
+                    "name": "@ViewBag.Name",
+                    "email": "@ViewBag.Email"
+                },
+
+                "theme": {
+                    "color": "#ffc107"
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.open();
+
+            // ✅ Show demo button
+            $("#demoSuccessBtn").removeClass("d-none");
+
+            // Store selected planId
+            $("#demoSuccessBtn").data("planId", planId);
+        })
+        .fail(function () {
+            alert("Error creating order. Check backend.");
+        });
+    }
+
+    // ✅ DEMO PAYMENT BUTTON
+    $("#demoSuccessBtn").click(function () {
+
+        var planId = $(this).data("planId");
+
+        $.post("/Auth/CaptureRazorpayPayment", {
+            userId: "@ViewBag.UserId",
+            subscriptionPlanId: planId,
+            razorpay_payment_id: "DEMO_PAYMENT"
+        })
+        .done(function (data) {
+            if (data.success) {
+                alert("✅ Demo Payment Successful!");
+                window.location.href = "/Auth/Login";
+            } else {
+                alert("Error: " + data.message);
+            }
+        });
+    });
+
+    function verifyPayment(response, planId) {
+
+        $.post("/Auth/CaptureRazorpayPayment", {
+            userId: "@ViewBag.UserId",
+            subscriptionPlanId: planId,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+        })
+        .done(function (data) {
+            if (data.success) {
+                alert("Payment Successful");
+                window.location.href = "/Auth/Login";
+            }
+        });
+    }
+</script>

@@ -1,0 +1,722 @@
+﻿@* @model IEnumerable<MovieMania.Models.Movie>
+
+@{
+    ViewData["Title"] = "Anime";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="browse-header">
+    <div class="container-fluid px-4">
+        <h1 class="page-title">Anime</h1>
+        <p class="page-subtitle">Discover the best Japanese animation</p>
+
+        <div class="filter-bar">
+            <form method="get" class="filter-form">
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select name="sortBy" class="filter-select">
+                        <option value="latest" selected="@(ViewBag.CurrentSort == "latest")">Latest First</option>
+                        <option value="rating" selected="@(ViewBag.CurrentSort == "rating")">Top Rated</option>
+                        <option value="views" selected="@(ViewBag.CurrentSort == "views")">Most Viewed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="filter-btn">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="results-count">
+            Showing @Model.Count() of @ViewBag.TotalItems anime
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+    <div class="anime-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var anime in Model)
+            {
+                <div class="anime-card" onclick="location.href='/User/Home/MovieDetails/@anime.Id'">
+                    <div class="anime-poster">
+                        <img src="@(anime.ThumbnailUrl ?? "/images/default-movie.jpg")" alt="@anime.Title">
+                        @if (anime.Rating > 0)
+                        {
+                            <div class="anime-rating">
+                                <i class="fas fa-star"></i>
+                                <span>@string.Format("{0:F1}", anime.Rating)</span>
+                            </div>
+                        }
+                        @if (anime.ReleaseYear.HasValue)
+                        {
+                            <div class="anime-year">
+                                @anime.ReleaseYear.Value
+                            </div>
+                        }
+                    </div>
+                    <div class="anime-info">
+                        <h4 class="anime-title">@anime.Title</h4>
+                        <p class="anime-meta">@(anime.Genre ?? "Anime")</p>
+                        @if (anime.Duration.HasValue)
+                        {
+                            <p class="anime-duration">@(anime.Duration.Value) min</p>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-dragon"></i>
+                <h3>No anime found</h3>
+                <p>Check back later for new releases</p>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
+    {
+        <nav class="pagination-nav">
+            <ul class="pagination">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Anime", new { page = i, sortBy = ViewBag.CurrentSort })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<style>
+    .browse-header {
+        background: linear-gradient(180deg, #141414 0%, #1a1a1a 100%);
+        padding: 40px 0 20px;
+        border-bottom: 1px solid #333;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #b3b3b3;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+    }
+
+    .filter-bar {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .filter-group label {
+            display: block;
+            color: #b3b3b3;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+    .filter-select {
+        width: 100%;
+        padding: 10px;
+        background: #2a2a2a;
+        border: 1px solid #333;
+        color: white;
+        border-radius: 4px;
+    }
+
+    .filter-btn {
+        background: #e50914;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .filter-btn:hover {
+            background: #f40612;
+        }
+
+    .results-count {
+        color: #b3b3b3;
+        font-size: 0.9rem;
+    }
+
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+    }
+
+    .anime-card {
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+        .anime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.2);
+        }
+
+    .anime-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+        .anime-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+    .anime-card:hover .anime-poster img {
+        transform: scale(1.05);
+    }
+
+    .anime-rating {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.8);
+        padding: 4px 10px;
+        border-radius: 4px;
+        color: #ffd700;
+        font-size: 0.85rem;
+        z-index: 2;
+    }
+
+    .anime-year {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(229, 9, 20, 0.9);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .anime-info {
+        padding: 12px;
+    }
+
+    .anime-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .anime-meta {
+        color: #b3b3b3;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    .anime-duration {
+        color: #b3b3b3;
+        font-size: 0.75rem;
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px;
+        color: #b3b3b3;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #e50914;
+            opacity: 0.5;
+        }
+
+    .pagination-nav {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 5px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .page-link {
+        display: block;
+        padding: 8px 15px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .page-item.active .page-link {
+        background: #e50914;
+        border-color: #e50914;
+    }
+
+    @@media (max-width: 1200px) {
+        .anime-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .anime-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .anime-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-form {
+            flex-direction: column;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .anime-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style> *@
+
+@model IEnumerable<MovieMania.Models.Movie>
+
+@{
+    ViewData["Title"] = "Anime";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+@* Anti-Forgery Token for AJAX calls *@
+@Html.AntiForgeryToken()
+
+<div class="browse-header">
+    <div class="container-fluid px-4">
+        <h1 class="page-title">Anime</h1>
+        <p class="page-subtitle">Discover the best Japanese animation and series</p>
+
+        <div class="filter-bar">
+            <form method="get" asp-action="Anime" class="filter-form">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
+                           placeholder="Search anime..." class="filter-select" />
+                </div>
+
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select name="sortBy" class="filter-select">
+                        <option value="latest" selected="@(ViewBag.CurrentSort == "latest")">Latest First</option>
+                        <option value="rating" selected="@(ViewBag.CurrentSort == "rating")">Top Rated</option>
+                        <option value="views" selected="@(ViewBag.CurrentSort == "views")">Most Viewed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="filter-btn">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="results-count mt-3">
+            Showing @Model.Count() of @(ViewBag.TotalItems ?? 0) anime
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
+    <div class="anime-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var anime in Model)
+            {
+                <div class="anime-card" onclick="location.href='/User/Home/MovieDetails/@anime.Id'">
+                    <div class="anime-poster">
+                        <img src="@(string.IsNullOrEmpty(anime.ThumbnailUrl) ? "/images/default-movie.jpg" : anime.ThumbnailUrl)" alt="@anime.Title">
+
+                        @if (anime.Rating > 0)
+                        {
+                            <div class="anime-rating">
+                                <i class="fas fa-star"></i>
+                                <span>@anime.Rating?.ToString("0.0")</span>
+                            </div>
+                        }
+
+                        <div class="anime-duration-badge">
+                            @(anime.Duration?.ToString() ?? "N/A") min
+                        </div>
+                    </div>
+                    <div class="anime-info">
+                        <h4 class="anime-title">@anime.Title</h4>
+                        <p class="anime-meta">
+                            <span class="genre-text">@(anime.Genre ?? "Anime")</span> •
+                            <span>@(anime.ReleaseYear?.ToString() ?? "2026")</span>
+                        </p>
+                        <div class="card-actions">
+                            <button class="watch-btn">
+                                <i class="fas fa-play me-1"></i> Watch
+                            </button>
+                            <button class="wishlist-icon-btn"
+                                    id="wishlist-btn-@anime.Id"
+                                    onclick="event.stopPropagation(); toggleWishlist(@anime.Id)">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-dragon"></i>
+                <h3>No anime found</h3>
+                <p>Try adjusting your filters or search criteria.</p>
+                <a href="@Url.Action("Anime")" class="btn btn-outline-danger mt-3">Clear All Filters</a>
+            </div>
+        }
+    </div>
+
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
+    {
+        <nav class="pagination-nav">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Anime", new { page = i, searchString = ViewBag.CurrentSearch, sortBy = ViewBag.CurrentSort })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<style>
+    :root {
+        --netflix-red: #e50914;
+        --dark-bg: #141414;
+        --card-bg: #1a1a1a;
+        --text-gray: #b3b3b3;
+    }
+
+    .browse-header {
+        background: linear-gradient(180deg, #000 0%, var(--dark-bg) 100%);
+        padding: 60px 0 30px;
+        border-bottom: 1px solid #333;
+    }
+
+    .page-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+        color: var(--text-gray);
+        font-size: 1.2rem;
+        margin-bottom: 35px;
+    }
+
+    .filter-bar {
+        background: #1f1f1f;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid #333;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .filter-group label {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: block;
+        }
+
+    .filter-select {
+        width: 100%;
+        padding: 12px;
+        background: #2a2a2a;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 6px;
+        outline: none;
+    }
+
+    .filter-btn {
+        background: var(--netflix-red);
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 6px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .filter-btn:hover {
+            background: #ff0a16;
+            transform: scale(1.02);
+        }
+
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 25px;
+    }
+
+    .anime-card {
+        background: var(--card-bg);
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid #222;
+        position: relative;
+    }
+
+        .anime-card:hover {
+            transform: translateY(-12px);
+            border-color: #444;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+    .anime-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+        .anime-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+    .anime-card:hover .anime-poster img {
+        transform: scale(1.1);
+    }
+
+    .anime-rating {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0,0,0,0.85);
+        padding: 5px 12px;
+        border-radius: 20px;
+        color: #ffd700;
+        font-size: 0.85rem;
+        font-weight: 700;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.1);
+        z-index: 2;
+    }
+
+    .anime-duration-badge {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .anime-info {
+        padding: 15px;
+    }
+
+    .anime-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .anime-meta {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .genre-text {
+        color: var(--netflix-red);
+        font-weight: 600;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .watch-btn {
+        flex-grow: 1;
+        background: #333;
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .anime-card:hover .watch-btn {
+        background: var(--netflix-red);
+    }
+
+    .wishlist-icon-btn {
+        background: transparent;
+        border: 1px solid #444;
+        color: white;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+    }
+
+        .wishlist-icon-btn:hover {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .wishlist-icon-btn.active {
+            color: var(--netflix-red);
+            border-color: var(--netflix-red);
+        }
+
+    .pagination-nav {
+        margin-top: 40px;
+    }
+
+    .page-link {
+        background: #1f1f1f;
+        border: 1px solid #333;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+        .page-link:hover, .page-item.active .page-link {
+            background: var(--netflix-red);
+            border-color: var(--netflix-red);
+            color: white !important;
+        }
+
+    .empty-state {
+        grid-column: 1/-1;
+        padding: 100px 20px;
+        text-align: center;
+        background: #1a1a1a;
+        border-radius: 15px;
+        border: 1px dashed #444;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--netflix-red);
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function toggleWishlist(contentId) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var $btn = $('#wishlist-btn-' + contentId);
+            var $icon = $btn.find('i');
+
+            $.ajax({
+                url: '/User/Wishlist/Add',
+                type: 'POST',
+                data: {
+                    contentId: contentId,
+                    contentType: 'Movie', // Ensuring type is Movie for this page
+                    __RequestVerificationToken: token
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $btn.toggleClass('active');
+                        if ($btn.hasClass('active')) {
+                            $icon.removeClass('far').addClass('fas');
+                            Swal.fire({
+                                toast: true, position: 'top-end', icon: 'success',
+                                title: 'Added to Watchlist', showConfirmButton: false, timer: 2000,
+                                background: '#1a1a1a', color: '#fff'
+                            });
+                        } else {
+                            $icon.removeClass('fas').addClass('far');
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

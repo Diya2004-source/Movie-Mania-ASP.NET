@@ -1,0 +1,159 @@
+﻿@model MovieMania.Models.SubscriptionPlan
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Subscription Plan Details";
+}
+
+<div class="container mt-4">
+    <div class="card border-0 shadow-lg bg-dark">
+        <div class="card-body p-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-warning">
+                    <i class="fas fa-crown me-2"></i>@Model.Name
+                </h2>
+                <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary") p-3 fs-6">
+                    <i class="fas fa-@(Model.IsActive ? "check-circle" : "times-circle") me-2"></i>
+                    @(Model.IsActive ? "ACTIVE" : "INACTIVE")
+                </span>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="bg-secondary p-4 rounded">
+                        <h5 class="text-warning mb-4">
+                            <i class="fas fa-info-circle me-2"></i>Basic Information
+                        </h5>
+                        <table class="table table-dark table-borderless">
+                            <tr>
+                                <td class="text-muted" style="width: 150px;">Plan Name:</td>
+                                <td class="text-light fw-bold">@Model.Name</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Price:</td>
+                                <td class="text-success fw-bold fs-5">₹ @Model.Price.ToString("N2")</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Duration:</td>
+                                <td class="text-light">@Model.DurationInDays days</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Display Order:</td>
+                                <td class="text-light">@Model.DisplayOrder</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="bg-secondary p-4 rounded">
+                        <h5 class="text-warning mb-4">
+                            <i class="fas fa-tv me-2"></i>Streaming Details
+                        </h5>
+                        <table class="table table-dark table-borderless">
+                            <tr>
+                                <td class="text-muted" style="width: 150px;">Video Quality:</td>
+                                <td>
+                                    @if (Model.VideoQuality == "4K")
+                                    {
+                                        <span class="badge bg-danger fs-6">4K Ultra HD</span>
+                                    }
+                                    else if (Model.VideoQuality == "Full HD")
+                                    {
+                                        <span class="badge bg-info text-dark fs-6">Full HD (1080p)</span>
+                                    }
+                                    else if (Model.VideoQuality == "HD")
+                                    {
+                                        <span class="badge bg-primary fs-6">HD (720p)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary fs-6">@Model.VideoQuality</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Max Screens:</td>
+                                <td>
+                                    <span class="badge bg-primary fs-6">@Model.MaxScreens Devices</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="col-12">
+                        <div class="bg-secondary p-4 rounded">
+                            <h5 class="text-warning mb-3">
+                                <i class="fas fa-align-left me-2"></i>Description
+                            </h5>
+                            <p class="text-light mb-0 fs-5">@Model.Description</p>
+                        </div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Features))
+                {
+                    <div class="col-12">
+                        <div class="bg-secondary p-4 rounded">
+                            <h5 class="text-warning mb-3">
+                                <i class="fas fa-star me-2"></i>Features
+                            </h5>
+                            <div class="text-light">
+                                @foreach (var feature in Model.Features.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    <div class="mb-2">
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        @feature.Trim()
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="col-12">
+                    <div class="bg-secondary p-4 rounded">
+                        <h5 class="text-warning mb-3">
+                            <i class="fas fa-clock me-2"></i>Timeline
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Created</small>
+                                <p class="text-light">@Model.CreatedAt.ToString("dddd, dd MMMM yyyy HH:mm:ss")</p>
+                            </div>
+                            @if (Model.UpdatedAt.HasValue)
+                            {
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block">Last Updated</small>
+                                    <p class="text-light">@Model.UpdatedAt.Value.ToString("dddd, dd MMMM yyyy HH:mm:ss")</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg px-5">
+                    <i class="fas fa-edit me-2"></i>Edit Plan
+                </a>
+                <a asp-action="Index" class="btn btn-outline-light btn-lg px-5 ms-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: #0f0f0f;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+</style>
