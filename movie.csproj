@@ -7,6 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+    <Content Remove="Views\Admin\Anime\Create.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     <Folder Include="obj\Debug\" />
     <Folder Include="Services\" />
     <Folder Include="Views\Admin\AdminAuth\" />
@@ -18,16 +28,39 @@
   </ItemGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+    <None Include="Views\Admin\Anime\Create.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Razorpay" Version="3.3.2" />
+<<<<<<< HEAD
+=======
+=======
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
   </ItemGroup>
 
 </Project>

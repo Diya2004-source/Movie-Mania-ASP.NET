@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 ﻿@model dynamic
 @{
     ViewData["Title"] = "Dashboard";
@@ -19,20 +23,236 @@
         color: white;
         min-height: 100vh;
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+<<<<<<< HEAD
+=======
+=======
+﻿
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<!-- Netflix-style Hero Banner -->
+<div class="netflix-hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Welcome Back, <span class="hero-name">@ViewBag.UserName</span></h1>
+        <p class="hero-subtitle">Ready to continue your entertainment journey?</p>
+        <div class="hero-buttons">
+            <a href="/User/Home/Movies" class="btn-primary">
+                <i class="fas fa-play me-2"></i>Continue Watching
+            </a>
+            <a href="/User/Wishlist" class="btn-secondary">
+                <i class="fas fa-plus me-2"></i>My List
+            </a>
+        </div>
+    </div>
+    <div class="hero-overlay"></div>
+</div>
+
+<div class="dashboard-container">
+    <div class="container-fluid px-4 py-4">
+        <!-- All Movies Section with Netflix-style row -->
+        <div class="netflix-row">
+            <div class="row-header">
+                <h2 class="row-title">Popular Movies</h2>
+                <a href="/User/Home/Movies" class="row-link">Browse All <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            <div class="movies-carousel owl-carousel">
+                @if (ViewBag.Movies != null && ViewBag.Movies.Count > 0)
+                {
+                    @foreach (var movie in ViewBag.Movies)
+                    {
+                        <div class="movie-item">
+                            <div class="movie-card" onclick="location.href='/User/Home/MovieDetails/@movie.Id'">
+                                <div class="movie-poster">
+                                    <img src="@(movie.ThumbnailUrl ?? "/images/default-movie.jpg")" alt="@movie.Title">
+                                    @if (movie.Rating != null && movie.Rating > 0)
+                                    {
+                                        <div class="movie-rating">
+                                            <i class="fas fa-star"></i>
+                                            <span>@movie.Rating.ToString("F1")</span>
+                                        </div>
+                                    }
+                                    <div class="movie-overlay">
+                                        <button class="play-btn" onclick="event.stopPropagation(); location.href='/User/Home/MovieDetails/@movie.Id'">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button class="info-btn" onclick="event.stopPropagation(); location.href='/User/Home/MovieDetails/@movie.Id'">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="movie-info">
+                                    <h4 class="movie-title">@movie.Title</h4>
+                                    <p class="movie-meta">
+                                        <span class="match">97% Match</span>
+                                        <span class="year">@(movie.ReleaseYear?.ToString() ?? "2026")</span>
+                                        <span class="quality">HD</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-message">No movies available</div>
+                }
+            </div>
+        </div>
+
+        <!-- TV Shows Section - ADD THIS SECTION HERE -->
+        <div class="netflix-row">
+            <div class="row-header">
+                <h2 class="row-title">TV Shows</h2>
+                <a href="/User/Home/Shows" class="row-link">Browse All <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            <div class="shows-carousel owl-carousel">
+                @if (ViewBag.Shows != null && ViewBag.Shows.Count > 0)
+                {
+                    @foreach (var show in ViewBag.Shows)
+                    {
+                        <div class="show-item">
+                            <div class="show-card" onclick="location.href='/User/Home/ShowDetails/@show.Id'">
+                                <div class="show-poster">
+                                    <img src="@(show.ThumbnailUrl ?? "/images/default-show.jpg")" alt="@show.Title">
+                                    <div class="show-badge">
+                                        <span class="badge">@(show.Genre ?? "Hotstar Specials")</span>
+                                    </div>
+                                    @if (show.Rating != null && show.Rating > 0)
+                                    {
+                                        <div class="show-rating-badge">
+                                            <i class="fas fa-star"></i>
+                                            <span>@show.Rating.ToString("F1")</span>
+                                        </div>
+                                    }
+                                    <div class="show-overlay">
+                                        <button class="play-btn" onclick="event.stopPropagation(); location.href='/User/Home/ShowDetails/@show.Id'">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button class="info-btn" onclick="event.stopPropagation(); location.href='/User/Home/ShowDetails/@show.Id'">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="show-info">
+                                    <h4 class="show-title">@show.Title</h4>
+                                    <p class="show-meta">
+                                        <!-- FIXED: Changed .Any() to .Count > 0 -->
+                                        <span class="episodes">@(show.Episodes != null && show.Episodes.Count > 0 ? $"{show.Episodes.Count} Episodes" : "New Series")</span>
+                                        <span class="year">@(show.ReleaseYear?.ToString() ?? "2026")</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-message">No TV shows available</div>
+                }
+            </div>
+        </div>
+
+        <!-- Anime Section -->
+        <div class="netflix-row">
+            <div class="row-header">
+                <h2 class="row-title">Anime</h2>
+                <a href="/User/Home/Anime" class="row-link">Browse All <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            @if (ViewBag.Anime != null && ViewBag.Anime.Count > 0)
+            {
+                <div class="anime-grid">
+                    @foreach (var anime in ViewBag.Anime.Take(6))
+                    {
+                        <div class="anime-item">
+                            <div class="anime-card" onclick="location.href='/User/Home/MovieDetails/@anime.Id'">
+                                <div class="anime-poster">
+                                    <img src="@(anime.ThumbnailUrl ?? "/images/default-movie.jpg")" alt="@anime.Title">
+                                    @if (anime.Rating != null && anime.Rating > 0)
+                                    {
+                                        <div class="anime-rating-badge">
+                                            <i class="fas fa-star"></i>
+                                            <span>@anime.Rating.ToString("F1")</span>
+                                        </div>
+                                    }
+                                    <div class="anime-overlay">
+                                        <button class="play-btn" onclick="event.stopPropagation(); location.href='/User/Home/MovieDetails/@anime.Id'">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="anime-info">
+                                    <h4 class="anime-title">@anime.Title</h4>
+                                    <p class="anime-meta">@(anime.Genre ?? "Anime") · @(anime.ReleaseYear?.ToString() ?? "2026")</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state-anime">
+                    <i class="fas fa-dragon"></i>
+                    <p>No anime available</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Netflix-style Dashboard */
+    .dashboard-container {
+        background-color: #141414;
+        color: #ffffff;
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     }
 
     /* Hero Banner */
     .netflix-hero {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
         height: 70vh;
         position: relative;
         background: linear-gradient(to right, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0) 70%), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070') center/cover;
         display: flex;
         align-items: center;
         padding: 0 4%;
+<<<<<<< HEAD
+=======
+=======
+        height: 60vh;
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/9d3533b2-0e2b-40b2-95e0-ecd7979cc88b/') center/cover no-repeat;
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    .hero-content {
+        position: absolute;
+        bottom: 20%;
+        left: 5%;
+        z-index: 2;
+        max-width: 600px;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     }
 
     .hero-title {
         font-size: 3.5rem;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
         font-weight: 800;
         margin-bottom: 1rem;
     }
@@ -57,14 +277,84 @@
         border-radius: 4px;
         text-decoration: none;
         margin-left: 10px;
+<<<<<<< HEAD
+=======
+=======
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-name {
+        color: #e50914;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: #e5e5e5;
+        margin-bottom: 20px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-primary {
+        background-color: #e50914;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #f40612;
+        }
+
+    .btn-secondary {
+        background-color: rgba(109, 109, 110, 0.7);
+        color: white;
+        padding: 12px 30px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: rgba(109, 109, 110, 0.9);
+        }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(20,20,20,0.8) 80%, #141414 100%);
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     }
 
     /* Netflix Rows */
     .netflix-row {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
         margin-top: -60px;
         position: relative;
         z-index: 5;
         padding: 20px 4%;
+<<<<<<< HEAD
+=======
+=======
+        margin-bottom: 50px;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     }
 
     .row-header {
@@ -72,6 +362,10 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     }
 
     .row-title {
@@ -280,10 +574,349 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<<<<<<< HEAD
+=======
+=======
+        padding: 0 20px;
+    }
+
+    .row-title {
+        color: #e5e5e5;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .row-link {
+        color: #b3b3b3;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+        .row-link:hover {
+            color: #ffffff;
+        }
+
+        .row-link i {
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+    /* Movie Cards */
+    .movies-carousel, .shows-carousel {
+        padding: 10px 0;
+    }
+
+    .movie-item, .show-item {
+        padding: 0 5px;
+    }
+
+    .movie-card, .show-card, .anime-card {
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        background: #1a1a1a;
+    }
+
+        .movie-card:hover, .show-card:hover, .anime-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+    .movie-poster, .show-poster, .anime-poster {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+        .movie-poster img, .show-poster img, .anime-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+    .movie-card:hover .movie-poster img,
+    .show-card:hover .show-poster img,
+    .anime-card:hover .anime-poster img {
+        transform: scale(1.1);
+    }
+
+    .movie-rating, .show-rating-badge, .anime-rating-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 4px 10px;
+        border-radius: 4px;
+        color: #ffd700;
+        font-size: 0.85rem;
+        z-index: 2;
+    }
+
+        .movie-rating i, .show-rating-badge i, .anime-rating-badge i {
+            margin-right: 4px;
+        }
+
+    .show-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+    }
+
+    .badge {
+        background-color: #e50914;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 2px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .movie-overlay, .show-overlay, .anime-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        padding: 20px;
+        display: flex;
+        gap: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .movie-card:hover .movie-overlay,
+    .show-card:hover .show-overlay,
+    .anime-card:hover .anime-overlay {
+        opacity: 1;
+    }
+
+    .play-btn, .info-btn {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+        .play-btn:hover, .info-btn:hover {
+            background: #e50914;
+            transform: scale(1.1);
+        }
+
+        .play-btn i, .info-btn i {
+            font-size: 1rem;
+        }
+
+    .movie-info, .show-info, .anime-info {
+        padding: 12px;
+    }
+
+    .movie-title, .show-title, .anime-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .movie-meta, .show-meta, .anime-meta {
+        font-size: 0.8rem;
+        color: #b3b3b3;
+        display: flex;
+        gap: 10px;
+    }
+
+    .match {
+        color: #46d369;
+        font-weight: 600;
+    }
+
+    .quality {
+        border: 1px solid #b3b3b3;
+        padding: 0 4px;
+        border-radius: 2px;
+    }
+
+    /* Anime Grid */
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 15px;
+        padding: 0 20px;
+    }
+
+    /* Empty States */
+    .empty-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px;
+        color: #b3b3b3;
+        background: #1a1a1a;
+        border-radius: 8px;
+        font-size: 1.1rem;
+    }
+
+    .empty-state-anime {
+        text-align: center;
+        padding: 60px;
+        color: #b3b3b3;
+        background: #1a1a1a;
+        border-radius: 8px;
+        margin: 0 20px;
+    }
+
+        .empty-state-anime i {
+            font-size: 3rem;
+            color: #e50914;
+            opacity: 0.5;
+            margin-bottom: 15px;
+        }
+
+    /* Owl Carousel Customization */
+    .owl-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        pointer-events: none;
+        z-index: 100;
+    }
+
+        .owl-nav button {
+            pointer-events: auto;
+            width: 50px;
+            height: 50px;
+            background: rgba(20,20,20,0.7) !important;
+            border-radius: 50% !important;
+            color: white !important;
+            font-size: 1.5rem !important;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+            .owl-nav button:hover {
+                background: #e50914 !important;
+                transform: scale(1.1);
+            }
+
+        .owl-nav .owl-prev {
+            margin-left: -25px;
+        }
+
+        .owl-nav .owl-next {
+            margin-right: -25px;
+        }
+
+    .owl-dots {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .owl-dot span {
+        width: 10px;
+        height: 10px;
+        background: #b3b3b3;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+    }
+
+    .owl-dot.active span {
+        background: #e50914;
+        transform: scale(1.2);
+    }
+
+    /* Responsive */
+    @@media (max-width: 1200px) {
+        .anime-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .hero-title {
+            font-size: 2.8rem;
+        }
+
+        .anime-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.2rem;
+        }
+
+        .hero-content {
+            bottom: 15%;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+        }
+
+        .anime-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .row-header {
+            padding: 0 10px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .hero-title {
+            font-size: 1.8rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
+        .anime-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .owl-nav button {
+            width: 35px;
+            height: 35px;
+            font-size: 1rem !important;
+        }
+    }
+</style>
+
+<!-- Owl Carousel CSS and JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 
 @section Scripts {
     <script>
         $(document).ready(function() {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             $('.movies-carousel, .shows-carousel').owlCarousel({
                 margin: 15, loop: false, nav: false, dots: false,
                 responsive: { 0: { items: 2 }, 600: { items: 3 }, 1000: { items: 6 } }
@@ -316,5 +949,40 @@
                 }
             });
         }
+<<<<<<< HEAD
+=======
+=======
+            // Initialize Movies Carousel
+            $('.movies-carousel').owlCarousel({
+                loop: true,
+                margin: 15,
+                nav: true,
+                dots: true,
+                responsive: {
+                    0: { items: 2 },
+                    480: { items: 3 },
+                    768: { items: 4 },
+                    992: { items: 5 },
+                    1200: { items: 6 }
+                }
+            });
+
+            // Initialize Shows Carousel
+            $('.shows-carousel').owlCarousel({
+                loop: true,
+                margin: 15,
+                nav: true,
+                dots: true,
+                responsive: {
+                    0: { items: 1 },
+                    480: { items: 2 },
+                    768: { items: 3 },
+                    992: { items: 4 },
+                    1200: { items: 5 }
+                }
+            });
+        });
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     </script>
 }

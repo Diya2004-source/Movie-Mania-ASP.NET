@@ -11,7 +11,11 @@ namespace MovieMania.Models
         [Key]
         public int Id { get; set; }
 
+<<<<<<< HEAD
         [Required(ErrorMessage = "Movie title is required")]
+=======
+        [Required(ErrorMessage = "Movie title is require")]
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
         [StringLength(200, MinimumLength = 2, ErrorMessage = "Title must be between 2 and 200 characters")]
         [Display(Name = "Movie Title")]
         public string Title { get; set; }

@@ -25,7 +25,15 @@ namespace MovieMania.Controllers.User
         {
             var query = _context.Movies.Where(m => m.IsActive);
 
+<<<<<<< HEAD
             // Apply genre filter
+=======
+<<<<<<< HEAD
+            // Apply genre filter
+=======
+            // Apply filter for genre
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             if (!string.IsNullOrEmpty(genre) && genre != "All")
             {
                 query = query.Where(m => m.Genre != null && m.Genre == genre);
@@ -77,7 +85,15 @@ namespace MovieMania.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
+<<<<<<< HEAD
             // Check if user has active subscription
+=======
+<<<<<<< HEAD
+            // Check if user has active subscription
+=======
+            // Check if user has active subscription or not
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             var hasSubscription = await _context.UserSubscriptions
                 .AnyAsync(s => s.UserId == userId && s.EndDate >= DateTime.Now && s.IsActive);
 

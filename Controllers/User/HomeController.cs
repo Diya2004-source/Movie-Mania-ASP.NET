@@ -3,6 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieMania.Models;
 using System.Security.Claims;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+using System.Linq;
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 
 namespace MovieMania.Controllers.User
 {
@@ -16,7 +23,15 @@ namespace MovieMania.Controllers.User
             _context = context;
         }
 
+<<<<<<< HEAD
         // GET: /User/Home
+=======
+<<<<<<< HEAD
+        // GET: /User/Home
+=======
+        //Code to GET: /User/Home
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
         public async Task<IActionResult> Index()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -28,6 +43,10 @@ namespace MovieMania.Controllers.User
 
             ViewBag.UserName = user?.Name ?? "User";
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             // Get movies for dashboard
             ViewBag.Movies = await _context.Movies
                 .Where(m => m.IsActive)
@@ -197,4 +216,43 @@ namespace MovieMania.Controllers.User
             return View("~/Views/User/Home/ShowDetails.cshtml", show);
         }
     }
+<<<<<<< HEAD
+=======
+=======
+            // Build a dashboard view model rather than using ViewBag
+            var dashboard = new DashboardViewModel
+            {
+                Movies = await _context.Movies
+                    .Where(m => m.IsActive)
+                    .OrderByDescending(m => m.CreatedAt)
+                    .Take(10)
+                    .ToListAsync(),
+
+                Shows = await _context.Shows
+                    .Include(s => s.Episodes)
+                    .Where(s => s.IsActive)
+                    .OrderByDescending(s => s.CreatedAt)
+                    .Take(10)
+                    .ToListAsync(),
+
+                Anime = await _context.Movies
+                    .Where(m => m.IsActive && m.Genre != null && m.Genre.ToLower() == "anime")
+                    .OrderByDescending(m => m.CreatedAt)
+                    .Take(10)
+                    .ToListAsync()
+            };
+
+            return View("~/Views/User/Home/Index.cshtml", dashboard);
+        }
+    }
+
+    // ViewModel for dashboard
+    public class DashboardViewModel
+    {
+        public List<Movie> Movies { get; set; } = new();
+        public List<Show> Shows { get; set; } = new();
+        public List<Movie> Anime { get; set; } = new();
+    }
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 }

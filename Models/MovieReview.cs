@@ -4,7 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieMania.Models
 {
+<<<<<<< HEAD
     [Table("MovieReviews")]
+=======
+    [Table("MovieReview")]
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
     public class MovieReview
     {
         [Key]

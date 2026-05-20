@@ -31,7 +31,15 @@ namespace MovieMania.Controllers.User
                 .OrderByDescending(s => s.StartDate)
                 .FirstOrDefaultAsync();
 
+<<<<<<< HEAD
             // Get subscription history
+=======
+<<<<<<< HEAD
+            // Get subscription history
+=======
+            // Get subscription history of user
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             var subscriptionHistory = await _context.UserSubscriptions
                 .Include(s => s.SubscriptionPlan)
                 .Where(s => s.UserId == userId)
@@ -65,7 +73,15 @@ namespace MovieMania.Controllers.User
                 .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive);
 
             if (subscription == null)
+<<<<<<< HEAD
                 return Json(new { success = false, message = "No active subscription found" });
+=======
+<<<<<<< HEAD
+                return Json(new { success = false, message = "No active subscription found" });
+=======
+                return Json(new { success = false, message = "No active subscriptions found" });
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 
             subscription.IsActive = false;
             // Remove UpdatedAt if it doesn't exist in your model

@@ -18,7 +18,14 @@
 
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+<<<<<<< HEAD
             <!-- TITLE + GENRE -->
+=======
+<<<<<<< HEAD
+            <!-- TITLE + GENRE -->
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="Title" class="form-label text-light"></label>
@@ -33,20 +40,45 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
             <!-- DATE + YEAR + RATING -->
+=======
+<<<<<<< HEAD
+            <!-- DATE + YEAR + RATING -->
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label asp-for="ReleaseDate" class="form-label text-light"></label>
                     <input asp-for="ReleaseDate" type="date" class="form-control custom-input" />
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                    <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label asp-for="ReleaseYear" class="form-label text-light"></label>
                     <input asp-for="ReleaseYear" class="form-control custom-input" />
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                    <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label asp-for="Rating" class="form-label text-light"></label>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     <input asp-for="Rating" type="number" step="0.1" min="0" max="10"
                            class="form-control custom-input" />
                 </div>
@@ -57,30 +89,121 @@
                 <div class="col-md-4 mb-3">
                     <label asp-for="TotalSeasons" class="form-label text-light"></label>
                     <input asp-for="TotalSeasons" class="form-control custom-input" />
+<<<<<<< HEAD
+=======
+=======
+                    <input asp-for="Rating" class="form-control custom-input" step="0.1" />
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="TotalSeasons" class="form-label text-light"></label>
+                    <input asp-for="TotalSeasons" class="form-control custom-input" type="number" min="1" />
+                    <span asp-validation-for="TotalSeasons" class="text-danger"></span>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label asp-for="TotalEpisodes" class="form-label text-light"></label>
+<<<<<<< HEAD
                     <input asp-for="TotalEpisodes" class="form-control custom-input" />
+=======
+<<<<<<< HEAD
+                    <input asp-for="TotalEpisodes" class="form-control custom-input" />
+=======
+                    <input asp-for="TotalEpisodes" class="form-control custom-input" type="number" min="0" />
+                    <span asp-validation-for="TotalEpisodes" class="text-danger"></span>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label asp-for="Language" class="form-label text-light"></label>
                     <input asp-for="Language" class="form-control custom-input" />
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                 </div>
             </div>
 
             <!-- IMAGES PREVIEW -->
+<<<<<<< HEAD
+=======
+=======
+                    <span asp-validation-for="Language" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Director" class="form-label text-light"></label>
+                    <input asp-for="Director" class="form-control custom-input" />
+                    <span asp-validation-for="Director" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Country" class="form-label text-light"></label>
+                    <input asp-for="Country" class="form-control custom-input" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Cast" class="form-label text-light"></label>
+                <input asp-for="Cast" class="form-control custom-input" />
+                <span asp-validation-for="Cast" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label text-light"></label>
+                <textarea asp-for="Description" class="form-control custom-input" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TrailerUrl" class="form-label text-light"></label>
+                    <input asp-for="TrailerUrl" class="form-control custom-input" />
+                    <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ThumbnailUrl" class="form-label text-light"></label>
+                    <input asp-for="ThumbnailUrl" class="form-control custom-input" />
+                    <span asp-validation-for="ThumbnailUrl" class="text-danger"></span>
+                </div>
+            </div>
+
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label text-light">Current Thumbnail</label><br />
                     @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
                     {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                         <img src="@Model.ThumbnailUrl" width="140" style="border-radius:8px;" />
                     }
                     else
                     {
                         <span class="text-muted">No image</span>
+<<<<<<< HEAD
+=======
+=======
+                        <img src="@Model.ThumbnailUrl" width="150" style="border-radius:8px; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No thumbnail</span>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     }
                 </div>
 
@@ -88,28 +211,66 @@
                     <label class="form-label text-light">Current Poster</label><br />
                     @if (!string.IsNullOrEmpty(Model.PosterUrl))
                     {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                         <img src="@Model.PosterUrl" width="140" style="border-radius:8px;" />
                     }
                     else
                     {
                         <span class="text-muted">No image</span>
+<<<<<<< HEAD
+=======
+=======
+                        <img src="@Model.PosterUrl" width="150" style="border-radius:8px; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No poster</span>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     }
                 </div>
             </div>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             <!-- FILE UPLOAD (FIXED) -->
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label text-light">Change Thumbnail</label>
+<<<<<<< HEAD
+=======
+=======
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label text-light">Upload New Thumbnail</label>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     <input type="file" name="ThumbnailFile" class="form-control custom-input" accept="image/*" />
                 </div>
 
                 <div class="col-md-6 mb-3">
+<<<<<<< HEAD
                     <label class="form-label text-light">Change Poster</label>
+=======
+<<<<<<< HEAD
+                    <label class="form-label text-light">Change Poster</label>
+=======
+                    <label class="form-label text-light">Upload New Poster</label>
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     <input type="file" name="PosterFile" class="form-control custom-input" accept="image/*" />
                 </div>
             </div>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
             <!-- STATUS -->
             <div class="row">
                 <div class="col-md-6 mb-3 form-check">
@@ -133,11 +294,48 @@
                     Cancel
                 </a>
             </div>
+<<<<<<< HEAD
+=======
+=======
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label text-light">Active</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input asp-for="IsFeatured" class="form-check-input" />
+                        <label asp-for="IsFeatured" class="form-check-label text-light">Featured</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-warning btn-custom px-5">
+                    <i class="fas fa-save me-2"></i>Update Show
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light btn-custom px-4 ms-2">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
         </form>
     </div>
 </div>
 
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 <style>
     body {
         background: #0f0f0f;

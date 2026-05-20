@@ -41,9 +41,18 @@ namespace movie.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+<<<<<<< HEAD
                     b.Property<bool>("IsPaymentDone")
                         .HasColumnType("bit");
 
+=======
+<<<<<<< HEAD
+                    b.Property<bool>("IsPaymentDone")
+                        .HasColumnType("bit");
+
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime2");
 
@@ -57,17 +66,35 @@ namespace movie.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     b.Property<string>("PaymentStatus")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                     b.Property<string>("ProfilePicture")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ReferralCode")
+<<<<<<< HEAD
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+=======
+<<<<<<< HEAD
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+=======
+                        .HasColumnType("nvarchar(max)");
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
 
                     b.Property<int>("RewardPoints")
                         .HasColumnType("int");
@@ -99,6 +126,13 @@ namespace movie.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                        .IsRequired()
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
@@ -121,6 +155,13 @@ namespace movie.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                        .IsRequired()
+>>>>>>> 14ac8531bd2a898f14d4c39038b54eaa701e3c1d
+>>>>>>> e6456616c907c0f5683d34071f3b0624a05bc2d3
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
